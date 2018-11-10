@@ -8,9 +8,9 @@ include dirname(__FILE__)."/../vendor/autoload.php";
  *
  */
 define('ROOT',dirname(__FILE__).'/../');
-$configName = ROOT.'conf/smproxy.ini';
+$configName = ROOT.'conf/';
 if (file_exists($configName)) {
-    define('CONFIG',parse_ini_file($configName, true));
+    define('CONFIG',initConfig($configName));
 } else {
     throw new \SMProxy\SMProxyException('Error:config conf/smproxy.ini file not exists!');
 }

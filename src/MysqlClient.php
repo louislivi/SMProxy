@@ -30,6 +30,8 @@ abstract class MysqlClient extends Base
     {
         if (!$this ->client->connect($host, $port, $timeout = 0.1, $flag = 0)) {
             throw new SMProxyException("connect {$host}:{$port} failed. Error: {$this ->client->errCode}\n");
+        }else{
+            return $this ->client;
         }
     }
 

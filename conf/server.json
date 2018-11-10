@@ -1,0 +1,29 @@
+{
+  "server": {
+    "user":"root",
+    "password":"123456",
+    "charset":"utf8mb4",
+    "host": "0.0.0.0",
+    "port": "3366",
+    "mode": 3,
+    "sock_type": 1,
+    "swoole": {
+      "worker_num": 2,
+      "max_coro_num": 16000,
+      "open_tcp_nodelay": true,
+      "daemonize": 0,
+      "heartbeat_check_interval": 60,
+      "heartbeat_idle_time": 600,
+      "reload_async": true,
+      "log_file": "/var/logs/error.log",
+      "pid_file": "/var/logs/pid/server.pid"
+    },
+    "swoole_client_setting": {
+      "package_max_length": 16777216
+    },
+    "swoole_client_sock_setting": {
+      "sock_type": 1,
+      "sync_type": 1
+    }
+  }
+}
