@@ -109,6 +109,11 @@ class SMProxyServer extends BaseServer
                 }
                 if (isset($this->connectReadState[$fd]) && $this->connectReadState[$fd] === true) {
                     $model = 'read';
+                    $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;
+                    //如果没有读库 默认用写库
+                    if (!array_key_exists($key, $dbConfig)){
+                        $model = 'write';
+                    }
                 } else {
                     $model = 'write';
                 }
