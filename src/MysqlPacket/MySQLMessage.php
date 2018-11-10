@@ -189,7 +189,7 @@ class MySQLMessage
     {
         $length = (int)$this->readLength();
         if ($length <= 0) {
-            return self::$EMPTY_BYTES;
+            return [self::$EMPTY_BYTES];
         }
         $ab = array_copy($this->data, $this->position, $length);
         $this->position += $length;

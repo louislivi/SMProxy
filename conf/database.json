@@ -1,0 +1,36 @@
+{
+  "database": {
+    "account": {
+      "root": {
+        "user": "root",
+        "password": "123456"
+      }
+    },
+    "serverInfo": {
+      "wechat_1": {
+        "write": {
+          "host": "127.0.0.1",
+          "port": 3306,
+          "timeout": 0.5,
+          "flag": 0,
+          "account": "root"
+        },
+        "read": {
+          "host": "127.0.0.1",
+          "port": 3306,
+          "timeout": 0.5,
+          "flag": 0,
+          "account": "root"
+        }
+      }
+    },
+    "databases": {
+      "db1": {
+        "serverInfo": "db1",
+        "maxSpareConns": 10,
+        "maxConns": 20,
+        "charset": "utf-8"
+      }
+    }
+  }
+}

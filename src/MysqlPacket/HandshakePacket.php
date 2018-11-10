@@ -1,6 +1,8 @@
 <?php
 namespace SMProxy\MysqlPacket;
 
+use SMProxy\MysqlPacket\Util\BufferUtil;
+
 /**
  * MySql握手包
  *
@@ -45,17 +47,17 @@ class HandshakePacket extends MySQLPacket
     public function write()
     {
         // default init 256,so it can avoid buff extract
-        $buffer = '';
+        $buffer = [];
         BufferUtil::writeUB3($buffer, $this->calcPacketSize());
-        $buffer .= $this->packetId;
-        $buffer .= $this->protocolVersion;
+        $buffer []= $this->packetId;
+        $buffer []= $this->protocolVersion;
         BufferUtil::writeWithNull($buffer, $this->serverVersion);
         BufferUtil::writeUB4($buffer, $this->threadId);
         BufferUtil::writeWithNull($buffer, $this->seed);
         BufferUtil::writeUB2($buffer, $this->serverCapabilities);
-        $buffer .= $this->serverCharsetIndex;
+        $buffer []= $this->serverCharsetIndex;
         BufferUtil::writeUB2($buffer, $this->serverStatus);
-        $buffer .= implode('',self::$FILLER_13);
+        $buffer = array_merge($buffer,self::$FILLER_13);
         BufferUtil::writeWithNull($buffer, $this->restOfScrambleBuff);
         return $buffer;
     }

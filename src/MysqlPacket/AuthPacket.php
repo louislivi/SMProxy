@@ -20,7 +20,7 @@ class AuthPacket extends MySQLPacket
     public $extra;// from FILLER(23)
     public $user;
     public $password;
-    public $database;
+    public $database = 0;
 
     public function read(BinaryPacket $bin)
     {
