@@ -7,7 +7,7 @@
       }
     },
     "serverInfo": {
-      "wechat_1": {
+      "server1": {
         "write": {
           "host": "127.0.0.1",
           "port": 3306,
@@ -26,7 +26,7 @@
     },
     "databases": {
       "db1": {
-        "serverInfo": "db1",
+        "serverInfo": "server1",
         "maxSpareConns": 10,
         "maxConns": 20,
         "charset": "utf-8"
