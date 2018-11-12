@@ -7,6 +7,21 @@
     "port": "3366",
     "mode": 3,
     "sock_type": 1,
+    "logs": {
+      "open":true,
+      "config": {
+        "system": {
+          "log_path": "/var/logs",
+          "log_file": "system.log",
+          "format": "Y/m/d"
+        },
+        "mysql": {
+          "log_path": "/var/logs",
+          "log_file": "mysql.log",
+          "format": "Y/m/d"
+        }
+      }
+    },
     "swoole": {
       "worker_num": 2,
       "max_coro_num": 16000,
