@@ -1,5 +1,12 @@
-# smproxy
+# SMProxy
 ## swoole msyql proxy 一个基于mysql协议，swoole 开发的mysql数据库连接池
+## 特性
+- 支持读写分离
+- 支持数据库连接池，能够有效解决PHP带来的数据库连接瓶颈
+- 支持所有sql语句
+- 采用协程调度
+- 支持 HandshakeV10 协议版本
+- 完美兼容mysql5.6-5.7
 
 ## 环境
 * swoole 2.1+
