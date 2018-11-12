@@ -118,7 +118,6 @@ class SMProxyServer extends BaseServer
                     default:
                         break;
                 }
-                var_dump($this->connectReadState[$fd]);
                 if (isset($this->connectReadState[$fd]) && $this->connectReadState[$fd] === true) {
                     $model = 'read';
                     $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;

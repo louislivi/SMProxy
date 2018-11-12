@@ -29,7 +29,7 @@ reload  : graceful restart
 -h      : print this help message and exit (also --help)
 DESC;
 if (!isset($argv[1])) {
-    print_r($desc);
+    print_r($desc."\n");
     exit();
 }
 
@@ -51,10 +51,10 @@ switch ($argv[1]) {
         break;
     case '-h':
     case '--help':
-        print_r($desc);
+        print_r($desc."\n");
         break;
     default:
-        print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information.");
+        print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information."."\n");
         break;
 }
 
@@ -67,7 +67,7 @@ switch ($argv[1]) {
 function start()
 {
     if (verifyServer()){
-        print_r('server is running!');
+        print_r('server is running!'."\n");
     }else{
         new class extends \SMProxy\SMProxyServer{};
     }
@@ -81,9 +81,9 @@ function stop()
     if (verifyServer()){
         system('kill -9 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
         file_put_contents(CONFIG['server']['swoole']['pid_file'],0);
-        print_r('server stop success!');
+        print_r('server stop success!'."\n");
     }else{
-        print_r('Error: server is not running !');
+        print_r('Error: server is not running !'."\n");
     }
 }
 
@@ -98,7 +98,7 @@ function restart()
     if (verifyServer()){
         system('kill -9 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
         start();
-        print_r('server restart success!');
+        print_r('server restart success!'."\n");
     }else{
         start();
     }
@@ -114,7 +114,7 @@ function reload()
 {
     if (verifyServer()){
         system('kill -USR1 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
-        print_r('server restart success!');
+        print_r('server restart success!'."\n");
     }else{
         start();
     }
@@ -126,9 +126,9 @@ function reload()
 function status()
 {
     if (verifyServer()){
-        print_r('server is start!');
+        print_r('server is start!'."\n");
     }else{
-        print_r('server is not running!');
+        print_r('server is not running!'."\n");
     }
 }
 
