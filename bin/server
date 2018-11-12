@@ -79,7 +79,7 @@ function start()
 function stop()
 {
     if (verifyServer()){
-        system('kill -9 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+        system("kill -9 $(ps -ef|grep SMProxy|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')",$result);
         file_put_contents(CONFIG['server']['swoole']['pid_file'],0);
         print_r('server stop success!'."\n");
     }else{
@@ -96,7 +96,7 @@ function stop()
 function restart()
 {
     if (verifyServer()){
-        system('kill -9 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+        stop();
         start();
         print_r('server restart success!'."\n");
     }else{
