@@ -124,6 +124,34 @@ function initConfig($dir)
         }
     }
     $config = json_decode(str_replace('ROOT',ROOT,json_encode($config)),true);
+    if (isset($config['server']['logs']['config']['system']['log_path'])){
+        if (!file_exists($config['server']['logs']['config']['system']['log_path'])){
+            mkdir($config['server']['logs']['config']['system']['log_path'],755,true);
+        }
+    }else{
+        throw new \SMProxy\SMProxyException('ERROR:server.logs.config.system.log_path 配置项不存在!');
+    }
+    if (isset($config['server']['logs']['config']['mysql']['log_path'])){
+        if (!file_exists($config['server']['logs']['config']['mysql']['log_path'])){
+            mkdir($config['server']['logs']['config']['mysql']['log_path'],755,true);
+        }
+    }else{
+        throw new \SMProxy\SMProxyException('ERROR:server.logs.config.mysql.log_path 配置项不存在!');
+    }
+    if (isset($config['server']['swoole']['log_file'])){
+        if (!file_exists(dirname($config['server']['swoole']['log_file']))){
+            mkdir(dirname($config['server']['swoole']['log_file']),755,true);
+        }
+    }else{
+        throw new \SMProxy\SMProxyException('ERROR:server.swoole.log_file 配置项不存在!');
+    }
+    if (isset($config['server']['swoole']['pid_file'])){
+        if (!file_exists(dirname($config['server']['swoole']['pid_file']))){
+            mkdir(dirname($config['server']['swoole']['pid_file']),755,true);
+        }
+    }else{
+        throw new \SMProxy\SMProxyException('ERROR:server.swoole.pid_file 配置项不存在!');
+    }
     return $config;
 }
 
