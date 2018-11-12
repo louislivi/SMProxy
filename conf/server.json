@@ -1,22 +1,37 @@
 {
   "server": {
-    "user":"root",
-    "password":"123456",
-    "charset":"utf8mb4",
+    "user": "root",
+    "password": "123456",
+    "charset": "utf8mb4",
     "host": "0.0.0.0",
     "port": "3366",
     "mode": 3,
     "sock_type": 1,
+    "logs": {
+      "open":true,
+      "config": {
+        "system": {
+          "log_path": "ROOT/logs",
+          "log_file": "system.log",
+          "format": "Y/m/d"
+        },
+        "mysql": {
+          "log_path": "ROOT/logs",
+          "log_file": "mysql.log",
+          "format": "Y/m/d"
+        }
+      }
+    },
     "swoole": {
       "worker_num": 2,
       "max_coro_num": 16000,
       "open_tcp_nodelay": true,
-      "daemonize": 0,
+      "daemonize": 1,
       "heartbeat_check_interval": 60,
       "heartbeat_idle_time": 600,
       "reload_async": true,
-      "log_file": "/var/logs/error.log",
-      "pid_file": "/var/logs/pid/server.pid"
+      "log_file": "ROOT/logs/error.log",
+      "pid_file": "ROOT/logs/pid/server.pid"
     },
     "swoole_client_setting": {
       "package_max_length": 16777216

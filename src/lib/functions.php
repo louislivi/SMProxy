@@ -123,6 +123,7 @@ function initConfig($dir)
             closedir($dh);
         }
     }
+    $config = json_decode(str_replace('ROOT',ROOT,json_encode($config)),true);
     return $config;
 }
 

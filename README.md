@@ -31,6 +31,9 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 
 ## 配置文件:
+```
+ROOT 当前SMProxy跟目录
+```
 ### database.json
 ```Json
 {

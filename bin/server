@@ -1,5 +1,7 @@
 #! /usr/bin/php
 <?php
+swoole_set_process_name("SMProxy");
+date_default_timezone_set('PRC');
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/26
@@ -7,10 +9,10 @@
  *
  */
 //设置根目录
-define('ROOT', dirname(__FILE__) . '/../');
+define('ROOT', dirname(__FILE__) . '/..');
 include dirname(__FILE__) . "/../vendor/autoload.php";
 //读取配置文件
-$configName = ROOT . 'conf/';
+$configName = ROOT . '/conf/';
 if (file_exists($configName)) {
     define('CONFIG', initConfig($configName));
 } else {
@@ -64,7 +66,7 @@ switch ($argv[1]) {
  */
 function start()
 {
-    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
+    if (verifyServer()){
         print_r('server is running!');
     }else{
         new class extends \SMProxy\SMProxyServer{};
@@ -76,9 +78,9 @@ function start()
  */
 function stop()
 {
-    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
-        system('kill -15 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
-        file_put_contents(CONFIG['server']['swoole']['pid_file'],'');
+    if (verifyServer()){
+        system('kill -9 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+        file_put_contents(CONFIG['server']['swoole']['pid_file'],0);
         print_r('server stop success!');
     }else{
         print_r('Error: server is not running !');
@@ -93,8 +95,9 @@ function stop()
  */
 function restart()
 {
-    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
-        system('kill -USR1 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+    if (verifyServer()){
+        system('kill -9 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+        start();
         print_r('server restart success!');
     }else{
         start();
@@ -109,8 +112,8 @@ function restart()
  */
 function reload()
 {
-    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
-        system('kill -USR2 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+    if (verifyServer()){
+        system('kill -USR1 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
         print_r('server restart success!');
     }else{
         start();
@@ -122,9 +125,16 @@ function reload()
  */
 function status()
 {
-    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
+    if (verifyServer()){
         print_r('server is start!');
     }else{
         print_r('server is not running!');
     }
+}
+
+function verifyServer()
+{
+    return (CONFIG['server']['swoole']['pid_file']??false) &&
+        file_exists(CONFIG['server']['swoole']['pid_file']) &&
+        file_get_contents(CONFIG['server']['swoole']['pid_file']);
 }
