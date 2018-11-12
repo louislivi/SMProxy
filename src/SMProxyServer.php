@@ -97,13 +97,19 @@ class SMProxyServer extends BaseServer
                     case MySQLPacket::$COM_PROCESS_KILL:
                         break;
                     case MySQLPacket::$COM_STMT_PREPARE:
-                        $this->connectReadState[$fd] = true;
+                        $connection = new FrontendConnection();
+                        $queryType = $connection->query($bin);
+                        if ($queryType == ServerParse::SELECT ||
+                            $queryType == ServerParse::SHOW ||
+                            $queryType == ServerParse::SET ||
+                            $queryType == ServerParse::USE
+                        ) {
+                            $this->connectReadState[$fd] = true;
+                        }
                         break;
                     case MySQLPacket::$COM_STMT_EXECUTE:
-                        $this->connectReadState[$fd] = true;
                         break;
                     case MySQLPacket::$COM_STMT_CLOSE:
-                        $this->connectReadState[$fd] = true;
                         if (substr($data, -5) == getString([1, 0, 0, 0, 1])) {
                             $data = substr($data, 0, strlen($data) - 5);
                         }
