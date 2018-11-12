@@ -4,11 +4,13 @@ namespace SMProxy;
 
 use SMProxy\Handler\Frontend\FrontendAuthenticator;
 use SMProxy\Handler\Frontend\FrontendConnection;
+use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;
 use SMProxy\MysqlPacket\MySqlPacketDecoder;
 use SMProxy\MysqlPacket\MySQLPacket;
 use SMProxy\MysqlPacket\OkPacket;
 use SMProxy\MysqlPacket\Util\ErrorCode;
+use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPool\MySQLPool;
 use SMProxy\Parser\ServerParse;
 
@@ -52,13 +54,17 @@ class SMProxyServer extends BaseServer
             $bin = (new MySqlPacketDecoder())->decode($data);
             $dbConfig = $this->parseDbConfig();
             MySQLPool::init($dbConfig);
+            Log::set_config(CONFIG['server']['logs']['config'],CONFIG['server']['logs']['open']);
             if (!$this->source[$fd]->auth) {
                 $authPacket = new AuthPacket();
                 $authPacket->read($bin);
                 $checkPassword = $this->source[$fd]->checkPassword($authPacket->password, CONFIG['server']['password']);
                 if (CONFIG['server']['user'] != $authPacket->user || !$checkPassword) {
-                    $errMessage = $this->writeErrMessage(2,
-                        "Access denied for user '" . $authPacket->user . "'", ErrorCode::ER_NO_SUCH_USER);
+                    $message = "Access denied for user '" . $authPacket->user . "'";
+                    $errMessage = $this->writeErrMessage(2,$message
+                        , ErrorCode::ER_NO_SUCH_USER);
+                    $mysql_log = Log::get_logger('mysql');
+                    $mysql_log ->error($message);
                     $server->send($fd, getString($errMessage));
                     return null;
                 } else {
@@ -125,9 +131,8 @@ class SMProxyServer extends BaseServer
                 } else {
                     $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;
                     if (array_key_exists($key, $dbConfig)) {
-                        $chan = new \Swoole\Coroutine\Channel(1);
                         $client = MySQLPool::fetch($key,
-                            $server, $fd, $chan);
+                            $server, $fd);
                         $this->mysqlClient[$fd][$model] = $client;
                         if ($data && $client->client->isConnected()) {
                             $client->client->send($data);
@@ -136,7 +141,8 @@ class SMProxyServer extends BaseServer
                         $message = 'database config ' . ($this->source[$fd]->database?:'') . ' ' . $model . ' is not exists!';
                         $errMessage = $this->writeErrMessage(1,$message
                             ,ErrorCode::ER_SYNTAX_ERROR);
-                        print_r($message."\n");
+                        $mysql_log = Log::get_logger('mysql');
+                        $mysql_log ->error($message);
                         $server->send($fd, getString($errMessage));
                     }
                 }
@@ -151,6 +157,7 @@ class SMProxyServer extends BaseServer
      * @param $server
      * @param $fd
      *
+     * @throws MySQLException
      */
     public function onClose($server, $fd)
     {
@@ -167,6 +174,6 @@ class SMProxyServer extends BaseServer
             unset($this->connectReadState[$fd]);
         }
         parent::onClose($server, $fd);
-        echo "connection close: {$fd}\n";
+//        echo "connection close: {$fd}\n";
     }
 }

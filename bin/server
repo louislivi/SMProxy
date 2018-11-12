@@ -1,19 +1,130 @@
 #! /usr/bin/php
 <?php
-include dirname(__FILE__)."/../vendor/autoload.php";
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/26
  * Time: 下午6:32
  *
  */
-define('ROOT',dirname(__FILE__).'/../');
-$configName = ROOT.'conf/';
+//设置根目录
+define('ROOT', dirname(__FILE__) . '/../');
+include dirname(__FILE__) . "/../vendor/autoload.php";
+//读取配置文件
+$configName = ROOT . 'conf/';
 if (file_exists($configName)) {
-    define('CONFIG',initConfig($configName));
+    define('CONFIG', initConfig($configName));
 } else {
-    throw new \SMProxy\SMProxyException('Error:config conf/smproxy.ini file not exists!');
+    throw new \SMProxy\SMProxyException('Error:config conf/ No such file or directory!');
 }
 
-class Server extends \SMProxy\SMProxyServer{}
-new Server();
+$desc = <<<DESC
+Options and arguments (and corresponding environment variables):
+start   : start server
+stop    : stop server
+restart : restart server
+status  : view service status
+reload  : graceful restart
+-h      : print this help message and exit (also --help)
+DESC;
+if (!isset($argv[1])) {
+    print_r($desc);
+    exit();
+}
+
+switch ($argv[1]) {
+    case 'start':
+        start();
+        break;
+    case 'stop':
+        stop();
+        break;
+    case 'restart':
+        restart();
+        break;
+    case 'status':
+        status();
+        break;
+    case 'reload':
+        reload();
+        break;
+    case '-h':
+    case '--help':
+        print_r($desc);
+        break;
+    default:
+        print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information.");
+        break;
+}
+
+/**
+ * 启动服务
+ *
+ * @throws ErrorException
+ * @throws \SMProxy\SMProxyException
+ */
+function start()
+{
+    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
+        print_r('server is running!');
+    }else{
+        new class extends \SMProxy\SMProxyServer{};
+    }
+}
+
+/**
+ * 停止服务
+ */
+function stop()
+{
+    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
+        system('kill -15 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+        file_put_contents(CONFIG['server']['swoole']['pid_file'],'');
+        print_r('server stop success!');
+    }else{
+        print_r('Error: server is not running !');
+    }
+}
+
+/**
+ * 重启服务
+ *
+ * @throws ErrorException
+ * @throws \SMProxy\SMProxyException
+ */
+function restart()
+{
+    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
+        system('kill -USR1 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+        print_r('server restart success!');
+    }else{
+        start();
+    }
+}
+
+/**
+ * 平滑重启
+ *
+ * @throws ErrorException
+ * @throws \SMProxy\SMProxyException
+ */
+function reload()
+{
+    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
+        system('kill -USR2 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
+        print_r('server restart success!');
+    }else{
+        start();
+    }
+}
+
+/**
+ * 服务状态
+ */
+function status()
+{
+    if ((CONFIG['server']['swoole']['pid_file']??false) && file_exists(CONFIG['server']['swoole']['pid_file'])){
+        print_r('server is start!');
+    }else{
+        print_r('server is not running!');
+    }
+}

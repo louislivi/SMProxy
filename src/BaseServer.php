@@ -43,9 +43,14 @@ abstract class BaseServer extends Base
             $this->server->on('connect', [$this, 'onConnect']);
             $this->server->on('receive', [$this, 'onReceive']);
             $this->server->on('close', [$this, 'onClose']);
-            $this->server->start();
+            $result = $this->server->start();
+            if ($result){
+                print_r('server start success!'. "\n");
+            }else{
+                print_r('server start error!'. "\n");
+            }
         } catch (\Swoole\Exception | \ErrorException | SMProxyException $exception) {
-            print_r($exception->getMessage() . "\n");
+            print_r('ERROR:'.$exception->getMessage() . "\n");
         }
     }
 

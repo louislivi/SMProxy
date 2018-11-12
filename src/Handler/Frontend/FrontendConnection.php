@@ -2,6 +2,7 @@
 
 namespace SMProxy\Handler\Frontend;
 
+use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\{BinaryPacket,MySQLMessage};
 
 /**
@@ -31,7 +32,8 @@ class FrontendConnection
         $mm->position(5);
         $sql = $mm ->readString();
         if ($sql == null || strlen($sql) == 0) {
-            print_r("Empty SQL\n");
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log ->error('Empty SQL');
             return;
         }
 

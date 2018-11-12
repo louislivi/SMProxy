@@ -84,7 +84,7 @@ class MySQLPool
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    static public function fetch($connName,\swoole_server $server,$fd,$chan)
+    static public function fetch($connName,\swoole_server $server,$fd)
     {
         if (!self::$init) {
             throw new MySQLException('Should call MySQLPool::init!');
@@ -96,7 +96,7 @@ class MySQLPool
         if (!empty($connsPool) && count($connsPool) > self::$resumeFetchCount[$connName]) {
             $conn = array_pop($connsPool);
             if(!$conn ->client ->isConnected()){
-                return self::reconnect($server,$fd,$chan,$conn,$connName);
+                return self::reconnect($server,$fd,$conn,$connName);
             }else{
                 $conn ->serverFd = $fd;
                 self::$busyConns[$connName][spl_object_hash($conn)] = $conn;
@@ -113,7 +113,7 @@ class MySQLPool
             if (!empty($connsPool)) {
                 $conn = array_pop($connsPool);
                 if(!$conn ->client ->isConnected()){
-                    return self::reconnect($server,$fd,$chan,$conn,$connName);
+                    return self::reconnect($server,$fd,$conn,$connName);
                 }else{
                     $conn ->serverFd = $fd;
                     self::$busyConns[$connName][spl_object_hash($conn)] = $conn;
@@ -123,7 +123,7 @@ class MySQLPool
                 return false;//should not happen
             }
         }
-        return self::initConn($server,$fd,$chan,$connName);
+        return self::initConn($server,$fd,$connName);
     }
 
     /**
@@ -138,8 +138,9 @@ class MySQLPool
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    public static function initConn($server,$fd,$chan,$connName)
+    public static function initConn($server,$fd,$connName)
     {
+        $chan = new \Swoole\Coroutine\Channel(1);
         $conn = new MysqlProxy($server,$fd,$chan);
         $serverInfo = self::$connsConfig[$connName]['serverInfo'];
         $database = strpos($connName,'_') == false?0:substr($connName,strpos($connName,'_')+1);
@@ -172,13 +173,13 @@ class MySQLPool
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    public static function reconnect($server,$fd,$chan,$conn,$connName)
+    public static function reconnect($server,$fd,$conn,$connName)
     {
         if (!$conn ->client ->isConnected()){
             $old_id = spl_object_hash($conn);
             unset(self::$busyConns[$connName][$old_id]);
             unset(self::$connsNameMap[$old_id]);
-            return self::initConn($server,$fd,$chan,$connName);
+            return self::initConn($server,$fd,$connName);
         }
         return $conn;
     }
