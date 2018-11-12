@@ -4,9 +4,24 @@
 ## 环境
 * swoole 2.1+
 * php 7.0+
-
+## 安装
+下载的文件直接解压即可。
 ## 运行
-bin/server
+- bin/server start   : 运行服务
+- bin/server stop    : 停止服务
+- bin/server restart : 重启服务
+- bin/server status  : 查询服务运行状态
+- bin/server reload  : 平滑重启
+- bin/server -h      : 帮助
+## SMProxy连接测试
+测试SMProxy与测试mysql完全一致，mysql怎么连接，SMProxy就怎么连接。
+
+推荐先采用命令行测试：
+
+mysql -uroot -p123456 -P3366 -h127.0.0.1
+
+也可采用工具连接。
+
 
 ## 配置文件:
 ### database.json
@@ -62,13 +77,28 @@ bin/server
 ```Json
 {
   "server": {
-    "user":"maiya",
-    "password":"P--!jathJhk1UbE3FthiYNmOQJW+XHeX",
+    "user":"root",
+    "password":"123456",
     "charset":"utf8mb4",
     "host": "0.0.0.0",
     "port": "3366",
     "mode": 3,
     "sock_type": 1,
+    "logs": {
+      "open":true,
+      "config": {
+        "system": {
+          "log_path": "/var/www/swoole/swoole-mysql-proxy/logs",
+          "log_file": "system.log",
+          "format": "Y/m/d"
+        },
+        "mysql": {
+          "log_path": "/var/www/swoole/swoole-mysql-proxy/logs",
+          "log_file": "mysql.log",
+          "format": "Y/m/d"
+        }
+      }
+    },
     "swoole": {
       "worker_num": 2,
       "max_coro_num": 16000,
@@ -90,15 +120,15 @@ bin/server
   }
 }
 ```
-| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  [mode](https://wiki.swoole.com/wiki/page/277.html) | sock_type 1 tcp | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-|   |   |   |   |   |   |   |  worker_num work进程数量 | package_max_length 最大包长  | sock_type 1.tcp  |
-|   |   |   |   |   |   |   |  max_coro_num 最大携程数  |   | sync_type 1.异步  |
-|   |   |   |   |   |   |   |  open_tcp_nodelay 关闭Nagle合并算法  |   |   |
-|   |   |   |   |   |   |   |  daemonize 守护进程化 |   |   |
-|   |   |   |   |   |   |   |  heartbeat_check_interval 心跳检测 |   |   |
-|   |   |   |   |   |   |   |  heartbeat_idle_time 最大空闲时间 |   |   |
-|   |   |   |   |   |   |   |  reload_async 异步重启 |   |   |
-|   |   |   |   |   |   |   |  log_file 日志目录 |   |   |
-|   |   |   |   |   |   |   |  pid_file 主进程pid目录 |   |   |
+| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  [mode](https://wiki.swoole.com/wiki/page/277.html) | sock_type 1 tcp | logs 日志配置 | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+|   |   |   |   |   |   |   | logs.open 日志开关  |  worker_num work进程数量 | package_max_length 最大包长  | sock_type 1.tcp  |
+|   |   |   |   |   |   |   | logs.config 日志配置项 |  max_coro_num 最大携程数  |   | sync_type 1.异步  |
+|   |   |   |   |   |   |   | logs.system or mysql 配置模块  |  open_tcp_nodelay 关闭Nagle合并算法  |   |   |
+|   |   |   |   |   |   |   | logs..log_path 日志目录 |  daemonize 守护进程化 |   |   |
+|   |   |   |   |   |   |   | logs..log_file 日志文件名 |  heartbeat_check_interval 心跳检测 |   |   |
+|   |   |   |   |   |   |   | logs..format 日志日期格式 |  heartbeat_idle_time 最大空闲时间 |   |   |
+|   |   |   |   |   |   |   |   |  reload_async 异步重启 |   |   |
+|   |   |   |   |   |   |   |   |  log_file 日志目录 |   |   |
+|   |   |   |   |   |   |   |   |  pid_file 主进程pid目录 |   |   |
 
