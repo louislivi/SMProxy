@@ -13,6 +13,7 @@ use Swoole\Coroutine;
 abstract class BaseServer extends Base
 {
     protected $connectReadState = [];
+    protected $connectHasTransaction = [];
     protected $server;
 
     /**

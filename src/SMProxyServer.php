@@ -78,6 +78,7 @@ class SMProxyServer extends BaseServer
                         // just init the frontend
                         break;
                     case MySQLPacket::$COM_QUERY:
+                    case MySQLPacket::$COM_STMT_PREPARE:
                         $connection = new FrontendConnection();
                         $queryType = $connection->query($bin);
                         if ($queryType == ServerParse::SELECT ||
@@ -85,7 +86,16 @@ class SMProxyServer extends BaseServer
                             $queryType == ServerParse::SET ||
                             $queryType == ServerParse::USE
                         ) {
-                            $this->connectReadState[$fd] = true;
+                            if (!isset($this ->connectHasTransaction[$fd]) || !$this ->connectHasTransaction[$fd]){
+                                $this->connectReadState[$fd] = true;
+                            }
+                        }else if ($queryType == ServerParse::START){
+                            $this ->connectHasTransaction[$fd] = true;
+                            $this->connectReadState[$fd] = false;
+                        }else if ($queryType == ServerParse::COMMIT || $queryType == ServerParse::ROLLBACK){
+                            $this ->connectHasTransaction[$fd] = false;
+                        }else{
+                            $this->connectReadState[$fd] = false;
                         }
                         break;
                     case MySQLPacket::$COM_PING:
@@ -95,17 +105,6 @@ class SMProxyServer extends BaseServer
                         $data = '';
                         break;
                     case MySQLPacket::$COM_PROCESS_KILL:
-                        break;
-                    case MySQLPacket::$COM_STMT_PREPARE:
-                        $connection = new FrontendConnection();
-                        $queryType = $connection->query($bin);
-                        if ($queryType == ServerParse::SELECT ||
-                            $queryType == ServerParse::SHOW ||
-                            $queryType == ServerParse::SET ||
-                            $queryType == ServerParse::USE
-                        ) {
-                            $this->connectReadState[$fd] = true;
-                        }
                         break;
                     case MySQLPacket::$COM_STMT_EXECUTE:
                         break;
@@ -119,6 +118,7 @@ class SMProxyServer extends BaseServer
                     default:
                         break;
                 }
+                var_dump($this->connectReadState[$fd]);
                 if (isset($this->connectReadState[$fd]) && $this->connectReadState[$fd] === true) {
                     $model = 'read';
                     $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;
