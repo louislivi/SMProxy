@@ -3,6 +3,7 @@
 namespace SMProxy;
 
 use SMProxy\Handler\Backend\BackendAuthenticator;
+use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;
 use SMProxy\MysqlPacket\BinaryPacket;
 use SMProxy\MysqlPacket\ErrorPacket;
@@ -59,7 +60,7 @@ class MysqlProxy extends MysqlClient
                 $authPacket = new AuthPacket();
                 $authPacket->packetId = 1;
                 $authPacket->clientFlags = BackendAuthenticator::getClientFlags();
-                $authPacket->maxPacketSize = 16777216;
+                $authPacket->maxPacketSize = CONFIG['server']['swoole_client_setting']['package_max_length']??16777216;
                 $authPacket->charsetIndex = CharsetUtil::getIndex($this ->charset??'utf-8');
                 $authPacket->user = $this ->account['user'];
                 $authPacket->password = $password;
@@ -79,7 +80,8 @@ class MysqlProxy extends MysqlClient
                         $errorPacket = new ErrorPacket();
                         $errorPacket ->read($binaryPacket);
                         $errorPacket ->errno = ErrorCode::ER_SYNTAX_ERROR;
-                        print_r($errorPacket ->errno.':'.$errorPacket->message."\n");
+                        $mysql_log = Log::get_logger('mysql');
+                        $mysql_log ->error($errorPacket ->errno.':'.$errorPacket->message);
                         $data = getString($errorPacket ->write());
 //                        switch ($errorPacket ->sqlState){
 //                            case 28000:
@@ -101,6 +103,6 @@ class MysqlProxy extends MysqlClient
 
     public function onClientClose($cli)
     {
-        echo "write client connection close\n";
+//        echo "mysql proxy connection close\n";
     }
 }

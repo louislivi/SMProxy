@@ -1,6 +1,8 @@
 <?php
 
 namespace SMProxy;
+use SMProxy\Log\Log;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/30
@@ -30,7 +32,8 @@ class Base extends Context
                     unset(self::$pool[\Swoole\Coroutine::getuid()]);
                 }
             } catch (SMProxyException $SMProxyException) {
-                print_r($SMProxyException->getMessage() . "\n");
+                $system_log = Log::get_logger('system');
+                $system_log ->warn($SMProxyException->getMessage());
             }
         });
     }
