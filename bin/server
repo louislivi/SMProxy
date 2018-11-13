@@ -1,6 +1,6 @@
 #! /usr/bin/php
 <?php
-swoole_set_process_name("SMProxy");
+
 date_default_timezone_set('PRC');
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -69,6 +69,8 @@ function start()
     if (verifyServer()){
         print_r('server is running!'."\n");
     }else{
+        print_r('server starting ...'."\n");
+        swoole_set_process_name("SMProxy");
         new class extends \SMProxy\SMProxyServer{};
     }
 }
@@ -79,8 +81,8 @@ function start()
 function stop()
 {
     if (verifyServer()){
-        system("kill -9 $(ps -ef|grep SMProxy|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')",$result);
         file_put_contents(CONFIG['server']['swoole']['pid_file'],0);
+        system("kill -9 $(ps -ef|grep SMProxy|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')",$result);
         print_r('server stop success!'."\n");
     }else{
         print_r('Error: server is not running !'."\n");
