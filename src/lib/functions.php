@@ -15,7 +15,8 @@
 function getBytes($data)
 {
     $bytes = [];
-    for ($i = 0; $i < strlen($data); $i++) {
+    $count = strlen($data);
+    for ($i = 0; $i < $count; $i++) {
         $byte = ord($data[$i]);
         $bytes[] = $byte;
     }
@@ -32,7 +33,8 @@ function getBytes($data)
 function getString($bytes)
 {
     $string = '';
-    for ($i = 0; $i < count($bytes); $i++) {
+    $count = count($bytes);
+    for ($i = 0; $i < $count; $i++) {
         $str = chr($bytes[$i]);
         $string .= $str;
     }
@@ -51,7 +53,7 @@ function getString($bytes)
 function array_copy(array $array, int $start, int $len)
 {
     $newArray = [];
-    for ($i = 0; $i <= $len - 1; $i++) {
+    for ($i = 0; $i < $len; $i++) {
         $newArray[] = $array[$start + $i];
     }
     return $newArray;
