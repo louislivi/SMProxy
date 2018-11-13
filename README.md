@@ -3,11 +3,15 @@
 ## 特性
 - 支持读写分离
 - 支持数据库连接池，能够有效解决PHP带来的数据库连接瓶颈
-- 支持所有sql语句
+- 支持SQL92标准
+- 遵守Mysql原生协议，跨语言，跨平台的通用中间件代理。
+- 支持多个数据库连接，多个数据库，多个用户，灵活搭配。
+- 支持mysql事物
 - 采用协程调度
 - 支持 HandshakeV10 协议版本
 - 完美兼容mysql5.6-5.7
-
+## 设计初衷
+php没有连接池，所以高并发时数据库会出现连接打满的情况，mycat等数据库中间件会出现部分sql无法使用，例如不支持批量添加等，而且过于臃肿。所以就自己编写了这个仅支持连接池和读写分离的轻量级中间件，使用swoole协程调度HandshakeV10协议转发使程序更加稳定不用像mycat一样解析所有sql包体，增加复杂度。
 ## 环境
 * swoole 2.1+
 * php 7.0+
@@ -142,3 +146,8 @@ ROOT 当前SMProxy跟目录
 |   |   |   |   |   |   |   |   |  log_file 日志目录 |   |   |
 |   |   |   |   |   |   |   |   |  pid_file 主进程pid目录 |   |   |
 
+## 其他学习资料
+- mysql协议分析 ：https://www.cnblogs.com/davygeek/p/5647175.html
+- mysql官方协议文档 ：https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
+- mycat源码 ：https://github.com/MyCATApache/Mycat-Server
+- swoole ：https://www.swoole.com/
