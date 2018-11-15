@@ -37,7 +37,9 @@ class SMProxyServer extends BaseServer
         // 生成认证数据
         $Authenticator = new FrontendAuthenticator();
         $this->source[$fd] = $Authenticator;
-        $server->send($fd, $Authenticator->getHandshakePacket($fd));
+        if ($server ->exist($fd)){
+            $server->send($fd, $Authenticator->getHandshakePacket($fd));
+        }
     }
 
     /**
@@ -69,10 +71,14 @@ class SMProxyServer extends BaseServer
                                 , ErrorCode::ER_NO_SUCH_USER);
                             $mysql_log = Log::get_logger('mysql');
                             $mysql_log ->error($message);
-                            $server->send($fd, getString($errMessage));
+                            if ($server ->exist($fd)){
+                                $server->send($fd, getString($errMessage));
+                            }
                             return null;
                         } else {
-                            $server->send($fd, getString(OkPacket::$AUTH_OK));
+                            if ($server ->exist($fd)){
+                                $server->send($fd, getString(OkPacket::$AUTH_OK));
+                            }
                             $this->source[$fd]->auth = true;
                             $this->source[$fd]->database = $authPacket->database;
                         }
@@ -157,7 +163,9 @@ class SMProxyServer extends BaseServer
                                     ,ErrorCode::ER_SYNTAX_ERROR);
                                 $mysql_log = Log::get_logger('mysql');
                                 $mysql_log ->error($message);
-                                $server->send($fd, getString($errMessage));
+                                if ($server ->exist($fd)){
+                                    $server->send($fd, getString($errMessage));
+                                }
                             }
                         }
                     }
