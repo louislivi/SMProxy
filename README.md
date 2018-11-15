@@ -1,5 +1,11 @@
-# SMProxy
+# [SMProxy](https://github.com/louislivi/smproxy)
 ## swoole msyql proxy 一个基于mysql协议，swoole 开发的mysql数据库连接池
+## 数据库连接池
+
+    数据库连接池负责分配、管理和释放数据库连接，它允许应用程序重复使用一个现有的数据库连接，而不是再重新建立一个；
+    释放空闲时间超过最大空闲时间的数据库连接来避免因为没有释放数据库连接而引起的数据库连接遗漏。
+    这项技术能明显提高对数据库操作的性能。 
+
 ## 特性
 - 支持读写分离
 - 支持数据库连接池，能够有效解决PHP带来的数据库连接瓶颈
@@ -32,7 +38,16 @@ php没有连接池，所以高并发时数据库会出现连接打满的情况�
 mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 也可采用工具连接。
-
+### 测试
+```php
+$start = microtime(true);
+print_r(Db::query('select * from account limit 1'));
+print_r(microtime(true)-$start);
+```
+#### 未使用SMProxy连接池运行:
+    0.322674036026
+#### 使用SMProxy连接池运行:
+    0.073625087738037
 
 ## 配置文件:
 ```
