@@ -28,6 +28,7 @@ final class ServerParse
     public const USE = 14;
     public const EXPLAIN = 15;
     public const KILL_QUERY = 16;
+    public const MODEL = 17;
 
     public static function parse(String $stmt)
     {
@@ -396,7 +397,7 @@ final class ServerParse
     }
 
     // UPDATE' ' | USE' '
-    static function uCheck(String $stmt, int $offset)
+    static function uCheck(String $stmt, int $offset, bool $has_Space = true)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -409,7 +410,7 @@ final class ServerParse
                         $c4 = $stmt[++$offset];
                         $c5 = $stmt[++$offset];
                         if (($c1 == 'D' || $c1 == 'd') && ($c2 == 'A' || $c2 == 'a') && ($c3 == 'T' || $c3 == 't')
-                            && ($c4 == 'E' || $c4 == 'e') && ($c5 == ' ' || $c5 == '\t' || $c5 == '\r' || $c5 == '\n')) {
+                            && ($c4 == 'E' || $c4 == 'e') && ($has_Space?($c5 == ' ' || $c5 == '\t' || $c5 == '\r' || $c5 == '\n'):true)) {
                             return self::UPDATE;
                         }
                     }

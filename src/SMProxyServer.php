@@ -60,8 +60,6 @@ class SMProxyServer extends BaseServer
                     MySQLPool::init($dbConfig);
                     Log::set_config(CONFIG['server']['logs']['config'],CONFIG['server']['logs']['open']);
                     if (!$this->source[$fd]->auth) {
-//                var_dump($data);
-//                var_dump(implode(',',getBytes($data)));
                         $authPacket = new AuthPacket();
                         $authPacket->read($bin);
                         $checkPassword = $this->source[$fd]->checkPassword($authPacket->password, CONFIG['server']['password']);
@@ -93,7 +91,11 @@ class SMProxyServer extends BaseServer
                                     $queryType == ServerParse::USE
                                 ) {
                                     if (!isset($this ->connectHasTransaction[$fd]) || !$this ->connectHasTransaction[$fd]){
-                                        $this->connectReadState[$fd] = true;
+                                        if ((($data[-6] == 'u' || $data[-6] == 'U') && ServerParse::uCheck($data,-6,false) == ServerParse::UPDATE)){
+                                            $this->connectReadState[$fd] = false;
+                                        }else{
+                                            $this->connectReadState[$fd] = true;
+                                        }
                                     }
                                 }else if ($queryType == ServerParse::START){
                                     $this ->connectHasTransaction[$fd] = true;
@@ -199,7 +201,7 @@ class SMProxyServer extends BaseServer
      */
     protected function packageSplit(string $data,bool $auth)
     {
-        if (strlen($data) == $this ->getPackageLength($data,0,$auth?4:3)){
+        if (strlen($data) == $this ->getPackageLength($data,0,4)){
             return [$data];
         }
         $packages = [];
@@ -213,8 +215,11 @@ class SMProxyServer extends BaseServer
         if ($auth){
             $split($data,$packages);
         } else{
-            $packageLength = $this ->getPackageLength($data,0,3);
+            $packageLength = $this ->getPackageLength($data,0,3)+1;
             $packages[] = substr($data,0,$packageLength);
+            if (isset($data[$packageLength]) && ord($data[$packageLength]) != 0){
+                $split($data,$packages,$packageLength);
+            }
         }
         return $packages;
     }
