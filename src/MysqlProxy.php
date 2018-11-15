@@ -66,7 +66,9 @@ class MysqlProxy extends MysqlClient
                 $authPacket->password = $password;
                 $authPacket->database = $this ->database??0;
                 $this->auth = true;
-                $cli->send(getString($authPacket->write()));
+                if ($cli ->isConnected()){
+                    $cli->send(getString($authPacket->write()));
+                }
             } else {
                 $send = true;
                 switch ($binaryPacket->data[4]) {
