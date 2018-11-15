@@ -91,7 +91,8 @@ class SMProxyServer extends BaseServer
                                     $queryType == ServerParse::USE
                                 ) {
                                     if (!isset($this ->connectHasTransaction[$fd]) || !$this ->connectHasTransaction[$fd]){
-                                        if ((($data[-6] == 'u' || $data[-6] == 'U') && ServerParse::uCheck($data,-6,false) == ServerParse::UPDATE)){
+                                        $trim_data = rtrim($data);
+                                        if ((($trim_data[-6] == 'u' || $trim_data[-6] == 'U') && ServerParse::uCheck($trim_data,-6,false) == ServerParse::UPDATE)){
                                             $this->connectReadState[$fd] = false;
                                         }else{
                                             $this->connectReadState[$fd] = true;
