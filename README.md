@@ -54,6 +54,7 @@ print_r(microtime(true)-$start);
 
 ## 配置文件:
 ```
+配置文件位于 smproxy/conf 目录中
 ROOT 当前SMProxy跟目录
 ```
 ### database.json
