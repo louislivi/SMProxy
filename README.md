@@ -68,6 +68,15 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542618779523.jpg)
 
+#### mysql 连接数
+未使用连接池:
+
+![mysql](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
+
+使用连接池:
+
+![mysql](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
+
 请以实际压测为准，根数据量，网络环境，数据库配置有关。
 ## 交流:
 QQ群：722124111
