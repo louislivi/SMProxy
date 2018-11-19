@@ -1,10 +1,12 @@
+中文 | [English](./README-EN.md)
+
 # [SMProxy](https://github.com/louislivi/smproxy)
 ## swoole msyql proxy 一个基于mysql协议，swoole 开发的mysql数据库连接池
 ## 数据库连接池
-
-    数据库连接池负责分配、管理和释放数据库连接，它允许应用程序重复使用一个现有的数据库连接，而不是再重新建立一个；
-    释放空闲时间超过最大空闲时间的数据库连接来避免因为没有释放数据库连接而引起的数据库连接遗漏。
-    这项技术能明显提高对数据库操作的性能。 
+    将数据库连接作为对象存储在内存中，当用户需要访问数据库时，首次会建立连接，后面并非建立一个新的连接，
+    而是从连接池中取出一个已建立的空闲连接对象。使用完毕后，用户也并非将连接关闭，而是将连接放回连接池中，
+    以供下一个请求访问使用。而连接的建立、断开都由连接池自身来管理。
+    超出最大连接数会采用协程挂起 等到有连接关闭再恢复协程继续操作
 
 ## 特性
 - 支持读写分离
@@ -16,6 +18,8 @@
 - 采用协程调度
 - 支持 HandshakeV10 协议版本
 - 完美兼容mysql5.6-5.7
+- 兼容各大框架，无缝提升性能
+
 ## 设计初衷
     php没有连接池，所以高并发时数据库会出现连接打满的情况，
     mycat等数据库中间件会出现部分sql无法使用，例如不支持批量添加等，而且过于臃肿。
@@ -42,19 +46,35 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 也可采用工具连接。
 ### 测试
-```php
-$start = microtime(true);
-print_r(Db::query('select * from account limit 1'));
-print_r(microtime(true)-$start);
-```
-#### 未使用SMProxy连接池运行:
-    0.17314600944519
-#### 使用SMProxy连接池运行:
-    0.073625087738037
+#### Thinkphp5.0
+![Thinkphp5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
 
+未使用连接池:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542617800249.jpg)
+
+使用连接池:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542617941297.jpg)
+
+#### Laravel5.7
+![Laravel5.7](https://file.gesmen.com.cn/smproxy/3FE76B55-9422-40DB-B8CE-7024F36BB5A9.png)
+
+未使用连接池:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542619087242.jpg)
+
+使用连接池:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542618779523.jpg)
+
+请以实际压测为准，根数据量，网络环境，数据库配置有关。
+## 交流:
+QQ群：722124111
 ## 配置文件:
 ```
-ROOT 当前SMProxy跟目录
+配置文件位于 smproxy/conf 目录中
+配置文件大写ROOT 代表当前SMProxy跟目录
 ```
 ### database.json
 ```Json
@@ -152,9 +172,9 @@ ROOT 当前SMProxy跟目录
   }
 }
 ```
-| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  [mode](https://wiki.swoole.com/wiki/page/277.html) | sock_type 1 tcp | logs 日志配置 | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
+| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  mode 运行模式 | sock_type 1 tcp | logs 日志配置 | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-|   |   |   |   |   |   |   | logs.open 日志开关  |  worker_num work进程数量 | package_max_length 最大包长  | sock_type 1.tcp  |
+|   |   |   |   |   | 3 SWOOLE_PROCESS多进程模式（默认），4 SWOOLE_BASE基本模式  |   | logs.open 日志开关  |  worker_num work进程数量 | package_max_length 最大包长  | sock_type 1.tcp  |
 |   |   |   |   |   |   |   | logs.config 日志配置项 |  max_coro_num 最大携程数  |   | sync_type 1.异步  |
 |   |   |   |   |   |   |   | logs.system or mysql 配置模块  |  open_tcp_nodelay 关闭Nagle合并算法  |   |   |
 |   |   |   |   |   |   |   | logs..log_path 日志目录 |  daemonize 守护进程化 |   |   |
