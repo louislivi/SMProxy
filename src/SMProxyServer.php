@@ -53,7 +53,7 @@ class SMProxyServer extends BaseServer
     public function onReceive($server, $fd, $reactor_id, $data)
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
-            $packages = $this ->packageSplit($data,$this->source[$fd]->auth);
+            $packages = $this ->packageSplit($data,$this->source[$fd]->auth?:false);
             foreach ($packages as $package){
                 $data = $package;
                 $this ->go(function () use($server, $fd, $reactor_id, $data){

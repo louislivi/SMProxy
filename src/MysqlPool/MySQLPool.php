@@ -16,6 +16,7 @@ class MySQLPool
     static protected $connsNameMap = [];
     static protected $pendingFetchCount = [];
     static protected $resumeFetchCount = [];
+    static protected $yieldChannel = [];
 
     /**
      * @param array $connsConfig
@@ -65,7 +66,7 @@ class MySQLPool
                 if (self::$pendingFetchCount[$connName] > 0) {
                     self::$resumeFetchCount[$connName]++;
                     self::$pendingFetchCount[$connName]--;
-                    \Swoole\Coroutine::resume('MySQLPool::' . $connName);
+                    self::$yieldChannel[$connName] ->push($id);
                 }
                 return;
             }
@@ -104,8 +105,11 @@ class MySQLPool
             }
         }
         if (count(self::$busyConns[$connName]) + count($connsPool) == self::$connsConfig[$connName]['maxConns']) {
+            if (!isset(self::$yieldChannel[$connName])){
+                self::$yieldChannel[$connName] = new \Swoole\Coroutine\Channel(1);
+            }
             self::$pendingFetchCount[$connName]++;
-            if (\Swoole\Coroutine::suspend('MySQLPool::' . $connName) == false) {
+            if (self::$yieldChannel[$connName] ->pop(true) == false) {
                 self::$pendingFetchCount[$connName]--;
                 throw new MySQLException('Reach max connections! Cann\'t pending fetch!');
             }

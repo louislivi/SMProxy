@@ -32,7 +32,8 @@ final class ParseUtil
     private static function parseString(String $stmt, int $offset)
     {
         $sb = '';
-        for (++$offset; $offset < strlen($stmt); ++$offset) {
+        $stmtLen = strlen($stmt);
+        for (++$offset; $offset < $stmtLen; ++$offset) {
             $c = $stmt[$offset];
             if ($c == '\\') {
                 switch ($c = $stmt[++$offset]) {
@@ -167,7 +168,7 @@ final class ParseUtil
                 return self::parseIdentifierEscape($stmt, $aliasIndex);
             default:
                 $offset = $aliasIndex;
-                for (; $offset < strlen($stmt) && CharTypes::isIdentifierChar($stmt[$offset]); ++$offset) ;
+                for ($stmtLen = strlen($stmt); $offset <  $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]); ++$offset) ;
                 return substr($stmt, $aliasIndex, $offset);
         }
     }
@@ -241,7 +242,7 @@ final class ParseUtil
         if ($nextExpectedString == null || strlen($nextExpectedString) < 1) return $offset;
         $i = $offset;
         $index = 0;
-        for (; $i < strlen($stmt) && $index < strlen($nextExpectedString); ++$i) {
+        for ($stmtLen = strlen($stmt); $i <  $stmtLen && $index < strlen($nextExpectedString); ++$i) {
             if ($index == 0) {
                 $isSep = self::currentCharIsSep($stmt, $i);
                 if ($isSep) {
@@ -304,8 +305,9 @@ final class ParseUtil
 
     public static function move(String $stmt, int $offset, int $length)
     {
+        $stmtLen = strlen($stmt);
         $i = $offset;
-        for (; $i < strlen($stmt); ++$i) {
+        for (; $i < $stmtLen; ++$i) {
             switch ($stmt[$i]) {
                 case ' ':
                 case "\t":

@@ -32,7 +32,7 @@ final class ServerParse
 
     public static function parse(String $stmt)
     {
-        for ($i = 0; $i < strlen($stmt); ++$i) {
+        for ($i = 0,$stmtLen=strlen($stmt); $i < $stmtLen; ++$i) {
             switch ($stmt[$i]) {
                 case ' ':
                 case '\t':
@@ -100,14 +100,15 @@ final class ServerParse
     // KILL' '
     static function killCheck(String $stmt, int $offset)
     {
-        if (strlen($stmt) > $offset + strlen("ILL ")) {
+        $stmtLen = strlen($stmt);
+        if ($stmtLen > $offset + strlen("ILL ")) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
             if (($c1 == 'I' || $c1 == 'i') && ($c2 == 'L' || $c2 == 'l') && ($c3 == 'L' || $c3 == 'l')
                 && ($c4 == ' ' || $c4 == '\t' || $c4 == '\r' || $c4 == '\n')) {
-                while (strlen($stmt) > ++$offset) {
+                while ($stmtLen > ++$offset) {
                     switch ($stmt[$offset]) {
                         case ' ':
                         case '\t':
@@ -118,7 +119,7 @@ final class ServerParse
                         case 'q':
                             return self::killQueryCheck($stmt, $offset);
                         default:
-                            return ($$offset << 8) | self::KILL;
+                            return ($offset << 8) | self::KILL;
                     }
                 }
                 return self::OTHER;
@@ -130,7 +131,8 @@ final class ServerParse
     // KILL QUERY' '
     static function killQueryCheck(String $stmt, int $offset)
     {
-        if (strlen($stmt) > $offset + strlen("UERY ")) {
+        $stmtLen = strlen($stmt);
+        if ($stmtLen > $offset + strlen("UERY ")) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
@@ -138,7 +140,7 @@ final class ServerParse
             $c5 = $stmt[++$offset];
             if (($c1 == 'U' || $c1 == 'u') && ($c2 == 'E' || $c2 == 'e') && ($c3 == 'R' || $c3 == 'r')
                 && ($c4 == 'Y' || $c4 == 'y') && ($c5 == ' ' || $c5 == '\t' || $c5 == '\r' || $c5 == '\n')) {
-                while (strlen($stmt) > ++$offset) {
+                while ($stmtLen > ++$offset) {
                     switch ($stmt[$offset]) {
                         case ' ':
                         case '\t':
@@ -146,7 +148,7 @@ final class ServerParse
                         case '\n':
                             continue;
                         default:
-                            return ($$offset << 8) | self::KILL_QUERY;
+                            return ($offset << 8) | self::KILL_QUERY;
                     }
                 }
                 return self::OTHER;
