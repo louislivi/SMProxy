@@ -1,5 +1,17 @@
 English | [中文](./README.md)
-
+```
+  /$$$$$$  /$$      /$$ /$$$$$$$                                        
+ /$$__  $$| $$$    /$$$| $$__  $$                                       
+| $$  \__/| $$$$  /$$$$| $$  \ $$ /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
+|  $$$$$$ | $$ $$/$$ $$| $$$$$$$//$$__  $$ /$$__  $$|  $$ /$$/| $$  | $$
+ \____  $$| $$  $$$| $$| $$____/| $$  \__/| $$  \ $$ \  $$$$/ | $$  | $$
+ /$$  \ $$| $$\  $ | $$| $$     | $$      | $$  | $$  >$$  $$ | $$  | $$
+|  $$$$$$/| $$ \/  | $$| $$     | $$      |  $$$$$$/ /$$/\  $$|  $$$$$$$
+ \______/ |__/     |__/|__/     |__/       \______/ |__/  \__/ \____  $$
+                                                               /$$  | $$
+                                                              |  $$$$$$/
+                                                               \______/
+```
 # [SMProxy](https://github.com/louislivi/smproxy)
 ## swoole msyql proxy 
 A mysql database connection pool based on mysql protocol, swoole development
@@ -57,6 +69,8 @@ Download the file directly and extract it.
 - bin/server status  : Query service running status
 - bin/server reload  : Smooth restart
 - bin/server -h      : help
+- bin/server -v      : view service version
+
 ## SMProxy connection test
 Testing SMProxy is exactly the same as testing mysql. How to connect mysql, how to connect SMProxy.
 
