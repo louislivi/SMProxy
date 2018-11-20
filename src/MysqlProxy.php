@@ -27,7 +27,7 @@ class MysqlProxy extends MysqlClient
     public $auth = false;
     public $chan;
 
-    public function __construct($server,$fd,$chan)
+    public function __construct($server, $fd, $chan)
     {
         parent::__construct();
         $this->server = $server;
@@ -56,43 +56,45 @@ class MysqlProxy extends MysqlClient
             if (!$this->auth) {
                 $handshakePacket = (new HandshakePacket())->read($binaryPacket);
                 $salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
-                $password = SecurityUtil::scramble411($this ->account['password'], $salt);
+                $password = SecurityUtil::scramble411($this->account['password'], $salt);
                 $authPacket = new AuthPacket();
                 $authPacket->packetId = 1;
                 $authPacket->clientFlags = BackendAuthenticator::getClientFlags();
-                $authPacket->maxPacketSize = CONFIG['server']['swoole_client_setting']['package_max_length']??16777216;
-                $authPacket->charsetIndex = CharsetUtil::getIndex($this ->charset??'utf-8');
-                $authPacket->user = $this ->account['user'];
+                $authPacket->maxPacketSize = CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
+                $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf-8');
+                $authPacket->user = $this->account['user'];
                 $authPacket->password = $password;
-                $authPacket->database = $this ->database??0;
+                $authPacket->database = $this->database ?? 0;
                 $this->auth = true;
-                if ($cli ->isConnected()){
+                if ($cli->isConnected()) {
                     $cli->send(getString($authPacket->write()));
                 }
             } else {
                 $send = true;
-                switch ($binaryPacket->data[4]) {
-                    case OkPacket::$FIELD_COUNT:
-                        if (!array_diff_assoc($binaryPacket->data,OkPacket::$AUTH_OK)){
-                            $send = false;
-                            $this->chan ->push($this);
-                        }
-                        break;
-                    case ErrorPacket::$FIELD_COUNT:
-                        $errorPacket = new ErrorPacket();
-                        $errorPacket ->read($binaryPacket);
-                        $errorPacket ->errno = ErrorCode::ER_SYNTAX_ERROR;
-                        $mysql_log = Log::get_logger('mysql');
-                        $mysql_log ->error($errorPacket ->errno.':'.$errorPacket->message);
-                        $data = getString($errorPacket ->write());
+                if (isset($binaryPacket->data[4])) {
+                    switch ($binaryPacket->data[4]) {
+                        case OkPacket::$FIELD_COUNT:
+                            if (!array_diff_assoc($binaryPacket->data, OkPacket::$AUTH_OK)) {
+                                $send = false;
+                                $this->chan->push($this);
+                            }
+                            break;
+                        case ErrorPacket::$FIELD_COUNT:
+                            $errorPacket = new ErrorPacket();
+                            $errorPacket->read($binaryPacket);
+                            $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
+                            $mysql_log = Log::get_logger('mysql');
+                            $mysql_log->error($errorPacket->errno . ':' . $errorPacket->message);
+                            $data = getString($errorPacket->write());
 //                        switch ($errorPacket ->sqlState){
 //                            case 28000:
 //                                throw new \ErrorException($errorPacket->message);
 //                                break;
 //                        }
-                        break;
+                            break;
+                    }
                 }
-                if ($send && $this->server->exist($fd)){
+                if ($send && $this->server->exist($fd)) {
                     $this->server->send($fd, $data);
                 }
             }

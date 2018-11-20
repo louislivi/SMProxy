@@ -44,6 +44,7 @@ abstract class BaseServer extends Base
             $this->server->on('connect', [$this, 'onConnect']);
             $this->server->on('receive', [$this, 'onReceive']);
             $this->server->on('close', [$this, 'onClose']);
+            $this->server->on('WorkerStart', [$this, 'onWorkerStart']);
             $result = $this->server->start();
             if ($result){
                 print_r('server start success!'. "\n");
@@ -60,6 +61,10 @@ abstract class BaseServer extends Base
     }
 
     protected function onReceive($server, $fd, $reactor_id, $data)
+    {
+    }
+
+    protected function onWorkerStart($server, $worker_id)
     {
     }
 
