@@ -10,6 +10,8 @@ date_default_timezone_set('PRC');
  */
 //设置根目录
 define('ROOT', dirname(__FILE__) . '/..');
+define('SMPROXY_VERSION', 1.2);
+
 include dirname(__FILE__) . "/../vendor/autoload.php";
 //读取配置文件
 $configName = ROOT . '/conf/';
@@ -18,8 +20,25 @@ if (file_exists($configName)) {
 } else {
     throw new \SMProxy\SMProxyException('Error:config conf/ No such file or directory!');
 }
+$version = 'SMProxy version:'.SMPROXY_VERSION."\n";
+$logo = <<<'LOGO'
 
-$desc = <<<DESC
+  /$$$$$$  /$$      /$$ /$$$$$$$                                        
+ /$$__  $$| $$$    /$$$| $$__  $$                                       
+| $$  \__/| $$$$  /$$$$| $$  \ $$ /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
+|  $$$$$$ | $$ $$/$$ $$| $$$$$$$//$$__  $$ /$$__  $$|  $$ /$$/| $$  | $$
+ \____  $$| $$  $$$| $$| $$____/| $$  \__/| $$  \ $$ \  $$$$/ | $$  | $$
+ /$$  \ $$| $$\  $ | $$| $$     | $$      | $$  | $$  >$$  $$ | $$  | $$
+|  $$$$$$/| $$ \/  | $$| $$     | $$      |  $$$$$$/ /$$/\  $$|  $$$$$$$
+ \______/ |__/     |__/|__/     |__/       \______/ |__/  \__/ \____  $$
+                                                               /$$  | $$
+                                                              |  $$$$$$/
+                                                               \______/
+                                                               
+
+LOGO;
+$logo = $logo.$version;
+$desc = $logo.<<<DESC
 Options and arguments (and corresponding environment variables):
 start   : start server
 stop    : stop server
@@ -27,34 +46,39 @@ restart : restart server
 status  : view service status
 reload  : graceful restart
 -h      : print this help message and exit (also --help)
+-v      : print server version
 DESC;
 if (!isset($argv[1])) {
-    print_r($desc."\n");
+    print_r($desc . "\n");
     exit();
 }
 
 switch ($argv[1]) {
     case 'start':
-        start();
+        start($logo);
         break;
     case 'stop':
         stop();
         break;
     case 'restart':
-        restart();
+        restart($logo);
         break;
     case 'status':
         status();
         break;
     case 'reload':
-        reload();
+        reload($logo);
         break;
     case '-h':
     case '--help':
-        print_r($desc."\n");
+        print_r($desc . "\n");
+        break;
+    case '-v':
+    case '--version':
+        print_r($logo . "\n");
         break;
     default:
-        print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information."."\n");
+        print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information." . "\n");
         break;
 }
 
@@ -64,14 +88,16 @@ switch ($argv[1]) {
  * @throws ErrorException
  * @throws \SMProxy\SMProxyException
  */
-function start()
+function start($logo)
 {
-    if (verifyServer()){
-        print_r('server is running!'."\n");
-    }else{
-        print_r('server starting ...'."\n");
+    if (verifyServer()) {
+        print_r('server is running!' . "\n");
+    } else {
+        print_r($logo.'server starting ...' . "\n");
         swoole_set_process_name("SMProxy");
-        new class extends \SMProxy\SMProxyServer{};
+        new class extends \SMProxy\SMProxyServer
+        {
+        };
     }
 }
 
@@ -80,12 +106,17 @@ function start()
  */
 function stop()
 {
-    if (verifyServer()){
-        file_put_contents(CONFIG['server']['swoole']['pid_file'],0);
-        system("kill -9 $(ps -ef|grep SMProxy|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')",$result);
-        print_r('server stop success!'."\n");
-    }else{
-        print_r('Error: server is not running !'."\n");
+    if (verifyServer()) {
+        file_put_contents(CONFIG['server']['swoole']['pid_file'], 0);
+        exec("ps -ef|grep SMProxy|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' '", $result);
+        if ($result) {
+            exec("kill -9 {$result[0]}", $result);
+            print_r('server stop success!' . "\n");
+        } else {
+            print_r('Notice: server is not running !' . "\n");
+        }
+    } else {
+        print_r('Error: server is not running !' . "\n");
     }
 }
 
@@ -95,14 +126,14 @@ function stop()
  * @throws ErrorException
  * @throws \SMProxy\SMProxyException
  */
-function restart()
+function restart($logo)
 {
-    if (verifyServer()){
+    if (verifyServer()) {
         stop();
-        start();
-        print_r('server restart success!'."\n");
-    }else{
-        start();
+        start($logo);
+        print_r('server restart success!' . "\n");
+    } else {
+        start($logo);
     }
 }
 
@@ -112,13 +143,17 @@ function restart()
  * @throws ErrorException
  * @throws \SMProxy\SMProxyException
  */
-function reload()
+function reload($logo)
 {
-    if (verifyServer()){
-        system('kill -USR1 '.file_get_contents(CONFIG['server']['swoole']['pid_file']),$result);
-        print_r('server restart success!'."\n");
-    }else{
-        start();
+    if (verifyServer()) {
+        if ($pid = file_get_contents(CONFIG['server']['swoole']['pid_file'])) {
+            exec('kill -USR1 ' . $pid);
+            print_r('server restart success!' . "\n");
+        } else {
+            print_r('Error: server is not running !' . "\n");
+        }
+    } else {
+        start($logo);
     }
 }
 
@@ -127,16 +162,16 @@ function reload()
  */
 function status()
 {
-    if (verifyServer()){
-        print_r('server is start!'."\n");
-    }else{
-        print_r('server is not running!'."\n");
+    if (verifyServer()) {
+        print_r('server is start!' . "\n");
+    } else {
+        print_r('server is not running!' . "\n");
     }
 }
 
 function verifyServer()
 {
-    return (CONFIG['server']['swoole']['pid_file']??false) &&
+    return (CONFIG['server']['swoole']['pid_file'] ?? false) &&
         file_exists(CONFIG['server']['swoole']['pid_file']) &&
         file_get_contents(CONFIG['server']['swoole']['pid_file']);
 }

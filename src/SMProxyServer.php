@@ -38,7 +38,7 @@ class SMProxyServer extends BaseServer
         // 生成认证数据
         $Authenticator = new FrontendAuthenticator();
         $this->source[$fd] = $Authenticator;
-        if ($server ->exist($fd)){
+        if ($server->exist($fd)) {
             $server->send($fd, $Authenticator->getHandshakePacket($fd));
         }
     }
@@ -54,13 +54,13 @@ class SMProxyServer extends BaseServer
     public function onReceive($server, $fd, $reactor_id, $data)
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
-            if (!isset($this->source[$fd]->auth)){
+            if (!isset($this->source[$fd]->auth)) {
                 throw new SMProxyException('can\'t connect SMProxy send message !');
             }
-            $packages = $this ->packageSplit($data,$this->source[$fd]->auth?:false);
-            foreach ($packages as $package){
+            $packages = $this->packageSplit($data, $this->source[$fd]->auth ?: false);
+            foreach ($packages as $package) {
                 $data = $package;
-                $this ->go(function () use($server, $fd, $reactor_id, $data){
+                $this->go(function () use ($server, $fd, $reactor_id, $data) {
                     $bin = (new MySqlPacketDecoder())->decode($data);
                     if (!$this->source[$fd]->auth) {
                         $authPacket = new AuthPacket();
@@ -68,16 +68,16 @@ class SMProxyServer extends BaseServer
                         $checkPassword = $this->source[$fd]->checkPassword($authPacket->password, CONFIG['server']['password']);
                         if (CONFIG['server']['user'] != $authPacket->user || !$checkPassword) {
                             $message = "Access denied for user '" . $authPacket->user . "'";
-                            $errMessage = $this->writeErrMessage(2,$message
+                            $errMessage = $this->writeErrMessage(2, $message
                                 , ErrorCode::ER_NO_SUCH_USER);
                             $mysql_log = Log::get_logger('mysql');
-                            $mysql_log ->error($message);
-                            if ($server ->exist($fd)){
+                            $mysql_log->error($message);
+                            if ($server->exist($fd)) {
                                 $server->send($fd, getString($errMessage));
                             }
                             return null;
                         } else {
-                            if ($server ->exist($fd)){
+                            if ($server->exist($fd)) {
                                 $server->send($fd, getString(OkPacket::$AUTH_OK));
                             }
                             $this->source[$fd]->auth = true;
@@ -97,20 +97,20 @@ class SMProxyServer extends BaseServer
                                     $queryType == ServerParse::SET ||
                                     $queryType == ServerParse::USE
                                 ) {
-                                    if (!isset($this ->connectHasTransaction[$fd]) || !$this ->connectHasTransaction[$fd]){
+                                    if (!isset($this->connectHasTransaction[$fd]) || !$this->connectHasTransaction[$fd]) {
                                         $trim_data = rtrim($data);
-                                        if ((($trim_data[-6] == 'u' || $trim_data[-6] == 'U') && ServerParse::uCheck($trim_data,-6,false) == ServerParse::UPDATE)){
+                                        if ((($trim_data[-6] == 'u' || $trim_data[-6] == 'U') && ServerParse::uCheck($trim_data, -6, false) == ServerParse::UPDATE)) {
                                             $this->connectReadState[$fd] = false;
-                                        }else{
+                                        } else {
                                             $this->connectReadState[$fd] = true;
                                         }
                                     }
-                                }else if ($queryType == ServerParse::START){
-                                    $this ->connectHasTransaction[$fd] = true;
+                                } else if ($queryType == ServerParse::START) {
+                                    $this->connectHasTransaction[$fd] = true;
                                     $this->connectReadState[$fd] = false;
-                                }else if ($queryType == ServerParse::COMMIT || $queryType == ServerParse::ROLLBACK){
-                                    $this ->connectHasTransaction[$fd] = false;
-                                }else{
+                                } else if ($queryType == ServerParse::COMMIT || $queryType == ServerParse::ROLLBACK) {
+                                    $this->connectHasTransaction[$fd] = false;
+                                } else {
                                     $this->connectReadState[$fd] = false;
                                 }
                                 break;
@@ -136,9 +136,9 @@ class SMProxyServer extends BaseServer
                         }
                         if (isset($this->connectReadState[$fd]) && $this->connectReadState[$fd] === true) {
                             $model = 'read';
-                            $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;
+                            $key = $this->source[$fd]->database ? $model . '_' . $this->source[$fd]->database : $model;
                             //如果没有读库 默认用写库
-                            if (!array_key_exists($key, $this ->dbConfig)){
+                            if (!array_key_exists($key, $this->dbConfig)) {
                                 $model = 'write';
                             }
                         } else {
@@ -150,8 +150,8 @@ class SMProxyServer extends BaseServer
                                 $client->client->send($data);
                             }
                         } else {
-                            $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;
-                            if (array_key_exists($key, $this ->dbConfig)) {
+                            $key = $this->source[$fd]->database ? $model . '_' . $this->source[$fd]->database : $model;
+                            if (array_key_exists($key, $this->dbConfig)) {
                                 $client = MySQLPool::fetch($key,
                                     $server, $fd);
                                 $this->mysqlClient[$fd][$model] = $client;
@@ -159,12 +159,12 @@ class SMProxyServer extends BaseServer
                                     $client->client->send($data);
                                 }
                             } else {
-                                $message = 'database config ' . ($this->source[$fd]->database?:'') . ' ' . $model . ' is not exists!';
-                                $errMessage = $this->writeErrMessage(1,$message
-                                    ,ErrorCode::ER_SYNTAX_ERROR);
+                                $message = 'database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model . ' is not exists!';
+                                $errMessage = $this->writeErrMessage(1, $message
+                                    , ErrorCode::ER_SYNTAX_ERROR);
                                 $mysql_log = Log::get_logger('mysql');
-                                $mysql_log ->error($message);
-                                if ($server ->exist($fd)){
+                                $mysql_log->error($message);
+                                if ($server->exist($fd)) {
                                     $server->send($fd, getString($errMessage));
                                 }
                             }
@@ -186,11 +186,11 @@ class SMProxyServer extends BaseServer
      */
     public function onClose($server, $fd)
     {
-        if (isset($this->source[$fd])){
+        if (isset($this->source[$fd])) {
             unset($this->source[$fd]);
         }
-        if (isset($this->mysqlClient[$fd])){
-            foreach ($this->mysqlClient[$fd] as $mysqlClient){
+        if (isset($this->mysqlClient[$fd])) {
+            foreach ($this->mysqlClient[$fd] as $mysqlClient) {
                 MySQLPool::recycle($mysqlClient);
             }
             unset($this->mysqlClient[$fd]);
@@ -213,38 +213,54 @@ class SMProxyServer extends BaseServer
      */
     public function onWorkerStart($server, $worker_id)
     {
-        $this ->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
-        MySQLPool::init($this ->dbConfig);
-        Log::set_config(CONFIG['server']['logs']['config'],CONFIG['server']['logs']['open']);
+        $this->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
+        //初始化链接
+        MySQLPool::init($this->dbConfig);
+        $clients = [];
+        foreach ($this->dbConfig as $key => $value) {
+            //建立初始连接
+//            while ($value['maxSpareConns'] > 0) {
+                $clients[] = MySQLPool::fetch($key, $server, 1);
+//                $value['maxSpareConns']--;
+//            }
+        }
+        foreach ($clients as $client){
+            MySQLPool::recycle($client);
+        }
+        Log::set_config(CONFIG['server']['logs']['config'], CONFIG['server']['logs']['open']);
+        $system_log = Log::get_logger('system');
+        $system_log->info('server start!');
+        print_r('server start!'."\n");
     }
 
     /**
      * 处理粘包问题
+     *
      * @param string $data
      * @param bool $auth 是否通过认证
      *
      * @return array
      */
-    protected function packageSplit(string $data,bool $auth)
+    protected function packageSplit(string $data, bool $auth)
     {
-        if (strlen($data) == $this ->getPackageLength($data,0,4)){
+        if (strlen($data) == $this->getPackageLength($data, 0, 4)) {
             return [$data];
         }
         $packages = [];
-        $split = function ($data,&$packages,$step = 0) use(&$split){
-            if (isset($data[$step]) && ord($data[$step]) != 0){
-                $packageLength = $this ->getPackageLength($data,$step,4);
-                $packages[] = substr($data,$step,$packageLength);
-                $split($data,$packages,$step+$packageLength);
+        $split = function ($data, &$packages, $step = 0) use (&$split) {
+            if (isset($data[$step]) && ord($data[$step]) != 0) {
+                $packageLength = $this->getPackageLength($data, $step, 4);
+                $packages[] = substr($data, $step, $packageLength);
+                $split($data, $packages, $step + $packageLength);
             }
         };
-        if ($auth){
-            $split($data,$packages);
-        } else{
-            $packageLength = $this ->getPackageLength($data,0,3)+1;
-            $packages[] = substr($data,0,$packageLength);
-            if (isset($data[$packageLength]) && ord($data[$packageLength]) != 0){
-                $split($data,$packages,$packageLength);
+        if ($auth) {
+            $split($data, $packages);
+        } else {
+            $packageLength = $this->getPackageLength($data, 0, 3) + 1;
+            $packages[] = substr($data, 0, $packageLength);
+            if (isset($data[$packageLength]) && ord($data[$packageLength]) != 0) {
+                $split($data, $packages, $packageLength);
             }
         }
         return $packages;
@@ -259,14 +275,14 @@ class SMProxyServer extends BaseServer
      *
      * @return int
      */
-    private function getPackageLength(string $data,int $step,int $offset)
+    private function getPackageLength(string $data, int $step, int $offset)
     {
-        $i  = ord($data[$step]);
-        $i |= ord($data[$step+1])  << 8;
-        $i |= ord($data[$step+2])  << 16;
-        if ($offset >= 4){
-            $i |= ord($data[$step+3])  << 24;
+        $i = ord($data[$step]);
+        $i |= ord($data[$step + 1]) << 8;
+        $i |= ord($data[$step + 2]) << 16;
+        if ($offset >= 4) {
+            $i |= ord($data[$step + 3]) << 24;
         }
-        return $i+$offset;
+        return $i + $offset;
     }
 }
