@@ -133,7 +133,7 @@ QQ群：722124111
 ```
 | account 账号信息 | serverInfo 服务信息 | databases 数据库连接池信息 |
 | ------ | ------ | ------ |
-| account.root 用户标识 与 serverInfo...account.root 对应 | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.db1 数据库名称 |
+| account.root 用户标识 与 serverInfo...account.root 对应 | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称 |
 | account..user 用户名  | serverInfo..write 读写分离 write 写库 read 读库 | databases..serverInfo 服务信息 |
 | account..password 密码  | serverInfo..host 数据库连接地址 | databases..maxSpareConns 最大空闲连接数 |
 |   | serverInfo..prot 数据库端口 | databases..maxConns 最大连接数 |
