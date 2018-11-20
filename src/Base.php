@@ -46,9 +46,9 @@ class Base extends Context
      * @return array
      * @throws SMProxyException
      */
-    public function parseDbConfig()
+    public function parseDbConfig($_config)
     {
-        $config = CONFIG['database']??[];
+        $config = $_config['database']??[];
             foreach ($config['databases'] as $key => $database){
                 if (isset($config['serverInfo'][$database['serverInfo']])){
                     foreach ($config['serverInfo'][$database['serverInfo']] as $s_key => $value){

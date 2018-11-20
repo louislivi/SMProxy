@@ -23,6 +23,7 @@ class SMProxyServer extends BaseServer
 {
     public $source;
     public $mysqlClient;
+    protected $dbConfig;
 
     /**
      * 连接
@@ -53,14 +54,14 @@ class SMProxyServer extends BaseServer
     public function onReceive($server, $fd, $reactor_id, $data)
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
+            if (!isset($this->source[$fd]->auth)){
+                throw new SMProxyException('can\'t connect SMProxy send message !');
+            }
             $packages = $this ->packageSplit($data,$this->source[$fd]->auth?:false);
             foreach ($packages as $package){
                 $data = $package;
                 $this ->go(function () use($server, $fd, $reactor_id, $data){
                     $bin = (new MySqlPacketDecoder())->decode($data);
-                    $dbConfig = $this->parseDbConfig();
-                    MySQLPool::init($dbConfig);
-                    Log::set_config(CONFIG['server']['logs']['config'],CONFIG['server']['logs']['open']);
                     if (!$this->source[$fd]->auth) {
                         $authPacket = new AuthPacket();
                         $authPacket->read($bin);
@@ -137,7 +138,7 @@ class SMProxyServer extends BaseServer
                             $model = 'read';
                             $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;
                             //如果没有读库 默认用写库
-                            if (!array_key_exists($key, $dbConfig)){
+                            if (!array_key_exists($key, $this ->dbConfig)){
                                 $model = 'write';
                             }
                         } else {
@@ -150,7 +151,7 @@ class SMProxyServer extends BaseServer
                             }
                         } else {
                             $key = $this->source[$fd]->database?$model . '_' . $this->source[$fd]->database:$model;
-                            if (array_key_exists($key, $dbConfig)) {
+                            if (array_key_exists($key, $this ->dbConfig)) {
                                 $client = MySQLPool::fetch($key,
                                     $server, $fd);
                                 $this->mysqlClient[$fd][$model] = $client;
@@ -199,6 +200,22 @@ class SMProxyServer extends BaseServer
         }
         parent::onClose($server, $fd);
 //        echo "connection close: {$fd}\n";
+    }
+
+    /**
+     * WorkerStart
+     *
+     * @param $server
+     * @param $worker_id
+     *
+     * @throws MySQLException
+     * @throws SMProxyException
+     */
+    public function onWorkerStart($server, $worker_id)
+    {
+        $this ->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
+        MySQLPool::init($this ->dbConfig);
+        Log::set_config(CONFIG['server']['logs']['config'],CONFIG['server']['logs']['open']);
     }
 
     /**
