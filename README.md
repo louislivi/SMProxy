@@ -1,7 +1,8 @@
 中文 | [English](./README-EN.md)
 
 # [SMProxy](https://github.com/louislivi/smproxy)
-## swoole msyql proxy 一个基于mysql协议，swoole 开发的mysql数据库连接池
+## swoole msyql proxy 
+一个基于mysql协议，swoole 开发的mysql数据库连接池
 ## 原理
     将数据库连接作为对象存储在内存中，当用户需要访问数据库时，首次会建立连接，后面并非建立一个新的连接，
     而是从连接池中取出一个已建立的空闲连接对象。使用完毕后，用户也并非将连接关闭，而是将连接放回连接池中，
