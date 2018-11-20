@@ -150,7 +150,7 @@ The configuration file uppercase ROOT represents the current SMProxy and directo
 ```
 account information | serverInfo service information | databases database connection pool information |
 | ------ | ------ | ------ |
-| account.root user ID Corresponds to serverInfo...account.root | serverInfo.server1 Service ID Corresponds to databases..serverInfo | databases.db1 database name |
+| account.root user ID Corresponds to serverInfo...account.root | serverInfo.server1 Service ID Corresponds to databases..serverInfo | databases.dbname database name |
 Account..user username | serverInfo..write read-write separation write write library read read library | databases..serverInfo service information |
 Account..password password | serverInfo..host database connection address | databases..maxSpareConns maximum idle connections |
 | | serverInfo..prot database port | databases..maxConns maximum number of connections |
