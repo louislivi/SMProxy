@@ -51,22 +51,22 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 未使用连接池:
 
-![ab](https://file.gesmen.com.cn/smproxy/1542617800249.jpg)
+![ab](https://file.gesmen.com.cn/smproxy/1542685140126.jpg)
 
 使用连接池:
 
-![ab](https://file.gesmen.com.cn/smproxy/1542617941297.jpg)
+![ab](https://file.gesmen.com.cn/smproxy/1542685109798.jpg)
 
 #### Laravel5.7
 ![Laravel5.7](https://file.gesmen.com.cn/smproxy/3FE76B55-9422-40DB-B8CE-7024F36BB5A9.png)
 
 未使用连接池:
 
-![ab](https://file.gesmen.com.cn/smproxy/1542619087242.jpg)
+![ab](https://file.gesmen.com.cn/smproxy/1542686575874.jpg)
 
 使用连接池:
 
-![ab](https://file.gesmen.com.cn/smproxy/1542618779523.jpg)
+![ab](https://file.gesmen.com.cn/smproxy/1542686580551.jpg)
 
 #### mysql 连接数
 未使用连接池:
@@ -78,6 +78,8 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 ![mysql](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
 
 请以实际压测为准，根数据量，网络环境，数据库配置有关。
+测试中因超出最大连接数会采用协程挂起 等到有连接关闭再恢复协程继续操作，
+所有并发量与配置文件maxConns设置的不合适，会导致比原链接慢，主要是为了控制连接数。
 ## 交流:
 QQ群：722124111
 ## 配置文件:
@@ -114,9 +116,10 @@ QQ群：722124111
       }
     },
     "databases": {
-      "db1": {
+      "dbname": {
         "serverInfo": "server1",
         "maxSpareConns": 10,
+        "maxSpareExp": 3600,
         "maxConns": 20,
         "charset": "utf-8"
       }
@@ -131,16 +134,16 @@ QQ群：722124111
 | account..password 密码  | serverInfo..host 数据库连接地址 | databases..maxSpareConns 最大空闲连接数 |
 |   | serverInfo..prot 数据库端口 | databases..maxConns 最大连接数 |
 |   | serverInfo..timeout 数据库超时时长(秒) | databases..charset 数据库编码格式 |
-|   | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞 |  |
+|   | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞 | databases..maxSpareExp 最大空闲时间 |
 |   | serverInfo..account  与 databases.account 对应|  |
 
 ### server.json
 ```Json
 {
   "server": {
-    "user":"root",
-    "password":"123456",
-    "charset":"utf8mb4",
+    "user": "root",
+    "password": "123456",
+    "charset": "utf8mb4",
     "host": "0.0.0.0",
     "port": "3366",
     "mode": 3,
@@ -149,27 +152,27 @@ QQ群：722124111
       "open":true,
       "config": {
         "system": {
-          "log_path": "/var/www/swoole/swoole-mysql-proxy/logs",
+          "log_path": "ROOT/logs",
           "log_file": "system.log",
           "format": "Y/m/d"
         },
         "mysql": {
-          "log_path": "/var/www/swoole/swoole-mysql-proxy/logs",
+          "log_path": "ROOT/logs",
           "log_file": "mysql.log",
           "format": "Y/m/d"
         }
       }
     },
     "swoole": {
-      "worker_num": 2,
+      "worker_num": 1,
       "max_coro_num": 16000,
       "open_tcp_nodelay": true,
       "daemonize": 0,
       "heartbeat_check_interval": 60,
       "heartbeat_idle_time": 600,
       "reload_async": true,
-      "log_file": "/var/www/swoole/swoole-mysql-proxy/logs/error.log",
-      "pid_file": "/var/www/swoole/swoole-mysql-proxy/logs/pid/server.pid"
+      "log_file": "ROOT/logs/error.log",
+      "pid_file": "ROOT/logs/pid/server.pid"
     },
     "swoole_client_setting": {
       "package_max_length": 16777216
