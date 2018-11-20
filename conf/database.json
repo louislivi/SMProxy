@@ -2,7 +2,7 @@
   "database": {
     "account": {
       "root": {
-        "user": "root",
+        "user": "root", 
         "password": "123456"
       }
     },
@@ -25,9 +25,10 @@
       }
     },
     "databases": {
-      "db1": {
+      "dbname": {
         "serverInfo": "server1",
         "maxSpareConns": 10,
+        "maxSpareExp": 3600,
         "maxConns": 20,
         "charset": "utf-8"
       }
