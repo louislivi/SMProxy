@@ -125,38 +125,83 @@ function initConfig(string $dir)
             closedir($dh);
         }
     }
-    $config = json_decode(str_replace('ROOT', ROOT, json_encode($config)), true);
+
+    //替换swoole 常量
+    if (isset($config['server']['mode'])) {
+        replace_constant($config['server']['mode'],SWOOLE_PROCESS);
+    } else {
+        $config['server']['mode'] = SWOOLE_PROCESS;
+    }
+
+    if (isset($config['server']['sock_type'])) {
+        replace_constant($config['server']['sock_type'],SWOOLE_SOCK_TCP);
+    } else {
+        $config['server']['sock_type'] = SWOOLE_SOCK_TCP;
+    }
+
+    if (isset($config['server']['swoole_client_sock_setting']['sock_type'])) {
+        replace_constant($config['server']['swoole_client_sock_setting']['sock_type'],SWOOLE_SOCK_TCP);
+    }else{
+        $config['server']['swoole_client_sock_setting']['sock_type'] = SWOOLE_SOCK_TCP;
+    }
+
+    if (isset($config['server']['swoole_client_sock_setting']['sync_type'])) {
+        replace_constant($config['server']['swoole_client_sock_setting']['sync_type'],SWOOLE_SOCK_ASYNC);
+    }else{
+        $config['server']['swoole_client_sock_setting']['sync_type'] = SWOOLE_SOCK_ASYNC;
+    }
+
+    //生成日志目录
     if (isset($config['server']['logs']['config']['system']['log_path'])) {
-        if (!file_exists($config['server']['logs']['config']['system']['log_path'])) {
-            mkdir($config['server']['logs']['config']['system']['log_path'], 755, true);
-        }
+        mk_log_dir($config['server']['logs']['config']['system']['log_path']);
     } else {
         throw new \SMProxy\SMProxyException('ERROR:server.logs.config.system.log_path 配置项不存在!');
     }
     if (isset($config['server']['logs']['config']['mysql']['log_path'])) {
-        if (!file_exists($config['server']['logs']['config']['mysql']['log_path'])) {
-            mkdir($config['server']['logs']['config']['mysql']['log_path'], 755, true);
-        }
+        mk_log_dir($config['server']['logs']['config']['mysql']['log_path']);
     } else {
         throw new \SMProxy\SMProxyException('ERROR:server.logs.config.mysql.log_path 配置项不存在!');
     }
     if (isset($config['server']['swoole']['log_file'])) {
-        if (!file_exists(dirname($config['server']['swoole']['log_file']))) {
-            mkdir(dirname($config['server']['swoole']['log_file']), 755, true);
-        }
+        mk_log_dir($config['server']['swoole']['log_file']);
     } else {
         throw new \SMProxy\SMProxyException('ERROR:server.swoole.log_file 配置项不存在!');
     }
     if (isset($config['server']['swoole']['pid_file'])) {
-        if (!file_exists(dirname($config['server']['swoole']['pid_file']))) {
-            mkdir(dirname($config['server']['swoole']['pid_file']), 755, true);
-        }
+        mk_log_dir($config['server']['swoole']['pid_file']);
     } else {
         throw new \SMProxy\SMProxyException('ERROR:server.swoole.pid_file 配置项不存在!');
     }
     return $config;
 }
 
+/**
+ * 替换常量值
+ *
+ * @param string $const
+ * @param string $default
+ */
+function replace_constant(string &$const,string $default = '')
+{
+    if (defined($const)){
+        $const = constant($const);
+    }else{
+        $const = $default;
+    }
+}
+
+/**
+ * 创建日志目录
+ *
+ * @param string $path
+ */
+function mk_log_dir(string &$path)
+{
+    $path = str_replace('ROOT', ROOT, $path);
+    if (!file_exists(dirname($path))) {
+        mkdir(dirname($path), 755, true);
+    }
+}
 
 /**
  * 对数据进行编码转换

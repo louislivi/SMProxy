@@ -178,8 +178,8 @@ QQ群：722124111
     "charset": "utf8mb4",
     "host": "0.0.0.0",
     "port": "3366",
-    "mode": 3,
-    "sock_type": 1,
+    "mode": "SWOOLE_PROCESS",
+    "sock_type": "SWOOLE_SOCK_TCP",
     "logs": {
       "open":true,
       "config": {
@@ -197,9 +197,9 @@ QQ群：722124111
     },
     "swoole": {
       "worker_num": 1,
-      "max_coro_num": 16000,
+      "max_coro_num": 6000,
       "open_tcp_nodelay": true,
-      "daemonize": 0,
+      "daemonize": 1,
       "heartbeat_check_interval": 60,
       "heartbeat_idle_time": 600,
       "reload_async": true,
@@ -210,16 +210,16 @@ QQ群：722124111
       "package_max_length": 16777216
     },
     "swoole_client_sock_setting": {
-      "sock_type": 1,
-      "sync_type": 1
+      "sock_type": "SWOOLE_SOCK_TCP",
+      "sync_type": "SWOOLE_SOCK_ASYNC"
     }
   }
 }
 ```
-| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  mode 运行模式 | sock_type 1 tcp | logs 日志配置 | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
+| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  mode 运行模式 | sock_type SWOOLE_SOCK_TCP tcp | logs 日志配置 | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-|   |   |   |   |   | 3 SWOOLE_PROCESS多进程模式（默认），4 SWOOLE_BASE基本模式  |   | logs.open 日志开关  |  worker_num work进程数量 | package_max_length 最大包长  | sock_type 1.tcp  |
-|   |   |   |   |   |   |   | logs.config 日志配置项 |  max_coro_num 最大携程数  |   | sync_type 1.异步  |
+|   |   |   |   |   | SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式  |   | logs.open 日志开关  |  worker_num work进程数量 | package_max_length 最大包长  | sock_type SWOOLE_SOCK_TCP tcp  |
+|   |   |   |   |   |   |   | logs.config 日志配置项 |  max_coro_num 最大携程数  |   | sync_type SWOOLE_SOCK_SYNC 同步，SWOOLE_SOCK_ASYNC 异步  |
 |   |   |   |   |   |   |   | logs.system or mysql 配置模块  |  open_tcp_nodelay 关闭Nagle合并算法  |   |   |
 |   |   |   |   |   |   |   | logs..log_path 日志目录 |  daemonize 守护进程化 |   |   |
 |   |   |   |   |   |   |   | logs..log_file 日志文件名 |  heartbeat_check_interval 心跳检测 |   |   |

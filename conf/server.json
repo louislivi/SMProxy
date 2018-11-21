@@ -5,8 +5,8 @@
     "charset": "utf8mb4",
     "host": "0.0.0.0",
     "port": "3366",
-    "mode": 3,
-    "sock_type": 1,
+    "mode": "SWOOLE_PROCESS",
+    "sock_type": "SWOOLE_SOCK_TCP",
     "logs": {
       "open":true,
       "config": {
@@ -37,8 +37,8 @@
       "package_max_length": 16777216
     },
     "swoole_client_sock_setting": {
-      "sock_type": 1,
-      "sync_type": 1
+      "sock_type": "SWOOLE_SOCK_TCP",
+      "sync_type": "SWOOLE_SOCK_ASYNC"
     }
   }
 }
