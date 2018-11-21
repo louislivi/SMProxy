@@ -195,8 +195,8 @@ Account..password password | serverInfo..host database connection address | data
     "charset": "utf8mb4",
     "host": "0.0.0.0",
     "port": "3366",
-    "mode": 3,
-    "sock_type": 1,
+    "mode": "SWOOLE_PROCESS",
+    "sock_type": "SWOOLE_SOCK_TCP",
     "logs": {
       "open":true,
       "config": {
@@ -214,9 +214,9 @@ Account..password password | serverInfo..host database connection address | data
     },
     "swoole": {
       "worker_num": 1,
-      "max_coro_num": 16000,
+      "max_coro_num": 6000,
       "open_tcp_nodelay": true,
-      "daemonize": 0,
+      "daemonize": 1,
       "heartbeat_check_interval": 60,
       "heartbeat_idle_time": 600,
       "reload_async": true,
@@ -227,16 +227,16 @@ Account..password password | serverInfo..host database connection address | data
       "package_max_length": 16777216
     },
     "swoole_client_sock_setting": {
-      "sock_type": 1,
-      "sync_type": 1
+      "sock_type": "SWOOLE_SOCK_TCP",
+      "sync_type": "SWOOLE_SOCK_ASYNC"
     }
   }
 }
 ```
-|user service username | password service password | charset service code | host link address | port service port multiple, separated | mode run mode | sock_type 1 tcp | logs log configuration | swoole swoole configuration | swoole_client_setting client configuration | swoole_client_sock_setting Client sock configuration |
+|user service username | password service password | charset service code | host link address | port service port multiple, separated | mode run mode | sock_type SWOOLE_SOCK_TCP tcp | logs log configuration | swoole swoole configuration | swoole_client_setting client configuration | swoole_client_sock_setting Client sock configuration |
  | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
- |   |   |   |   |   | 3 SWOOLE_PROCESS multi-process mode (default), 4 SWOOLE_BASE basic mode | | logs.open log switch | worker_num work process number | package_max_length maximum packet length | sock_type 1.tcp |
-|   |   |   |   |   |   |   | logs.config log configuration item | max_coro_num maximum number of Ctrips | | sync_type 1. Asynchronous |
+ |   |   |   |   |   | SWOOLE_PROCESS multi-process mode (default), SWOOLE_BASE basic mode | | logs.open log switch | worker_num work process number | package_max_length maximum packet length | sock_type SWOOLE_SOCK_TCP tcp |
+|   |   |   |   |   |   |   | logs.config log configuration item | max_coro_num maximum number of Ctrips | | sync_type SWOOLE_SOCK_ASYNC Asynchronous ,SWOOLE_SOCK_SYNC synchronous |
 |   |   |   |   |   |   |   | logs.system or mysql configuration module | open_tcp_nodelay Close Nagle merge algorithm   |   |   |
 |   |   |   |   |   |   |   | logs..log_path log directory | daemonize daemonization |
 |   |   |   |   |   |   |   | logs..log_file log file name | heartbeat_check_interval heartbeat detection |
