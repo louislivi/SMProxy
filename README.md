@@ -13,7 +13,7 @@
                                                                \______/
 ```
 # [SMProxy](https://github.com/louislivi/smproxy)
-## swoole msyql proxy 
+## swoole mysql proxy 
 一个基于mysql协议，swoole 开发的mysql数据库连接池
 ## 原理
     将数据库连接作为对象存储在内存中，当用户需要访问数据库时，首次会建立连接，后面并非建立一个新的连接，
