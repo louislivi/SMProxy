@@ -4,6 +4,7 @@
  * Date: 2018/11/9
  * Time: 上午9:41
  */
+
 namespace SMProxy\MysqlPacket\Util;
 /**
  * 随机数类
@@ -38,7 +39,7 @@ class RandomUtil
         for ($i = 0; $i < $size; $i++) {
             $ab[$i] = array_rand($bb);
         }
-        return $ab ->toArray();
+        return $ab->toArray();
     }
 
     private static function randomByte(array $b)

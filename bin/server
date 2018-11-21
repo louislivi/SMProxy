@@ -20,7 +20,7 @@ if (file_exists($configName)) {
 } else {
     throw new \SMProxy\SMProxyException('Error:config conf/ No such file or directory!');
 }
-$version = 'SMProxy version:'.SMPROXY_VERSION."\n";
+$version = 'SMProxy version:' . SMPROXY_VERSION . "\n";
 $logo = <<<'LOGO'
 
   /$$$$$$  /$$      /$$ /$$$$$$$                                        
@@ -37,8 +37,8 @@ $logo = <<<'LOGO'
                                                                
 
 LOGO;
-$logo = $logo.$version;
-$desc = $logo.<<<DESC
+$logo = $logo . $version;
+$desc = $logo . <<<DESC
 Options and arguments (and corresponding environment variables):
 start   : start server
 stop    : stop server
@@ -88,12 +88,12 @@ switch ($argv[1]) {
  * @throws ErrorException
  * @throws \SMProxy\SMProxyException
  */
-function start($logo)
+function start(string $logo)
 {
     if (verifyServer()) {
         print_r('server is running!' . "\n");
     } else {
-        print_r($logo.'server starting ...' . "\n");
+        print_r($logo . 'server starting ...' . "\n");
         swoole_set_process_name("SMProxy");
         new class extends \SMProxy\SMProxyServer
         {
@@ -126,7 +126,7 @@ function stop()
  * @throws ErrorException
  * @throws \SMProxy\SMProxyException
  */
-function restart($logo)
+function restart(string $logo)
 {
     if (verifyServer()) {
         stop();
@@ -143,7 +143,7 @@ function restart($logo)
  * @throws ErrorException
  * @throws \SMProxy\SMProxyException
  */
-function reload($logo)
+function reload(string $logo)
 {
     if (verifyServer()) {
         if ($pid = file_get_contents(CONFIG['server']['swoole']['pid_file'])) {
@@ -169,6 +169,11 @@ function status()
     }
 }
 
+/**
+ * 检查服务运行状态
+ *
+ * @return bool
+ */
 function verifyServer()
 {
     return (CONFIG['server']['swoole']['pid_file'] ?? false) &&

@@ -27,7 +27,7 @@ class MysqlProxy extends MysqlClient
     public $auth = false;
     public $chan;
 
-    public function __construct($server, $fd, $chan)
+    public function __construct(\swoole_server $server, int $fd, \Swoole\Coroutine\Channel $chan)
     {
         parent::__construct();
         $this->server = $server;
@@ -35,7 +35,7 @@ class MysqlProxy extends MysqlClient
         $this->chan = $chan;
     }
 
-    public function onClientConnect($cli)
+    public function onClientConnect(\swoole_client $cli)
     {
 
     }
@@ -46,7 +46,7 @@ class MysqlProxy extends MysqlClient
      * @param $cli
      * @param $data
      */
-    public function onClientReceive($cli, $data)
+    public function onClientReceive(\swoole_client $cli, string $data)
     {
         $this->go(function () use ($cli, $data) {
             $fd = $this->serverFd;
@@ -101,11 +101,11 @@ class MysqlProxy extends MysqlClient
         });
     }
 
-    public function onClientError($cli)
+    public function onClientError(\swoole_client $cli)
     {
     }
 
-    public function onClientClose($cli)
+    public function onClientClose(\swoole_client $cli)
     {
 //        echo "mysql proxy connection close\n";
     }

@@ -4,6 +4,7 @@
  * Date: 2018/11/9
  * Time: 下午12:10
  */
+
 namespace SMProxy\MysqlPacket\Util;
 
 /**

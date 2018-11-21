@@ -54,7 +54,7 @@ class AuthPacket extends MySQLPacket
         BufferUtil::writeUB4($data, $this->clientFlags);
         BufferUtil::writeUB4($data, $this->maxPacketSize);
         $data[] = $this->charsetIndex;
-        $data = array_merge($data,self::$FILLER);
+        $data = array_merge($data, self::$FILLER);
         if ($this->user == null) {
             $data[] = 0;
         } else {
@@ -75,35 +75,6 @@ class AuthPacket extends MySQLPacket
         BufferUtil::writeWithNull($data, getBytes('mysql_native_password'));
         return $data;
     }
-
-//    public void write(ChannelHandlerContext ctx) {
-//    // default init 256,so it can avoid buff extract
-//    ByteBuf buffer = ctx.alloc().buffer();
-//        BufferUtil.writeUB3(buffer, calcPacketSize());
-//        buffer.writeByte(packetId);
-//        BufferUtil.writeUB4(buffer, clientFlags);
-//        BufferUtil.writeUB4(buffer, maxPacketSize);
-//        buffer.writeByte((byte) charsetIndex);
-//        buffer.writeBytes(FILLER);
-//        if (user == null) {
-//            buffer.writeByte((byte) 0);
-//        } else {
-//            byte[] userData = user.getBytes();
-//            BufferUtil.writeWithNull(buffer, userData);
-//        }
-//        if (password == null) {
-//            buffer.writeByte((byte) 0);
-//        } else {
-//            BufferUtil.writeWithLength(buffer, password);
-//        }
-//        if (database == null) {
-//            buffer.writeByte((byte) 0);
-//        } else {
-//            byte[] databaseData = database.getBytes();
-//            BufferUtil.writeWithNull(buffer, databaseData);
-//        }
-//        ctx.writeAndFlush(buffer);
-//    }
 
     public function calcPacketSize()
     {

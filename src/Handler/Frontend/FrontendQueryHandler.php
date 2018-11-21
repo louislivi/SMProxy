@@ -9,6 +9,6 @@ namespace SMProxy\Handler\Frontend;
 interface FrontendQueryHandler
 {
 
-    function query(String $sql);
+    function query(string $sql);
 
 }

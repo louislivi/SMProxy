@@ -1,4 +1,5 @@
 <?php
+
 namespace SMProxy;
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -9,7 +10,7 @@ class SMProxyException extends \Exception
 {
     public function errorMessage()
     {
-        $errorMsg = 'Error  on line '.$this->getLine().'in'.$this->getFile().'<b>'.$this->getMessage().'</b> is not a vaild E-mailaddress';
+        $errorMsg = 'Error  on line ' . $this->getLine() . 'in' . $this->getFile() . ' ' . $this->getMessage();
         return $errorMsg;
     }
 }

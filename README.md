@@ -47,6 +47,7 @@
 ## 安装
 下载的文件直接解压即可。
 ## 运行
+需要给予 bin/server 执行权限
 - bin/server start   : 运行服务
 - bin/server stop    : 停止服务
 - bin/server restart : 重启服务

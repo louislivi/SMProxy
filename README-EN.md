@@ -63,6 +63,7 @@ A mysql database connection pool based on mysql protocol, swoole development
 ## installation
 Download the file directly and extract it.
 ## Run
+Need to give bin/server execute permission.
 - bin/server start   : Running service
 - bin/server stop    : Out of service
 - bin/server restart : Restart service

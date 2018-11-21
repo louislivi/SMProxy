@@ -22,7 +22,7 @@ class MySQLMessage
     public $length;
     private $position;
 
-    public function __construct($data)
+    public function __construct(array $data)
     {
         $this->data = $data;
         $this->length = count($data);
@@ -34,7 +34,7 @@ class MySQLMessage
         return $this->length;
     }
 
-    public function position($i = 0)
+    public function position(int $i = 0)
     {
         if ($i) {
             $this->position = $i;
@@ -48,7 +48,7 @@ class MySQLMessage
         return $this->data;
     }
 
-    public function move($i)
+    public function move(int $i)
     {
         $this->position += $i;
     }
@@ -58,7 +58,7 @@ class MySQLMessage
         return $this->length > $this->position;
     }
 
-    public function read($i = 0)
+    public function read(int $i = 0)
     {
         if ($i) {
             return $this->data[$i];
@@ -144,7 +144,7 @@ class MySQLMessage
         }
     }
 
-    public function readBytes($length = 0)
+    public function readBytes(int $length = 0)
     {
         if ($length) {
             return array_copy($this->data, $this->position, $length);
@@ -196,7 +196,7 @@ class MySQLMessage
         return $ab;
     }
 
-    public function readStringWithNull($charset = '')
+    public function readStringWithNull(string $charset = '')
     {
         $b = $this->data;
         if ($this->position >= $this->length) {

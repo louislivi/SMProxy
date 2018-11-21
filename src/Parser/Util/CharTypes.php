@@ -1,4 +1,5 @@
 <?php
+
 namespace SMProxy\Parser\Util;
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -7,7 +8,7 @@ namespace SMProxy\Parser\Util;
  */
 class CharTypes
 {
-    public static function isIdentifierChar($c)
+    public static function isIdentifierChar(int $c2)
     {
         $identifierFlags = new \SplFixedArray(256);
         for ($c = 0; $c < count($identifierFlags); ++$c) {
@@ -22,6 +23,6 @@ class CharTypes
         //  identifierFlags['`'] = true;
         $identifierFlags['_'] = true;
         $identifierFlags['$'] = true;
-        return $c > count($identifierFlags) || $identifierFlags[$c];
+        return $c2 > count($identifierFlags) || $identifierFlags[$c2];
     }
 }

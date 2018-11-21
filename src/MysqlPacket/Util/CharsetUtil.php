@@ -1,4 +1,5 @@
 <?php
+
 namespace SMProxy\MysqlPacket\Util;
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -107,7 +108,7 @@ class CharsetUtil
 
         // charset --> index
         for ($i = 0; $i < count(self::$INDEX_TO_CHARSET); $i++) {
-            $charset = self::$INDEX_TO_CHARSET[$i]??null;
+            $charset = self::$INDEX_TO_CHARSET[$i] ?? null;
             if ($charset != null && (self::$CHARSET_TO_INDEX[$charset] ?? null) == null) {
                 self::$CHARSET_TO_INDEX[$i] = $charset;
             }

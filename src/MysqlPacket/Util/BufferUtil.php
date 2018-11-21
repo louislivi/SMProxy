@@ -12,58 +12,58 @@ namespace SMProxy\MysqlPacket\Util;
  */
 class BufferUtil
 {
-    public static function writeUB2(&$buffer, $i)
+    public static function writeUB2(array &$buffer, int $i)
     {
         $buffer [] = $i & 0xff;
-        $buffer [] = shr16($i & 0xff << 8,8);
+        $buffer [] = shr16($i & 0xff << 8, 8);
     }
 
-    public static function writeUB3(&$buffer, $i)
+    public static function writeUB3(array &$buffer, int $i)
     {
         $buffer [] = $i & 0xff;
-        $buffer [] = shr16($i & 0xff << 8,8);
-        $buffer [] = shr16($i & 0xff << 16,16);
+        $buffer [] = shr16($i & 0xff << 8, 8);
+        $buffer [] = shr16($i & 0xff << 16, 16);
     }
 
-    public static function writeInt(&$buffer, $i)
+    public static function writeInt(array &$buffer, int $i)
     {
         $buffer [] = $i & 0xff;
-        $buffer [] = shr16($i & 0xff << 8,8);
-        $buffer [] = shr16($i & 0xff << 16,16);
-        $buffer [] = shr16($i & 0xff << 24,24);
+        $buffer [] = shr16($i & 0xff << 8, 8);
+        $buffer [] = shr16($i & 0xff << 16, 16);
+        $buffer [] = shr16($i & 0xff << 24, 24);
     }
 
-    public static function writeFloat(&$buffer, $f)
+    public static function writeFloat(array &$buffer, int $f)
     {
         self::writeInt($buffer, (int)($f));
     }
 
-    public static function writeUB4(&$buffer, $l)
+    public static function writeUB4(array &$buffer, int $l)
     {
         $buffer [] = $l & 0xff;
-        $buffer [] = shr16($l & 0xff << 8,8);
-        $buffer [] = shr16($l & 0xff << 16,16);
-        $buffer [] = shr16($l & 0xff << 24,24);
+        $buffer [] = shr16($l & 0xff << 8, 8);
+        $buffer [] = shr16($l & 0xff << 16, 16);
+        $buffer [] = shr16($l & 0xff << 24, 24);
     }
 
-    public static function writeLong(&$buffer, $l)
+    public static function writeLong(array &$buffer, int $l)
     {
         $buffer [] = $l & 0xff;
-        $buffer [] = shr16($l & 0xff << 8,8);
-        $buffer [] = shr16($l & 0xff << 16,16);
-        $buffer [] = shr16($l & 0xff << 24,24);
-        $buffer [] = shr16($l & 0xff << 32,32);
-        $buffer [] = shr16($l & 0xff << 40,40);
-        $buffer [] = shr16($l & 0xff << 48,48);
-        $buffer [] = shr16($l & 0xff << 56,56);
+        $buffer [] = shr16($l & 0xff << 8, 8);
+        $buffer [] = shr16($l & 0xff << 16, 16);
+        $buffer [] = shr16($l & 0xff << 24, 24);
+        $buffer [] = shr16($l & 0xff << 32, 32);
+        $buffer [] = shr16($l & 0xff << 40, 40);
+        $buffer [] = shr16($l & 0xff << 48, 48);
+        $buffer [] = shr16($l & 0xff << 56, 56);
     }
 
-    public static function writeDouble(&$buffer, $d)
+    public static function writeDouble(array &$buffer, int $d)
     {
         self::writeLong($buffer, (float)($d));
     }
 
-    public static function writeLength(&$buffer, $l)
+    public static function writeLength(array &$buffer, int $l)
     {
         if ($l < 251) {
             $buffer [] = $l;
@@ -80,14 +80,14 @@ class BufferUtil
         }
     }
 
-    public static function writeWithNull(&$buffer, $src)
+    public static function writeWithNull(array &$buffer, $src)
     {
-        $src = is_array($src) ?$src: [$src];
+        $src = is_array($src) ? $src : [$src];
         $buffer = array_merge($buffer, $src);
         $buffer [] = 0;
     }
 
-    public static function writeWithLength(&$buffer, $src, $nullValue = 0)
+    public static function writeWithLength(array &$buffer, $src, int $nullValue = 0)
     {
         if ($src == null) {
             $buffer[] = $nullValue;

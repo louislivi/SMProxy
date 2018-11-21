@@ -9,7 +9,7 @@ namespace SMProxy\MysqlPacket\Util;
 class SecurityUtil
 {
 
-    public static function scramble411($pass, $seed)
+    public static function scramble411(string $pass, array $seed)
     {
         $pass1 = getBytes(sha1($pass, true));
         $pass2 = getBytes(sha1(getString($pass1), true));
