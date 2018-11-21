@@ -217,13 +217,9 @@ class SMProxyServer extends BaseServer
         $this->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
         //初始化链接
         MySQLPool::init($this->dbConfig);
-        $clients = [];
         foreach ($this->dbConfig as $key => $value) {
-            //建立初始连接
-            $clients[] = MySQLPool::fetch($key, $server, 1);
-        }
-        foreach ($clients as $client) {
-            MySQLPool::recycle($client);
+            //初始化连接
+            MySQLPool::recycle(MySQLPool::fetch($key, $server, 1));
         }
         Log::set_config(CONFIG['server']['logs']['config'], CONFIG['server']['logs']['open']);
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
