@@ -13,6 +13,13 @@ English | [中文](./README.md)
                                                                \______/
 ```
 # [SMProxy](https://github.com/louislivi/smproxy)
+
+[![release](https://img.shields.io/github/release/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/releases)
+[![forks](https://img.shields.io/github/forks/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/network/members)
+[![stars](https://img.shields.io/github/stars/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/stargazers)
+[![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
+[![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg)](https://github.com/louislivi/smproxy)
+
 ## swoole mysql proxy 
 A mysql database connection pool based on mysql protocol, swoole development
 ## Principle
