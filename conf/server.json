@@ -23,8 +23,8 @@
       }
     },
     "swoole": {
-      "worker_num": 2,
-      "max_coro_num": 16000,
+      "worker_num": 1,
+      "max_coro_num": 6000,
       "open_tcp_nodelay": true,
       "daemonize": 1,
       "heartbeat_check_interval": 60,
