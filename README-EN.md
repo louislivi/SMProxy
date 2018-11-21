@@ -81,6 +81,19 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 Tool connections are also available.
 ### Test
+#### Useless framework php7.2.6
+![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
+
+Unused:0.15148401260376  Use:0.040808916091919
+
+Unused connection pool:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
+
+Use connection pool:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
+
 #### Thinkphp5.0
 ![Thinkphp5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
 

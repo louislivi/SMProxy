@@ -65,6 +65,19 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 也可采用工具连接。
 ### 测试
+#### 没用框架的php7.2.6
+![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
+
+没用：0.15148401260376  用了：0.040808916091919
+
+未使用连接池:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
+
+使用连接池:
+
+![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
+
 #### Thinkphp5.0
 ![Thinkphp5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
 
