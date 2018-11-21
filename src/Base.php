@@ -1,6 +1,7 @@
 <?php
 
 namespace SMProxy;
+
 use SMProxy\Log\Log;
 
 /**
@@ -15,10 +16,10 @@ class Base extends Context
      *
      * @param $function
      */
-    protected function go($function)
+    protected function go(\Closure $function)
     {
         if (\Swoole\Coroutine::getuid() !== -1) {
-            $pool = self::$pool[\Swoole\Coroutine::getuid()]??false;
+            $pool = self::$pool[\Swoole\Coroutine::getuid()] ?? false;
         } else {
             $pool = false;
         }
@@ -33,7 +34,7 @@ class Base extends Context
                 }
             } catch (SMProxyException $SMProxyException) {
                 $system_log = Log::get_logger('system');
-                $system_log ->warn($SMProxyException->getMessage());
+                $system_log->warn($SMProxyException->errorMessage());
             }
         });
     }
@@ -46,34 +47,34 @@ class Base extends Context
      * @return array
      * @throws SMProxyException
      */
-    public function parseDbConfig($_config)
+    public function parseDbConfig(array $_config)
     {
-        $config = $_config['database']??[];
-            foreach ($config['databases'] as $key => $database){
-                if (isset($config['serverInfo'][$database['serverInfo']])){
-                    foreach ($config['serverInfo'][$database['serverInfo']] as $s_key => $value){
-                        if (isset($config['account'][$value['account']])){
-                            if (!isset($config['databases'][$s_key])){
-                                $config['databases'][$s_key] = $config['databases'][$key];
-                                $config['databases'][$s_key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
-                                $config['databases'][$s_key]['serverInfo']['account'] =
-                                    $config['account'][$value['account']];
-                            }
-                            $config['databases'][$s_key.'_'.$key] = $config['databases'][$key];
-                            $config['databases'][$s_key.'_'.$key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
-                            $config['databases'][$s_key.'_'.$key]['serverInfo']['account'] =
+        $config = $_config['database'] ?? [];
+        foreach ($config['databases'] as $key => $database) {
+            if (isset($config['serverInfo'][$database['serverInfo']])) {
+                foreach ($config['serverInfo'][$database['serverInfo']] as $s_key => $value) {
+                    if (isset($config['account'][$value['account']])) {
+                        if (!isset($config['databases'][$s_key])) {
+                            $config['databases'][$s_key] = $config['databases'][$key];
+                            $config['databases'][$s_key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
+                            $config['databases'][$s_key]['serverInfo']['account'] =
                                 $config['account'][$value['account']];
-
-                        }else{
-                            throw new SMProxyException('config serverInfo->'.$s_key.
-                                '->account is not exists!');
                         }
+                        $config['databases'][$s_key . '_' . $key] = $config['databases'][$key];
+                        $config['databases'][$s_key . '_' . $key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
+                        $config['databases'][$s_key . '_' . $key]['serverInfo']['account'] =
+                            $config['account'][$value['account']];
+
+                    } else {
+                        throw new SMProxyException('config serverInfo->' . $s_key .
+                            '->account is not exists!');
                     }
-                }else{
-                    throw new SMProxyException('config serverInfo key '.$database['serverInfo'].'is not exists!');
                 }
-                unset($config['databases'][$key]);
+            } else {
+                throw new SMProxyException('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
             }
-            return $config['databases'];
+            unset($config['databases'][$key]);
         }
+        return $config['databases'];
+    }
 }

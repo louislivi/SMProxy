@@ -1,5 +1,6 @@
 <?php
-namespace  SMProxy\MysqlPacket;
+
+namespace SMProxy\MysqlPacket;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/25
@@ -20,7 +21,6 @@ class BinaryPacket extends MySQLPacket
     public static $FIELD_EOF = 5;
     public static $ROW = 6;
     public static $PACKET_EOF = 7;
-
     public $data;
 
     public function calcPacketSize()

@@ -1,5 +1,7 @@
 <?php
+
 namespace SMProxy\MysqlPacket;
+
 use SMProxy\MysqlPacket\Util\ByteUtil;
 use SMProxy\SMProxyException;
 
@@ -19,7 +21,7 @@ class MySqlPacketDecoder
      *
      * @throws Exception
      */
-    public function decode($data)
+    public function decode(string $data)
     {
         $data = getBytes($data);
         // 4 bytes:3 length + 1 packetId
@@ -43,7 +45,7 @@ class MySqlPacketDecoder
         // data will not be accessed any more,so we can use this array safely
         $packet->data = $data;
         if ($packet->data == null || count($packet->data) == 0) {
-            throw new SMProxyException("get data errorMessage,packetLength=" . $packet->packetLength."\n");
+            throw new SMProxyException("get data errorMessage,packetLength=" . $packet->packetLength . "\n");
         }
         return $packet;
     }

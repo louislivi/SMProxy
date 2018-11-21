@@ -20,7 +20,7 @@ class FrontendAuthenticator
     public $auth = false;
     public $database;
 
-    public function getHandshakePacket($server_id)
+    public function getHandshakePacket(int $server_id)
     {
         $rand1 = RandomUtil::randomBytes(8);
         $rand2 = RandomUtil::randomBytes(12);
@@ -38,7 +38,7 @@ class FrontendAuthenticator
         return getString($hs->write());
     }
 
-    public function checkPassword(array $password, String $pass)
+    public function checkPassword(array $password, string $pass)
     {
         // check null
         if ($pass == null || strlen($pass) == 0) {
@@ -95,7 +95,8 @@ class FrontendAuthenticator
         return $flag;
     }
 
-protected function failure(int $errno, String $info) {
+    protected function failure(int $errno, String $info)
+    {
 
-}
+    }
 }

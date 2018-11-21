@@ -1,5 +1,7 @@
 <?php
+
 namespace SMProxy\MysqlPool;
+
 use SMProxy\MysqlProxy;
 
 /**
@@ -43,12 +45,13 @@ class MySQLPool
         }
         self::$init = true;
     }
+
     /**
      * @param \Swoole\Coroutine\MySQL $conn
      *
      * @throws MySQLException
      */
-    static public function recycle($conn)
+    static public function recycle(MysqlProxy $conn)
     {
         if (!self::$init) {
             throw new MySQLException('Should call MySQLPool::init.');
@@ -61,16 +64,16 @@ class MySQLPool
             throw new MySQLException('Unknow MySQL connection.');
         }
         $connsPool = &self::$spareConns[$connName];
-        if ($conn ->client ->isConnected()) {
+        if ($conn->client->isConnected()) {
             if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
-                ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp'])??0))
+                ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
             ) {
-                $conn -> client ->close();
+                $conn->client->close();
             } else {
                 $connsPool[] = $conn;
                 if (self::$pendingFetchCount[$connName] > 0) {
                     self::$resumeFetchCount[$connName]++;
-                    self::$yieldChannel[$connName] ->push($id);
+                    self::$yieldChannel[$connName]->push($id);
                 }
                 return;
             }
@@ -89,7 +92,7 @@ class MySQLPool
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    static public function fetch($connName,\swoole_server $server,$fd)
+    static public function fetch(string $connName, \swoole_server $server, int $fd)
     {
         if (!self::$init) {
             throw new MySQLException('Should call MySQLPool::init!');
@@ -100,34 +103,34 @@ class MySQLPool
         $connsPool = &self::$spareConns[$connName];
         if (!empty($connsPool) && count($connsPool) > self::$resumeFetchCount[$connName]) {
             $conn = array_pop($connsPool);
-            if(!$conn ->client ->isConnected()){
-                return self::reconnect($server,$fd,$conn,$connName);
-            }else{
-                $conn ->serverFd = $fd;
+            if (!$conn->client->isConnected()) {
+                return self::reconnect($server, $fd, $conn, $connName);
+            } else {
+                $conn->serverFd = $fd;
                 $id = spl_object_hash($conn);
                 self::$busyConns[$connName][$id] = $conn;
                 self::$lastConnsTime[$id] = microtime(true);
                 return $conn;
             }
         }
-        if ((count(self::$busyConns[$connName]) + count($connsPool) + self::$pendingFetchCount[$connName] + self::$initConnCount[$connName] )  >= self::$connsConfig[$connName]['maxConns']) {
-            if (!isset(self::$yieldChannel[$connName])){
+        if ((count(self::$busyConns[$connName]) + count($connsPool) + self::$pendingFetchCount[$connName] + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxConns']) {
+            if (!isset(self::$yieldChannel[$connName])) {
                 self::$yieldChannel[$connName] = new \Swoole\Coroutine\Channel(1);
             }
             self::$pendingFetchCount[$connName]++;
-            if (self::$yieldChannel[$connName] ->pop() == false) {
+            if (self::$yieldChannel[$connName]->pop() == false) {
                 self::$pendingFetchCount[$connName]--;
                 throw new MySQLException('Reach max connections! Cann\'t pending fetch!');
             }
             self::$resumeFetchCount[$connName]--;
             if (!empty($connsPool)) {
                 $conn = array_pop($connsPool);
-                if(!$conn ->client ->isConnected()){
-                    $conn = self::reconnect($server,$fd,$conn,$connName);
+                if (!$conn->client->isConnected()) {
+                    $conn = self::reconnect($server, $fd, $conn, $connName);
                     self::$pendingFetchCount[$connName]--;
                     return $conn;
-                }else{
-                    $conn ->serverFd = $fd;
+                } else {
+                    $conn->serverFd = $fd;
                     $id = spl_object_hash($conn);
                     self::$busyConns[$connName][$id] = $conn;
                     self::$lastConnsTime[$id] = microtime(true);
@@ -138,7 +141,7 @@ class MySQLPool
                 return false;//should not happen
             }
         }
-        return self::initConn($server,$fd,$connName);
+        return self::initConn($server, $fd, $connName);
     }
 
     /**
@@ -153,25 +156,25 @@ class MySQLPool
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    public static function initConn($server,$fd,$connName,$step=3)
+    public static function initConn(\swoole_server $server, int $fd, string $connName, int $step = 3)
     {
         self::$initConnCount[$connName]++;
         $chan = new \Swoole\Coroutine\Channel(1);
-        $conn = new MysqlProxy($server,$fd,$chan);
+        $conn = new MysqlProxy($server, $fd, $chan);
         $serverInfo = self::$connsConfig[$connName]['serverInfo'];
-        $database = strpos($connName,'_') == false?0:substr($connName,strpos($connName,'_')+1);
-        $conn ->database = $database;
-        $conn ->account = $serverInfo['account'];
-        $conn ->charset = self::$connsConfig[$connName]['charset'];
+        $database = strpos($connName, '_') == false ? 0 : substr($connName, strpos($connName, '_') + 1);
+        $conn->database = $database;
+        $conn->account = $serverInfo['account'];
+        $conn->charset = self::$connsConfig[$connName]['charset'];
         if ($conn->connect($serverInfo['host'], $serverInfo['port'],
-                $serverInfo['timeout']??0.1, $serverInfo['flag']??0) == false) {
+                $serverInfo['timeout'] ?? 0.1, $serverInfo['flag'] ?? 0) == false) {
             throw new MySQLException('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
         }
         $client = $chan->pop();
-        if ($client == false){
-            if ($step !=0 ){
-                self::initConn($server,$fd,$connName,$step--);
-            }else{
+        if ($client == false) {
+            if ($step != 0) {
+                self::initConn($server, $fd, $connName, $step--);
+            } else {
                 self::$initConnCount[$connName]--;
                 throw new MySQLException('Cann\'t auth to MySQL server: ' . json_encode($serverInfo));
             }
@@ -197,14 +200,14 @@ class MySQLPool
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    public static function reconnect($server,$fd,$conn,$connName)
+    public static function reconnect(\swoole_server $server, int $fd, MysqlProxy $conn, string $connName)
     {
-        if (!$conn ->client ->isConnected()){
+        if (!$conn->client->isConnected()) {
             $old_id = spl_object_hash($conn);
             unset(self::$busyConns[$connName][$old_id]);
             unset(self::$connsNameMap[$old_id]);
             self::$lastConnsTime[$old_id] = 0;
-            return self::initConn($server,$fd,$connName);
+            return self::initConn($server, $fd, $connName);
         }
         return $conn;
     }

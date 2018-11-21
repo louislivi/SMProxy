@@ -3,7 +3,7 @@
 namespace SMProxy\Handler\Frontend;
 
 use SMProxy\Log\Log;
-use SMProxy\MysqlPacket\{BinaryPacket,MySQLMessage};
+use SMProxy\MysqlPacket\{BinaryPacket, MySQLMessage};
 
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -26,17 +26,15 @@ class FrontendConnection
 
     public function query(BinaryPacket $bin)
     {
-
         // 取得语句
         $mm = new MySQLMessage($bin->data);
         $mm->position(5);
-        $sql = $mm ->readString();
+        $sql = $mm->readString();
         if ($sql == null || strlen($sql) == 0) {
             $mysql_log = Log::get_logger('mysql');
-            $mysql_log ->error('Empty SQL');
-            return;
+            $mysql_log->error('Empty SQL');
+            return false;
         }
-
         // 执行查询
         return $this->queryHandler->query($sql);
     }

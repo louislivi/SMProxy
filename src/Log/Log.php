@@ -4,6 +4,7 @@
  * Date: 2018/11/12
  * Time: 上午9:56
  */
+
 namespace SMProxy\Log;
 
 /**
@@ -26,7 +27,8 @@ namespace SMProxy\Log;
  * private create_log_path   创建日志目录
  * private get_log_file      获取日志文件名称
  */
-class Log{
+class Log
+{
 // 日志根目录
     private $_log_path = '.';
 
@@ -46,25 +48,29 @@ class Log{
 
     /**
      * 设置配置
+     *
      * @param  array $config 总配置设定
      * @param bool $open 日志开关
      */
-    public static function set_config($config=array(),$open = true){
+    public static function set_config(array $config = [], bool $open = true)
+    {
         self::$_CONFIG = $config;
         self::$open = $open;
     }
 
     /**
      * 获取日志类对象
+     *
      * @param  array $config 总配置设定
      */
-    public static function get_logger($tag='system'){
+    public static function get_logger(string $tag = 'system')
+    {
 
         // 根据tag从总配置中获取对应设定，如不存在使用system设定
-        $config = isset(self::$_CONFIG[$tag])? self::$_CONFIG[$tag] : (isset(self::$_CONFIG['system'])? self::$_CONFIG['system'] : array());
+        $config = isset(self::$_CONFIG[$tag]) ? self::$_CONFIG[$tag] : (isset(self::$_CONFIG['system']) ? self::$_CONFIG['system'] : array());
 
         // 设置标签
-        $config['tag'] = $tag!='' && $tag!='system'? $tag : '-';
+        $config['tag'] = $tag != '' && $tag != 'system' ? $tag : '-';
 
         // 返回日志类对象
         return new Log($config);
@@ -73,27 +79,29 @@ class Log{
 
     /**
      * 初始化
+     *
      * @param array $config 配置设定
      */
-    public function __construct($config=array()){
+    public function __construct(array $config = [])
+    {
 
         // 日志根目录
-        if(isset($config['log_path'])){
+        if (isset($config['log_path'])) {
             $this->_log_path = $config['log_path'];
         }
 
         // 日志文件
-        if(isset($config['log_file'])){
+        if (isset($config['log_file'])) {
             $this->_log_file = $config['log_file'];
         }
 
         // 日志自定义目录
-        if(isset($config['format'])){
+        if (isset($config['format'])) {
             $this->_format = $config['format'];
         }
 
         // 日志标签
-        if(isset($config['tag'])){
+        if (isset($config['tag'])) {
             $this->_tag = $config['tag'];
         }
 
@@ -101,40 +109,51 @@ class Log{
 
     /**
      * 写入信息日志
+     *
      * @param  String $data 信息数据
+     *
      * @return Boolean
      */
-    public function info($data){
+    public function info(string $data)
+    {
         return $this->add('INFO', $data);
     }
 
     /**
      * 写入警告日志
-     * @param  String  $data 警告数据
+     *
+     * @param  String $data 警告数据
+     *
      * @return Boolean
      */
-    public function warn($data){
+    public function warn(string $data)
+    {
         return $this->add('WARN', $data);
     }
 
     /**
      * 写入错误日志
-     * @param  String  $data 错误数据
+     *
+     * @param  String $data 错误数据
+     *
      * @return Boolean
      */
-    public function error($data){
+    public function error(string $data)
+    {
         return $this->add('ERROR', $data);
     }
 
     /**
      * 写入日志
-     * @param  String  $type 日志类型
-     * @param  String  $data 日志数据
+     *
+     * @param  String $type 日志类型
+     * @param  String $data 日志数据
+     *
      * @return Boolean
      */
-    private function add($type, $data)
+    private function add(string $type, string $data)
     {
-        if (self::$open){
+        if (self::$open) {
             // 获取日志文件
             $log_file = $this->get_log_file();
 
@@ -145,13 +164,13 @@ class Log{
             $dt = new \DateTime;
 
             // 日志内容
-            $log_data = sprintf('[%s] %-5s %s %s'.PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->_tag, $data);
+            $log_data = sprintf('[%s] %-5s %s %s' . PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->_tag, $data);
 
             // 写入日志文件
-            if($is_create){
-                try{
+            if ($is_create) {
+                try {
                     return \Swoole\Coroutine::writeFile($log_file, $log_data, FILE_APPEND);
-                }catch (\Exception $exception){
+                } catch (\Exception $exception) {
                     return file_put_contents($log_file, $log_data, FILE_APPEND);
                 }
 
@@ -163,11 +182,14 @@ class Log{
 
     /**
      * 创建日志目录
-     * @param  String  $log_path 日志目录
+     *
+     * @param  String $log_path 日志目录
+     *
      * @return Boolean
      */
-    private function create_log_path($log_path){
-        if(!is_dir($log_path)){
+    private function create_log_path(string $log_path)
+    {
+        if (!is_dir($log_path)) {
             return mkdir($log_path, 0777, true);
         }
         return true;
@@ -175,9 +197,11 @@ class Log{
 
     /**
      * 获取日志文件名称
+     *
      * @return String
      */
-    private function get_log_file(){
+    private function get_log_file()
+    {
 
         // 创建日期时间对象writeFile
         $dt = new \DateTime();

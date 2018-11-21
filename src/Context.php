@@ -13,7 +13,7 @@ class Context
 {
     protected static $pool = [];
 
-    static function get($key)
+    static function get(string $key)
     {
         $cid = Coroutine::getuid();
         if ($cid < 0) {
@@ -25,7 +25,7 @@ class Context
         return null;
     }
 
-    static function put($key, $item)
+    static function put(string $key, $item)
     {
         $cid = Coroutine::getuid();
         if ($cid > 0) {
@@ -34,7 +34,7 @@ class Context
 
     }
 
-    static function delete($key = null)
+    static function delete(string $key = null)
     {
         $cid = Coroutine::getuid();
         if ($cid > 0) {

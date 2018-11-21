@@ -33,7 +33,7 @@ class SMProxyServer extends BaseServer
      *
      * @throws SMProxyException
      */
-    public function onConnect($server, $fd)
+    public function onConnect(\swoole_server $server, int $fd)
     {
         // 生成认证数据
         $Authenticator = new FrontendAuthenticator();
@@ -51,7 +51,7 @@ class SMProxyServer extends BaseServer
      * @param $reactor_id
      * @param $data
      */
-    public function onReceive($server, $fd, $reactor_id, $data)
+    public function onReceive(\swoole_server $server, int $fd, int $reactor_id, string $data)
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
             if (!isset($this->source[$fd]->auth)) {
@@ -97,6 +97,7 @@ class SMProxyServer extends BaseServer
                                     $queryType == ServerParse::SET ||
                                     $queryType == ServerParse::USE
                                 ) {
+
                                     if (!isset($this->connectHasTransaction[$fd]) || !$this->connectHasTransaction[$fd]) {
                                         $trim_data = rtrim($data);
                                         if ((($trim_data[-6] == 'u' || $trim_data[-6] == 'U') && ServerParse::uCheck($trim_data, -6, false) == ServerParse::UPDATE)) {
@@ -184,7 +185,7 @@ class SMProxyServer extends BaseServer
      *
      * @throws MySQLException
      */
-    public function onClose($server, $fd)
+    public function onClose(\swoole_server $server, int $fd)
     {
         if (isset($this->source[$fd])) {
             unset($this->source[$fd]);
@@ -211,7 +212,7 @@ class SMProxyServer extends BaseServer
      * @throws MySQLException
      * @throws SMProxyException
      */
-    public function onWorkerStart($server, $worker_id)
+    public function onWorkerStart(\swoole_server $server, int $worker_id)
     {
         $this->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
         //初始化链接
@@ -219,18 +220,17 @@ class SMProxyServer extends BaseServer
         $clients = [];
         foreach ($this->dbConfig as $key => $value) {
             //建立初始连接
-//            while ($value['maxSpareConns'] > 0) {
-                $clients[] = MySQLPool::fetch($key, $server, 1);
-//                $value['maxSpareConns']--;
-//            }
+            $clients[] = MySQLPool::fetch($key, $server, 1);
         }
-        foreach ($clients as $client){
+        foreach ($clients as $client) {
             MySQLPool::recycle($client);
         }
         Log::set_config(CONFIG['server']['logs']['config'], CONFIG['server']['logs']['open']);
-        $system_log = Log::get_logger('system');
-        $system_log->info('server start!');
-        print_r('server start!'."\n");
+        if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
+            $system_log = Log::get_logger('system');
+            $system_log->info('server start!');
+            print_r('server start!' . "\n");
+        }
     }
 
     /**

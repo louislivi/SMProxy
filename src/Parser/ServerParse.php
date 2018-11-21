@@ -30,9 +30,9 @@ final class ServerParse
     public const KILL_QUERY = 16;
     public const MODEL = 17;
 
-    public static function parse(String $stmt)
+    public static function parse(string $stmt)
     {
-        for ($i = 0,$stmtLen=strlen($stmt); $i < $stmtLen; ++$i) {
+        for ($i = 0, $stmtLen = strlen($stmt); $i < $stmtLen; ++$i) {
             switch ($stmt[$i]) {
                 case ' ':
                 case '\t':
@@ -78,7 +78,7 @@ final class ServerParse
     }
 
 // EXPLAIN' '
-    static function explainCheck(String $stmt, int $offset)
+    static function explainCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + strlen("XPLAIN ")) {
             $c1 = $stmt[++$offset];
@@ -98,7 +98,7 @@ final class ServerParse
     }
 
     // KILL' '
-    static function killCheck(String $stmt, int $offset)
+    static function killCheck(string $stmt, int $offset)
     {
         $stmtLen = strlen($stmt);
         if ($stmtLen > $offset + strlen("ILL ")) {
@@ -129,7 +129,7 @@ final class ServerParse
     }
 
     // KILL QUERY' '
-    static function killQueryCheck(String $stmt, int $offset)
+    static function killQueryCheck(string $stmt, int $offset)
     {
         $stmtLen = strlen($stmt);
         if ($stmtLen > $offset + strlen("UERY ")) {
@@ -158,7 +158,7 @@ final class ServerParse
     }
 
     // BEGIN
-    static function beginCheck(String $stmt, int $offset)
+    static function beginCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 4) {
             $c1 = $stmt[++$offset];
@@ -174,7 +174,7 @@ final class ServerParse
     }
 
     // COMMIT
-    static function commitCheck(String $stmt, int $offset)
+    static function commitCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 5) {
             $c1 = $stmt[++$offset];
@@ -192,7 +192,7 @@ final class ServerParse
     }
 
     // DELETE' '
-    static function deleteCheck(String $stmt, int $offset)
+    static function deleteCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -211,7 +211,7 @@ final class ServerParse
     }
 
     // INSERT' '
-    static function insertCheck(String $stmt, int $offset)
+    static function insertCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -229,7 +229,7 @@ final class ServerParse
         return self::OTHER;
     }
 
-    static function rCheck(String $stmt, int $offset)
+    static function rCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -247,7 +247,7 @@ final class ServerParse
     }
 
     // REPLACE' '
-    static function replaceCheck(String $stmt, int $offset)
+    static function replaceCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -266,7 +266,7 @@ final class ServerParse
     }
 
     // ROLLBACK
-    static function rollabckCheck(String $stmt, int $offset)
+    static function rollabckCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -284,7 +284,7 @@ final class ServerParse
         return self::OTHER;
     }
 
-    static function sCheck(String $stmt, int $offset)
+    static function sCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -308,7 +308,7 @@ final class ServerParse
     }
 
     // SAVEPOINT
-    static function savepointCheck(String $stmt, int $offset)
+    static function savepointCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 8) {
             $c1 = $stmt[++$offset];
@@ -328,7 +328,7 @@ final class ServerParse
         return self::OTHER;
     }
 
-    static function seCheck(String $stmt, int $offset)
+    static function seCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -352,7 +352,7 @@ final class ServerParse
     }
 
     // SELECT' '
-    static function selectCheck(String $stmt, int $offset)
+    static function selectCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 4) {
             $c1 = $stmt[++$offset];
@@ -368,7 +368,7 @@ final class ServerParse
     }
 
     // SHOW' '
-    static function showCheck(String $stmt, int $offset)
+    static function showCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 3) {
             $c1 = $stmt[++$offset];
@@ -383,7 +383,7 @@ final class ServerParse
     }
 
     // START' '
-    static function startCheck(String $stmt, int $offset)
+    static function startCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 4) {
             $c1 = $stmt[++$offset];
@@ -399,7 +399,7 @@ final class ServerParse
     }
 
     // UPDATE' ' | USE' '
-    static function uCheck(String $stmt, int $offset, bool $has_Space = true)
+    static function uCheck(string $stmt, int $offset, bool $has_Space = true)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -412,7 +412,7 @@ final class ServerParse
                         $c4 = $stmt[++$offset];
                         $c5 = $stmt[++$offset];
                         if (($c1 == 'D' || $c1 == 'd') && ($c2 == 'A' || $c2 == 'a') && ($c3 == 'T' || $c3 == 't')
-                            && ($c4 == 'E' || $c4 == 'e') && ($has_Space?($c5 == ' ' || $c5 == '\t' || $c5 == '\r' || $c5 == '\n'):true)) {
+                            && ($c4 == 'E' || $c4 == 'e') && ($has_Space ? ($c5 == ' ' || $c5 == '\t' || $c5 == '\r' || $c5 == '\n') : true)) {
                             return self::UPDATE;
                         }
                     }

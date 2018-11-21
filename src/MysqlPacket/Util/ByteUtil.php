@@ -1,5 +1,6 @@
 <?php
-namespace  SMProxy\MysqlPacket\Util;
+
+namespace SMProxy\MysqlPacket\Util;
 
 use SMProxy\MysqlPacket\MySQLMessage;
 
@@ -10,40 +11,40 @@ use SMProxy\MysqlPacket\MySQLMessage;
  */
 class ByteUtil
 {
-    static public function readUB2($data)
+    static public function readUB2(array $data)
     {
-        $i = ($data[0] );
-        $i |= ($data[1]  << 8);
+        $i = ($data[0]);
+        $i |= ($data[1] << 8);
         return $i;
     }
 
-    static public function readUB3($data)
+    static public function readUB3(array $data)
     {
-        $i = ($data[0] );
-        $i |= ($data[1]  << 8);
-        $i |= ($data[2]  << 16);
+        $i = ($data[0]);
+        $i |= ($data[1] << 8);
+        $i |= ($data[2] << 16);
         return $i;
     }
 
-    static public function readUB4($data)
+    static public function readUB4(array $data)
     {
-        $i = ($data[0] );
-        $i |= ($data[1]  << 8);
-        $i |= ($data[2]  << 16);
-        $i |= ($data[3]  << 24);
+        $i = ($data[0]);
+        $i |= ($data[1] << 8);
+        $i |= ($data[2] << 16);
+        $i |= ($data[3] << 24);
         return $i;
     }
 
-    static public function readLong($data)
+    static public function readLong(array $data)
     {
-        $l = ($data[0] );
-        $l |= ($data[1] ) << 8;
-        $l |= ($data[2] ) << 16;
-        $l |= ($data[3] ) << 24;
-        $l |= ($data[4] ) << 32;
-        $l |= ($data[5] ) << 40;
-        $l |= ($data[6] ) << 48;
-        $l |= ($data[7] ) << 56;
+        $l = ($data[0]);
+        $l |= ($data[1]) << 8;
+        $l |= ($data[2]) << 16;
+        $l |= ($data[3]) << 24;
+        $l |= ($data[4]) << 32;
+        $l |= ($data[5]) << 40;
+        $l |= ($data[6]) << 48;
+        $l |= ($data[7]) << 56;
         return $l;
     }
 
@@ -54,9 +55,9 @@ class ByteUtil
      *
      * @return
      */
-    static public function readLength($data)
+    static public function readLength(array $data)
     {
-        $length = $data[0] ;
+        $length = $data[0];
         switch ($length) {
             case 251:
                 return MySQLMessage::$NULL_LENGTH;

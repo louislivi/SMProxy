@@ -14,7 +14,7 @@ final class ParseUtil
         return ($c == ' ' || $c == "\t" || $c == "\n" || $c == "\r" || $c == ';');
     }
 
-    public static function getSQLId(String $stmt)
+    public static function getSQLId(string $stmt)
     {
         $offset = strpos($stmt, '=');
         if ($offset != -1 && strlen($stmt) > ++$offset) {
@@ -29,7 +29,7 @@ final class ParseUtil
      *
      * @param int offset stmt.charAt(offset) == first <code>'</code>
      */
-    private static function parseString(String $stmt, int $offset)
+    private static function parsestring(string $stmt, int $offset)
     {
         $sb = '';
         $stmtLen = strlen($stmt);
@@ -77,7 +77,7 @@ final class ParseUtil
      *
      * @param int offset stmt.charAt(offset) == first <code>"</code>
      */
-    private static function parseString2(String $stmt, int $offset)
+    private static function parsestring2(string $stmt, int $offset)
     {
         $sb = '';
         for (++$offset;
@@ -129,7 +129,7 @@ final class ParseUtil
      * @param offset stmt.charAt(offset) == first <code>`</code>
      */
     private
-    static function parseIdentifierEscape(String $stmt, int $offset)
+    static function parseIdentifierEscape(string $stmt, int $offset)
     {
         $sb = '';
         for (++$offset;
@@ -154,26 +154,26 @@ final class ParseUtil
      * @param aliasIndex for <code>AS id</code>, index of 'i'
      */
     public
-    static function parseAlias(String $stmt, int $aliasIndex)
+    static function parseAlias(string $stmt, int $aliasIndex)
     {
         if ($aliasIndex < 0 || $aliasIndex >= strlen($stmt)) {
             return null;
         }
         switch ($stmt[$aliasIndex]) {
             case '\'':
-                return self::parseString($stmt, $aliasIndex);
+                return self::parsestring($stmt, $aliasIndex);
             case '"':
-                return self::parseString2($stmt, $aliasIndex);
+                return self::parsestring2($stmt, $aliasIndex);
             case '`':
                 return self::parseIdentifierEscape($stmt, $aliasIndex);
             default:
                 $offset = $aliasIndex;
-                for ($stmtLen = strlen($stmt); $offset <  $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]); ++$offset) ;
+                for ($stmtLen = strlen($stmt); $offset < $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]); ++$offset) ;
                 return substr($stmt, $aliasIndex, $offset);
         }
     }
 
-    public static function comment(String $stmt, int $offset)
+    public static function comment(string $stmt, int $offset)
     {
         $len = strlen($stmt);
         $n = $offset;
@@ -200,7 +200,7 @@ final class ParseUtil
     }
 
     public
-    static function currentCharIsSep(String $stmt, int $offset)
+    static function currentCharIsSep(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset) {
             switch ($stmt[$offset]) {
@@ -219,7 +219,7 @@ final class ParseUtil
     /*****
      * 检查下一个字符是否为分隔符，并把偏移量加1
      */
-    public static function nextCharIsSep(String $stmt, int $offset)
+    public static function nextCharIsSep(string $stmt, int $offset)
     {
         return self::currentCharIsSep($stmt, ++$offset);
     }
@@ -229,20 +229,20 @@ final class ParseUtil
      *
      * @param string $stmt 被解析的sql
      * @param int $offset 被解析的sql的当前位置
-     * @param string $nextExpectedString 在stmt中准备查找的字符串
+     * @param string $nextExpectedstring 在stmt中准备查找的字符串
      * @param bool $checkSepChar 当找到expectValue值时，是否检查其后面字符为分隔符号
      *
      * @return int 如果包含指定的字符串，则移动相应的偏移量，否则返回值=offset
      */
-    public static function nextStringIsExpectedWithIgnoreSepChar(String $stmt,
+    public static function nextstringIsExpectedWithIgnoreSepChar(string $stmt,
                                                                  int $offset,
-                                                                 String $nextExpectedString,
+                                                                 string $nextExpectedstring,
                                                                  bool $checkSepChar)
     {
-        if ($nextExpectedString == null || strlen($nextExpectedString) < 1) return $offset;
+        if ($nextExpectedstring == null || strlen($nextExpectedstring) < 1) return $offset;
         $i = $offset;
         $index = 0;
-        for ($stmtLen = strlen($stmt); $i <  $stmtLen && $index < strlen($nextExpectedString); ++$i) {
+        for ($stmtLen = strlen($stmt); $i < $stmtLen && $index < strlen($nextExpectedstring); ++$i) {
             if ($index == 0) {
                 $isSep = self::currentCharIsSep($stmt, $i);
                 if ($isSep) {
@@ -250,12 +250,12 @@ final class ParseUtil
                 }
             }
             $actualChar = $stmt[$i];
-            $expectedChar = $nextExpectedString[$index++];
+            $expectedChar = $nextExpectedstring[$index++];
             if ($actualChar != $expectedChar) {
                 return $offset;
             }
         }
-        if ($index == strlen($nextExpectedString)) {
+        if ($index == strlen($nextExpectedstring)) {
             $ok = true;
             if ($checkSepChar) {
                 $ok = self::nextCharIsSep($stmt, $i);
@@ -268,8 +268,8 @@ final class ParseUtil
     private const JSON = "json";
     private const EQ = "=";
 
-    //private static final String WHERE = "where";
-    //private static final String SET = "set";
+    //private static final string WHERE = "where";
+    //private static final string SET = "set";
 
     /**********
      * 检查下一个字符串是否json= *
@@ -279,7 +279,7 @@ final class ParseUtil
      *
      * @return int 如果包含指定的字符串，则移动相应的偏移量，否则返回值=offset
      */
-    public static function nextStringIsJsonEq(String $stmt, int $offset)
+    public static function nextstringIsJsonEq(string $stmt, int $offset)
     {
         $i = $offset;
 
@@ -289,21 +289,21 @@ final class ParseUtil
         }
 
         // json 串
-        $k = self::nextStringIsExpectedWithIgnoreSepChar($stmt, $i, self::JSON, false);
+        $k = self::nextstringIsExpectedWithIgnoreSepChar($stmt, $i, self::JSON, false);
         if ($k <= $i) {
             return $offset;
         }
         $i = $k;
 
         // 等于符号
-        $k = self::nextStringIsExpectedWithIgnoreSepChar($stmt, $i, self::EQ, false);
+        $k = self::nextstringIsExpectedWithIgnoreSepChar($stmt, $i, self::EQ, false);
         if ($k <= $i) {
             return $offset;
         }
         return $i;
     }
 
-    public static function move(String $stmt, int $offset, int $length)
+    public static function move(string $stmt, int $offset, int $length)
     {
         $stmtLen = strlen($stmt);
         $i = $offset;
@@ -325,7 +325,7 @@ final class ParseUtil
         return $i;
     }
 
-    public static function compare(String $s, int $offset, $keyword)
+    public static function compare(string $s, int $offset, $keyword)
     {
         if (strlen($s) >= $offset + count($keyword)) {
             for ($i = 0; $i < count($keyword);

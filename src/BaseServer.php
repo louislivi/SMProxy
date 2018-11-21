@@ -46,25 +46,29 @@ abstract class BaseServer extends Base
             $this->server->on('close', [$this, 'onClose']);
             $this->server->on('WorkerStart', [$this, 'onWorkerStart']);
             $result = $this->server->start();
-            if ($result){
-                print_r('server start success!'. "\n");
-            }else{
-                print_r('server start error!'. "\n");
+            if ($result) {
+                print_r('server start success!' . "\n");
+            } else {
+                print_r('server start error!' . "\n");
             }
-        } catch (\Swoole\Exception | \ErrorException | SMProxyException $exception) {
-            print_r('ERROR:'.$exception->getMessage() . "\n");
+        } catch (\Swoole\Exception $exception) {
+            print_r('ERROR:' . $exception->getMessage() . "\n");
+        } catch (\ErrorException $exception) {
+            print_r('ERROR:' . $exception->getMessage() . "\n");
+        } catch (SMProxyException $exception) {
+            print_r('ERROR:' . $exception->errorMessage() . "\n");
         }
     }
 
-    protected function onConnect($server, $fd)
+    protected function onConnect(\swoole_server $server, int $fd)
     {
     }
 
-    protected function onReceive($server, $fd, $reactor_id, $data)
+    protected function onReceive(\swoole_server $server, int $fd, int $reactor_id, string $data)
     {
     }
 
-    protected function onWorkerStart($server, $worker_id)
+    protected function onWorkerStart(\swoole_server $server, int $worker_id)
     {
     }
 
@@ -74,7 +78,7 @@ abstract class BaseServer extends Base
      * @param $server
      * @param $fd
      */
-    protected function onClose($server, $fd)
+    protected function onClose(\swoole_server $server, int $fd)
     {
         $cid = Coroutine::getuid();
         if ($cid > 0 && isset(self::$pool[$cid])) {
@@ -84,11 +88,11 @@ abstract class BaseServer extends Base
     }
 
 
-    protected function writeErrMessage($id,String $msg,int $errno = 0)
+    protected function writeErrMessage(int $id, String $msg, int $errno = 0)
     {
         $err = new ErrorPacket();
         $err->packetId = $id;
-        if ($errno){
+        if ($errno) {
             $err->errno = $errno;
         }
         $err->message = array_iconv($msg);

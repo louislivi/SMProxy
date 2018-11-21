@@ -1,5 +1,7 @@
 <?php
+
 namespace SMProxy\MysqlPacket;
+
 use SMProxy\MysqlPacket\Util\BufferUtil;
 
 /**
