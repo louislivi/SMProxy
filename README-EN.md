@@ -13,7 +13,7 @@ English | [中文](./README.md)
                                                                \______/
 ```
 # [SMProxy](https://github.com/louislivi/smproxy)
-## swoole msyql proxy 
+## swoole mysql proxy 
 A mysql database connection pool based on mysql protocol, swoole development
 ## Principle
     Store the database connection as an object in memory. 
