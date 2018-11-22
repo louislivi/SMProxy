@@ -21,8 +21,9 @@
 [![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
 [![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
 
-## swoole mysql proxy 
-一个基于mysql协议，swoole 开发的mysql数据库连接池
+## Swoole MySQL Proxy
+一个基于mysql协议，swoole 开发的mysql数据库连接池。
+
 ## 原理
     将数据库连接作为对象存储在内存中，当用户需要访问数据库时，首次会建立连接，后面并非建立一个新的连接，
     而是从连接池中取出一个已建立的空闲连接对象。使用完毕后，用户也并非将连接关闭，而是将连接放回连接池中，
@@ -49,28 +50,34 @@
     mycat等数据库中间件会出现部分sql无法使用，例如不支持批量添加等，而且过于臃肿。
     所以就自己编写了这个仅支持连接池和读写分离的轻量级中间件，
     使用swoole协程调度HandshakeV10协议转发使程序更加稳定不用像mycat一样解析所有sql包体，增加复杂度。
-## 环境
-* swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-* php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
-## 安装
 
+## 环境
+
+- swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
+- php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+
+## 安装
 下载的文件直接解压即可。
 
-```git clont https://github.com/louislivi/smproxy.git```
+```bash
+git clont https://github.com/louislivi/smproxy.git
+```
 
 或
 
-```composer create-project --prefer-dist louislivi/smproxy smproxy```
+```bash
+composer create-project --prefer-dist louislivi/smproxy smproxy
+```
 
 ## 运行
 需要给予 bin/server 执行权限
-- bin/server start   : 运行服务
-- bin/server stop    : 停止服务
-- bin/server restart : 重启服务
-- bin/server status  : 查询服务运行状态
-- bin/server reload  : 平滑重启
-- bin/server -h      : 帮助
-- bin/server -v      : 查看当前服务版本
+- `bin/server start`   : 运行服务
+- `bin/server stop`    : 停止服务
+- `bin/server restart` : 重启服务
+- `bin/server status`  : 查询服务运行状态
+- `bin/server reload`  : 平滑重启
+- `bin/server -h`      : 帮助
+- `bin/server -v`      : 查看当前服务版本
 
 ## SMProxy连接测试
 测试SMProxy与测试mysql完全一致，mysql怎么连接，SMProxy就怎么连接。
