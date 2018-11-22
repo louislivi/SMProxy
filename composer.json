@@ -22,7 +22,7 @@
         }
     },
     "scripts": {
-      "test": "php ./bin/server start && printf \"ok\"",
+      "test": "php ./bin/server start && php ./bin/server stop",
       "start": "php ./bin/server start",
       "stop": "php ./bin/server stop",
       "restart": "php ./bin/server restart",
