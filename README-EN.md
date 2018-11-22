@@ -22,32 +22,31 @@ English | [中文](./README.md)
 [![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
 [![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
 
-## swoole mysql proxy 
-A mysql database connection pool based on mysql protocol, swoole development
-## Principle
-    Store the database connection as an object in memory. 
-    When the user needs to access the database, 
-    the connection is established for the first time, 
-    and instead a new connection is established.
-    Instead, an established free connection object is taken from the connection pool.   After using it, 
-    the user does not close the connection, 
-    but puts the connection back into the connection pool.
-    For access to the next request. 
-    The establishment and disconnection of the  connection are managed by the connection pool itself.
-    At the same time, 
-    you can also control the connection pool by setting the parameters of the connection pool.
-    The initial number of connections, 
-    the number of upper and lower limits of the connection, 
-    the maximum number of uses per connection, 
-    the maximum idle time, 
-    and so on.
-    It is also possible to monitor the number of database connections, 
-    usage, etc. through its own management mechanism.
-    If the maximum number of connections is exceeded, 
-    the coroutine will be suspended. 
-    Wait until the connection is closed and the coroutine will resume.
+## Swoole MySQL Proxy
 
-## Characteristic
+A mysql database connection pool based on mysql protocol, swoole.
+
+## Principle
+
+Store the database connection as an object in memory. When users need to access the database, a connection will be established for the first time. After that, instead of establishing a new connection, free connections will be retrieved from the connection pool when users require. Also, users don't need to close connection but put it back into the connection pool for other requests to use.
+
+All these things, connecting, disconnecting are managed by the connection pool itself. At the same time, 
+you can also configure the parameters of the connection pool, like:
+
+- The initial number of connections
+- Min / Max number of connections
+- Number of max requests per connection
+- Max idle time of connections
+
+...etc.
+
+It's also possible to monitor the number of database connections, 
+usage, etc. through its own management system.
+
+If the maximum number of connections is exceeded, the coroutine will be suspended and wait until a connection is released.
+
+## Features
+
 - Support for reading and writing separation
 - Support database connection pool, can effectively solve the database connection bottleneck brought by PHP
 - Support SQL92 standard
@@ -59,36 +58,48 @@ A mysql database connection pool based on mysql protocol, swoole development
 - Perfectly compatible with mysql4.1 -5.7
 - Compatible with major frameworks to seamlessly improve performance
 
-## Original design intention
-    Php does not have a connection pool, so the database will be full when the concurrency is high.
-    Database middleware such as mycat will appear some sql can not be used, 
-    for example, does not support batch addition, etc., and is too bloated.
-    So I wrote this lightweight middleware that only supports connection pooling and read-write separation.
-    Use the swoole coroutine to schedule HandshakeV10 protocol forwarding to make the program more stable. 
-    Do not parse all sql packages like mycat, increasing the complexity.
-## Need environment
+## Why This
+
+Php does not have a connection pool, so the database will be full when the concurrency is high.
+Database middleware such as mycat will appear some sql can not be used, 
+for example, does not support batch addition, etc., and is too bloated.
+So I wrote this lightweight middleware that only supports connection pooling and read-write separation.
+Use the swoole coroutine to schedule HandshakeV10 protocol forwarding to make the program more stable. 
+Do not parse all sql packages like mycat, increasing the complexity.
+
+## Environment Requirements
+
 * swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
 * php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
-## installation
+
+## Installation
+
 Download the file directly and extract it.
 
-```git clont https://github.com/louislivi/smproxy.git```
+```bash
+git clont https://github.com/louislivi/smproxy.git
+```
 
-OR
+Or
 
-```composer create-project --prefer-dist louislivi/smproxy smproxy```
+```bash
+composer create-project --prefer-dist louislivi/smproxy smproxy
+```
 
 ## Run
-Need to give bin/server execute permission.
-- bin/server start   : Running service
-- bin/server stop    : Out of service
-- bin/server restart : Restart service
-- bin/server status  : Query service running status
-- bin/server reload  : Smooth restart
-- bin/server -h      : help
-- bin/server -v      : view service version
 
-## SMProxy connection test
+`bin/server` needs execute permission.
+
+- `bin/server start`   : Running service
+- `bin/server stop`    : Out of service
+- `bin/server restart` : Restart service
+- `bin/server status`  : Query service running status
+- `bin/server reload`  : Smooth restart
+- `bin/server -h`      : help
+- `bin/server -v`      : view service version
+
+## Connection Test
+
 Testing SMProxy is exactly the same as testing mysql. How to connect mysql, how to connect SMProxy.
 
 It is recommended to use the command line test first:
@@ -96,8 +107,9 @@ It is recommended to use the command line test first:
 mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 Tool connections are also available.
-### Test
-#### Useless framework php7.2.6
+
+### PHP 7.2.6 Without Framework
+
 ![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
 Unused:0.15148401260376  Use:0.040808916091919
@@ -110,7 +122,8 @@ Use connection pool:
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
 
-#### Thinkphp5.0
+### Thinkphp 5.0
+
 ![Thinkphp5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
 
 Unused connection pool:
@@ -121,7 +134,8 @@ Use connection pool:
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542685109798.jpg)
 
-#### Laravel5.7
+### Laravel 5.7
+
 ![Laravel5.7](https://file.gesmen.com.cn/smproxy/3FE76B55-9422-40DB-B8CE-7024F36BB5A9.png)
 
 Unused connection pool:
@@ -132,7 +146,8 @@ Use connection pool:
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542686580551.jpg)
 
-#### Mysql connection number
+### MySQL Connection Number
+
 Unused connection pool:
 
 ![mysql](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
@@ -144,16 +159,19 @@ Use connection pool:
 Please take the actual pressure measurement as the standard, the root data volume, network environment, database configuration.
 In the test, the maximum number of connections will be exceeded, and the coroutine will be suspended. Wait until the connection is closed and the coroutine is resumed.
 All concurrency and the configuration file maxConns are not suitable, which will result in slower than the original link, mainly to control the number of connections.
-## communicate with:
+
+## Communities & Groups
+
 QQ group: 722124111
-Email   :574747417@qq.com
-## Configuration file:
-```
+
+## Configuration
+
 The configuration file is located in the smproxy/conf directory
 The configuration file uppercase ROOT represents the current SMProxy and directory
-```
+
 ### database.json
-```Json
+
+```json
 {
   "database": {
     "account": {
@@ -192,6 +210,7 @@ The configuration file uppercase ROOT represents the current SMProxy and directo
   }
 }
 ```
+
 account information | serverInfo service information | databases database connection pool information |
 | ------ | ------ | ------ |
 | account.root user ID Corresponds to serverInfo...account.root | serverInfo.server1 Service ID Corresponds to databases..serverInfo | databases.dbname database name |
@@ -203,7 +222,8 @@ Account..password password | serverInfo..host database connection address | data
 | | serverInfo..account corresponds to databases.account | |
 
 ### server.json
-```Json
+
+```json
 {
   "server": {
     "user": "root",
@@ -249,6 +269,7 @@ Account..password password | serverInfo..host database connection address | data
   }
 }
 ```
+
 |user service username | password service password | charset service code | host link address | port service port multiple, separated | mode run mode | sock_type SWOOLE_SOCK_TCP tcp | logs log configuration | swoole swoole configuration | swoole_client_setting client configuration | swoole_client_sock_setting Client sock configuration |
  | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
  |   |   |   |   |   | SWOOLE_PROCESS multi-process mode (default), SWOOLE_BASE basic mode | | logs.open log switch | worker_num work process number | package_max_length maximum packet length | sock_type SWOOLE_SOCK_TCP tcp |
@@ -261,7 +282,8 @@ Account..password password | serverInfo..host database connection address | data
 |   |   |   |   |   |   |   |   |  log_file log directory | | |
 |   |   |   |   |   |   |   |   |  pid_file main process pid directory | | |
 
-## Other learning materials
+## More Documentation
+
 - mysql protocol analysis: https://www.cnblogs.com/davygeek/p/5647175.html
 - mysql official protocol documentation: https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
 - mycat source code: https://github.com/MyCATApache/Mycat-Server
