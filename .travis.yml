@@ -10,6 +10,8 @@ install:
 before_script:
 - composer update --dev
 - chmod a+x ./bin/server
+- php -v
+- php -m
 
 script: composer test
 
