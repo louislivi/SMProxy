@@ -6,7 +6,7 @@ php:
 - 7.2
 
 install:
-- pecl install -f swoole-4.2.8
+- pecl install -f -y swoole-4.2.8
 before_script:
 - composer update --dev
 
