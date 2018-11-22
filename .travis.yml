@@ -11,7 +11,7 @@ before_script:
 - composer update --dev
 - chmod a+x ./bin/server
 
-script: composer test
+script: ./bin/server start
 
 cache:
   directories:
