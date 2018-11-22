@@ -70,6 +70,13 @@ A mysql database connection pool based on mysql protocol, swoole development
 * php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 ## installation
 Download the file directly and extract it.
+
+```git clont https://github.com/louislivi/smproxy.git```
+
+OR
+
+```composer create-project --prefer-dist louislivi/smproxy smproxy```
+
 ## Run
 Need to give bin/server execute permission.
 - bin/server start   : Running service
