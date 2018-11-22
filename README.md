@@ -53,7 +53,15 @@
 * swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
 * php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 ## 安装
+
 下载的文件直接解压即可。
+
+```git clont https://github.com/louislivi/smproxy.git```
+
+或
+
+```composer create-project --prefer-dist louislivi/smproxy smproxy```
+
 ## 运行
 需要给予 bin/server 执行权限
 - bin/server start   : 运行服务
