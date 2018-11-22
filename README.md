@@ -13,6 +13,14 @@
                                                                \______/
 ```
 # [SMProxy](https://github.com/louislivi/smproxy)
+
+[![release](https://img.shields.io/github/release/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/releases)
+[![forks](https://img.shields.io/github/forks/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/network/members)
+[![stars](https://img.shields.io/github/stars/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/stargazers)
+[![Gitter](https://img.shields.io/gitter/room/louislivi/Lobby.svg?style=popout-square)](https://gitter.im/louislivi/Lobby)
+[![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
+[![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
+
 ## swoole mysql proxy 
 一个基于mysql协议，swoole 开发的mysql数据库连接池
 ## 原理
@@ -33,7 +41,7 @@
 - 支持mysql事物
 - 采用协程调度
 - 支持 HandshakeV10 协议版本
-- 完美兼容mysql5.6-5.7
+- 完美兼容mysql4.1-5.7
 - 兼容各大框架，无缝提升性能
 
 ## 设计初衷
@@ -42,8 +50,8 @@
     所以就自己编写了这个仅支持连接池和读写分离的轻量级中间件，
     使用swoole协程调度HandshakeV10协议转发使程序更加稳定不用像mycat一样解析所有sql包体，增加复杂度。
 ## 环境
-* swoole 2.1+
-* php 7.0+
+* swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
+* php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 ## 安装
 下载的文件直接解压即可。
 ## 运行
