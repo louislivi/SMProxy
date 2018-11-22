@@ -21,8 +21,9 @@ English | [中文](./README.md)
 [![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
 [![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
 
-## swoole mysql proxy 
-A mysql database connection pool based on mysql protocol, swoole development
+## Swoole MySQL Proxy
+A mysql database connection pool based on mysql protocol, swoole.
+
 ## Principle
     Store the database connection as an object in memory. 
     When the user needs to access the database, 
@@ -65,20 +66,33 @@ A mysql database connection pool based on mysql protocol, swoole development
     So I wrote this lightweight middleware that only supports connection pooling and read-write separation.
     Use the swoole coroutine to schedule HandshakeV10 protocol forwarding to make the program more stable. 
     Do not parse all sql packages like mycat, increasing the complexity.
-## Need environment
+
+## Environment Requirements
 * swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
 * php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
-## installation
+
+## Installation
 Download the file directly and extract it.
+
+```bash
+git clont https://github.com/louislivi/smproxy.git
+```
+
+Or
+
+```bash
+composer create-project --prefer-dist louislivi/smproxy smproxy
+```
+
 ## Run
 Need to give bin/server execute permission.
-- bin/server start   : Running service
-- bin/server stop    : Out of service
-- bin/server restart : Restart service
-- bin/server status  : Query service running status
-- bin/server reload  : Smooth restart
-- bin/server -h      : help
-- bin/server -v      : view service version
+- `bin/server start`   : Running service
+- `bin/server stop`    : Out of service
+- `bin/server restart` : Restart service
+- `bin/server status`  : Query service running status
+- `bin/server reload`  : Smooth restart
+- `bin/server -h`      : help
+- `bin/server -v`      : view service version
 
 ## SMProxy connection test
 Testing SMProxy is exactly the same as testing mysql. How to connect mysql, how to connect SMProxy.
@@ -89,7 +103,7 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 Tool connections are also available.
 ### Test
-#### Useless framework php7.2.6
+#### php7.2.6 Without Framework
 ![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
 Unused:0.15148401260376  Use:0.040808916091919
