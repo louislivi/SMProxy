@@ -13,6 +13,14 @@ English | [中文](./README.md)
                                                                \______/
 ```
 # [SMProxy](https://github.com/louislivi/smproxy)
+
+[![release](https://img.shields.io/github/release/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/releases)
+[![forks](https://img.shields.io/github/forks/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/network/members)
+[![stars](https://img.shields.io/github/stars/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/stargazers)
+[![Gitter](https://img.shields.io/gitter/room/louislivi/Lobby.svg?style=popout-square)](https://gitter.im/louislivi/Lobby)
+[![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
+[![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
+
 ## swoole mysql proxy 
 A mysql database connection pool based on mysql protocol, swoole development
 ## Principle
@@ -47,7 +55,7 @@ A mysql database connection pool based on mysql protocol, swoole development
 - Support mysql transaction
 - Coroutine scheduling
 - Support for the HandshakeV10 protocol version
-- Perfectly compatible with mysql5.6-5.7
+- Perfectly compatible with mysql4.1 -5.7
 - Compatible with major frameworks to seamlessly improve performance
 
 ## Original design intention
@@ -58,8 +66,8 @@ A mysql database connection pool based on mysql protocol, swoole development
     Use the swoole coroutine to schedule HandshakeV10 protocol forwarding to make the program more stable. 
     Do not parse all sql packages like mycat, increasing the complexity.
 ## Need environment
-* swoole 2.1+
-* php 7.0+
+* swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
+* php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 ## installation
 Download the file directly and extract it.
 ## Run
