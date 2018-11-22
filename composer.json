@@ -20,5 +20,13 @@
         "psr-4": {
             "SMProxy\\": "src/"
         }
+    },
+    "scripts": {
+      "test": "./bin/server start",
+      "start": "./bin/server start",
+      "stop": "./bin/server stop",
+      "restart": "./bin/server restart",
+      "help": "./bin/server -h",
+      "version": "./bin/server -v"
     }
 }
