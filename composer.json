@@ -22,11 +22,11 @@
         }
     },
     "scripts": {
-      "test": "./bin/server start",
-      "start": "./bin/server start",
-      "stop": "./bin/server stop",
-      "restart": "./bin/server restart",
-      "help": "./bin/server -h",
-      "version": "./bin/server -v"
+      "test": "php ./bin/server start",
+      "start": "php ./bin/server start",
+      "stop": "php ./bin/server stop",
+      "restart": "php ./bin/server restart",
+      "help": "php ./bin/server -h",
+      "version": "php ./bin/server -v"
     }
 }
