@@ -9,6 +9,7 @@ install:
 - git clone https://github.com/swoole/swoole-src.git && cd swoole-src && phpize && ./configure && sudo make -j$(nproc) && sudo make install && sudo ldconfig && cd ..
 before_script:
 - composer update --dev
+- chmod a+x ./bin/server
 
 script: composer test
 
