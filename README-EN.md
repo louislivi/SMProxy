@@ -55,7 +55,7 @@ A mysql database connection pool based on mysql protocol, swoole development
 - Support mysql transaction
 - Coroutine scheduling
 - Support for the HandshakeV10 protocol version
-- Perfectly compatible with mysql5.6-5.7
+- Perfectly compatible with mysql4.1 -5.7
 - Compatible with major frameworks to seamlessly improve performance
 
 ## Original design intention
