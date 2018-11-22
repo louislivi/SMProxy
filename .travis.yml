@@ -5,14 +5,16 @@ php:
 - 7.1
 - 7.2
 
-services:
-- docker
+install:
+- printf "\n" | pecl install -f swoole-4.2.8
+before_script:
+- composer update --dev
+- chmod a+x ./bin/server
+- php -v
+- php -m
 
-before_install:
-- docker pull registry.cn-hangzhou.aliyuncs.com/louislivi/swoole:smproxy
-- docker run -d -p 127.0.0.1:80:4567 carlad/sinatra /bin/sh -c "cd /root/sinatra; bundle exec foreman start;"
-  docker run -ti -v ./:/var/www -d -p 3366:3366 --name smproxy registry.cn-hangzhou.aliyuncs.com/louislivi/swoole:smproxy /usr/sbin/init
-- docker ps -a
+script: composer test
 
-script:
-- smproxy exec php /var/www/smproxy/bin/server start
+cache:
+  directories:
+  - "$HOME/.composer/cache/files"
