@@ -5,16 +5,14 @@ php:
 - 7.1
 - 7.2
 
-install:
-- git clone https://github.com/swoole/swoole-src.git && cd swoole-src && phpize && ./configure && sudo make -j$(nproc) && sudo make install && sudo ldconfig && cd ..
-before_script:
-- composer update --dev
-- chmod a+x ./bin/server
-- php -v
-- php -m
+services:
+- docker
 
-script: composer test
+before_install:
+- docker pull registry.cn-hangzhou.aliyuncs.com/louislivi/swoole:smproxy
+- docker run -d -p 127.0.0.1:80:4567 carlad/sinatra /bin/sh -c "cd /root/sinatra; bundle exec foreman start;"
+  docker run -ti -v ./:/var/www -d -p 3366:3366 --name smproxy registry.cn-hangzhou.aliyuncs.com/louislivi/swoole:smproxy /usr/sbin/init
+- docker ps -a
 
-cache:
-  directories:
-  - "$HOME/.composer/cache/files"
+script:
+- smproxy exec php /var/www/smproxy/bin/server start
