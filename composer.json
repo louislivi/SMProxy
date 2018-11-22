@@ -1,12 +1,15 @@
 {
     "name": "root/swoole-mysql-proxy",
+    "description": "A mysql database connection pool based on mysql protocol, swoole development",
     "authors": [
         {
             "name": "louislivi",
             "email": "574747417@qq.com"
         }
     ],
-    "require": {},
+    "require": {
+        "php": "^7.0"
+    },
     "autoload": {
         "files": [
           "src/lib/functions.php"
