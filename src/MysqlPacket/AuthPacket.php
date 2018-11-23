@@ -8,7 +8,7 @@ use SMProxy\MysqlPacket\Util\Capabilities;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/31
- * Time: 上午10:32
+ * Time: 上午10:32.
  */
 class AuthPacket extends MySQLPacket
 {
@@ -17,7 +17,7 @@ class AuthPacket extends MySQLPacket
     public $clientFlags;
     public $maxPacketSize;
     public $charsetIndex;
-    public $extra;// from FILLER(23)
+    public $extra; // from FILLER(23)
     public $user;
     public $password;
     public $database = 0;
@@ -32,20 +32,19 @@ class AuthPacket extends MySQLPacket
         $this->maxPacketSize = $mm->readUB4();
         $this->charsetIndex = ($mm->read() & 0xff);
         $current = $mm->position();
-        $len = (int)$mm->readLength();
+        $len = (int) $mm->readLength();
         if ($len > 0 && $len < count(self::$FILLER)) {
             $this->extra = array_copy($mm->bytes(), $mm->position(), $len);
         }
         $mm->position($current + count(self::$FILLER));
         $this->user = $mm->readStringWithNull();
         $this->password = $mm->readBytesWithLength();
-        if ((($this->clientFlags & Capabilities::CLIENT_CONNECT_WITH_DB) != 0) && $mm->hasRemaining()) {
+        if ((0 != ($this->clientFlags & Capabilities::CLIENT_CONNECT_WITH_DB)) && $mm->hasRemaining()) {
             $this->database = $mm->readStringWithNull();
         }
 
         return $this;
     }
-
 
     public function write()
     {
@@ -55,39 +54,41 @@ class AuthPacket extends MySQLPacket
         BufferUtil::writeUB4($data, $this->maxPacketSize);
         $data[] = $this->charsetIndex;
         $data = array_merge($data, self::$FILLER);
-        if ($this->user == null) {
+        if (null == $this->user) {
             $data[] = 0;
         } else {
             $userData = getBytes($this->user);
             BufferUtil::writeWithNull($data, $userData);
         }
-        if ($this->password == null) {
+        if (null == $this->password) {
             $data[] = 0;
         } else {
             BufferUtil::writeWithLength($data, $this->password);
         }
-        if ($this->database == null) {
+        if (null == $this->database) {
             $data[] = 0;
         } else {
             $database = getBytes($this->database);
             BufferUtil::writeWithNull($data, $database);
         }
         BufferUtil::writeWithNull($data, getBytes('mysql_native_password'));
+
         return $data;
     }
 
     public function calcPacketSize()
     {
-        $size = 32;// 4+4+1+23;
-        $size += ($this->user == null) ? 1 : strlen($this->user) + 1;
-        $size += ($this->password == null) ? 1 : BufferUtil::getLength($this->password);
-        $size += ($this->database == null) ? 1 : strlen($this->database) + 1;
+        $size = 32; // 4+4+1+23;
+        $size += (null == $this->user) ? 1 : strlen($this->user) + 1;
+        $size += (null == $this->password) ? 1 : BufferUtil::getLength($this->password);
+        $size += (null == $this->database) ? 1 : strlen($this->database) + 1;
         $size += strlen('mysql_native_password') + 1;
+
         return $size;
     }
 
     protected function getPacketInfo()
     {
-        return "MySQL Authentication Packet";
+        return 'MySQL Authentication Packet';
     }
 }

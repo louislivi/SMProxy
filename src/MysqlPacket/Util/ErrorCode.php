@@ -2,18 +2,16 @@
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/11/9
- * Time: 下午12:10
+ * Time: 下午12:10.
  */
 
 namespace SMProxy\MysqlPacket\Util;
 
 /**
  * MySql 错误码
- *
  */
 interface ErrorCode
 {
-
     // cobar errorMessage code
     const ERR_OPEN_SOCKET = 3001;
     const ERR_CONNECT_SOCKET = 3002;
@@ -526,5 +524,4 @@ interface ErrorCode
     const ER_PLUGIN_IS_NOT_LOADED = 1494;
     const ER_MULTI_QUERY_TIMEOUT = 1495;
     const ER_MULTI_EXEC_ERROR = 1496;
-
 }

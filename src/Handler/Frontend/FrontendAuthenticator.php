@@ -2,7 +2,7 @@
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/11/9
- * Time: 上午10:01
+ * Time: 上午10:01.
  */
 
 namespace SMProxy\Handler\Frontend;
@@ -35,33 +35,34 @@ class FrontendAuthenticator
         $hs->serverCharsetIndex = (CharsetUtil::getIndex('utf8mb4') & 0xff);
         $hs->serverStatus = 2;
         $hs->restOfScrambleBuff = $rand2;
+
         return getString($hs->write());
     }
 
     public function checkPassword(array $password, string $pass)
     {
         // check null
-        if ($pass == null || strlen($pass) == 0) {
-            if ($password == null || count($password) == 0) {
+        if (null == $pass || 0 == strlen($pass)) {
+            if (null == $password || 0 == count($password)) {
                 return true;
             } else {
                 return false;
             }
         }
-        if ($password == null || count($password) == 0) {
+        if (null == $password || 0 == count($password)) {
             return false;
         }
 
-// encrypt
+        // encrypt
         $encryptPass = null;
         try {
             $encryptPass = SecurityUtil::scramble411($pass, $this->seed);
         } catch (\Exception $e) {
             return false;
         }
-        if ($encryptPass != null && (count($encryptPass) == count($password))) {
+        if (null != $encryptPass && (count($encryptPass) == count($password))) {
             $i = count($encryptPass);
-            while ($i-- != 0) {
+            while (0 != $i--) {
                 if ($encryptPass[$i] != $password[$i]) {
                     return false;
                 }
@@ -92,11 +93,11 @@ class FrontendAuthenticator
         $flag |= Capabilities::CLIENT_TRANSACTIONS;
         // flag |= ServerDefs.CLIENT_RESERVED;
         $flag |= Capabilities::CLIENT_SECURE_CONNECTION;
+
         return $flag;
     }
 
     protected function failure(int $errno, String $info)
     {
-
     }
 }

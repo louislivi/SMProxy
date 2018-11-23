@@ -7,11 +7,11 @@ use SMProxy\MysqlPacket\Util\BufferUtil;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/27
- * Time: 上午9:36
+ * Time: 上午9:36.
  */
 
 /**
- * MySql OkPacket
+ * MySql OkPacket.
  *
  * @Author lizhuyang
  */
@@ -49,15 +49,15 @@ class OkPacket extends MySQLPacket
         $i += BufferUtil::getLength($this->affectedRows);
         $i += BufferUtil::getLength($this->insertId);
         $i += 4;
-        if ($this->message != null) {
+        if (null != $this->message) {
             $i += BufferUtil::getLength($this->message);
         }
+
         return $i;
     }
 
     protected function getPacketInfo()
     {
-        return "MySQL OK Packet";
+        return 'MySQL OK Packet';
     }
-
 }

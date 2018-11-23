@@ -8,7 +8,7 @@ use Swoole\Coroutine;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/26
- * Time: 下午5:40
+ * Time: 下午5:40.
  */
 abstract class BaseServer extends Base
 {
@@ -35,7 +35,7 @@ abstract class BaseServer extends Base
             $this->server = new \swoole_server(CONFIG['server']['host'] ?? '0.0.0.0',
                 $ports[0], CONFIG['server']['mode'], CONFIG['server']['sock_type']);
             if (count($ports) > 1) {
-                for ($i = 1; $i < count($ports); $i++) {
+                for ($i = 1; $i < count($ports); ++$i) {
                     $this->server->addListener(CONFIG['server']['host'] ?? '0.0.0.0',
                         $ports[$i], CONFIG['server']['sock_type']);
                 }
@@ -47,16 +47,16 @@ abstract class BaseServer extends Base
             $this->server->on('WorkerStart', [$this, 'onWorkerStart']);
             $result = $this->server->start();
             if ($result) {
-                print_r('server start success!' . "\n");
+                print_r('server start success!'."\n");
             } else {
-                print_r('server start error!' . "\n");
+                print_r('server start error!'."\n");
             }
         } catch (\Swoole\Exception $exception) {
-            print_r('ERROR:' . $exception->getMessage() . "\n");
+            print_r('ERROR:'.$exception->getMessage()."\n");
         } catch (\ErrorException $exception) {
-            print_r('ERROR:' . $exception->getMessage() . "\n");
+            print_r('ERROR:'.$exception->getMessage()."\n");
         } catch (SMProxyException $exception) {
-            print_r('ERROR:' . $exception->errorMessage() . "\n");
+            print_r('ERROR:'.$exception->errorMessage()."\n");
         }
     }
 
@@ -73,7 +73,7 @@ abstract class BaseServer extends Base
     }
 
     /**
-     * 关闭连接 销毁携程变量
+     * 关闭连接 销毁携程变量.
      *
      * @param $server
      * @param $fd
@@ -84,9 +84,7 @@ abstract class BaseServer extends Base
         if ($cid > 0 && isset(self::$pool[$cid])) {
             unset(self::$pool[$cid]);
         }
-
     }
-
 
     protected function writeErrMessage(int $id, String $msg, int $errno = 0)
     {
@@ -96,6 +94,7 @@ abstract class BaseServer extends Base
             $err->errno = $errno;
         }
         $err->message = array_iconv($msg);
+
         return $err->write();
     }
 }
