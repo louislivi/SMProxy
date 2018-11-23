@@ -67,7 +67,7 @@ class SMProxyServer extends BaseServer
                         $checkPassword = $this->source[$fd]
                             ->checkPassword($authPacket->password, CONFIG['server']['password']);
                         if (CONFIG['server']['user'] != $authPacket->user || !$checkPassword) {
-                            $message = "Access denied for user '".$authPacket->user."'";
+                            $message = "Access denied for user '" . $authPacket->user . "'";
                             $errMessage = $this->writeErrMessage(2, $message, ErrorCode::ER_NO_SUCH_USER);
                             $mysql_log = Log::get_logger('mysql');
                             $mysql_log->error($message);
@@ -153,7 +153,7 @@ class SMProxyServer extends BaseServer
                         }
                         if (isset($this->connectReadState[$fd]) && true === $this->connectReadState[$fd]) {
                             $model = 'read';
-                            $key = $this->source[$fd]->database ? $model.'_'.$this->source[$fd]->database : $model;
+                            $key = $this->source[$fd]->database ? $model . '_' . $this->source[$fd]->database : $model;
                             //如果没有读库 默认用写库
                             if (!array_key_exists($key, $this->dbConfig)) {
                                 $model = 'write';
@@ -167,7 +167,7 @@ class SMProxyServer extends BaseServer
                                 $client->client->send($data);
                             }
                         } else {
-                            $key = $this->source[$fd]->database ? $model.'_'.$this->source[$fd]->database : $model;
+                            $key = $this->source[$fd]->database ? $model . '_' . $this->source[$fd]->database : $model;
                             if (array_key_exists($key, $this->dbConfig)) {
                                 $client = MySQLPool::fetch($key, $server, $fd);
                                 $this->mysqlClient[$fd][$model] = $client;
@@ -175,7 +175,7 @@ class SMProxyServer extends BaseServer
                                     $client->client->send($data);
                                 }
                             } else {
-                                $message = 'database config '.($this->source[$fd]->database ?: '').' '.$model.
+                                $message = 'database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
                                     ' is not exists!';
                                 $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR);
                                 $mysql_log = Log::get_logger('mysql');
@@ -245,7 +245,7 @@ class SMProxyServer extends BaseServer
         } else {
             ProcessHelper::setProcessTitle('SMProxy worker process');
         }
-        $this->dbConfig = $this->parseDbConfig(initConfig(ROOT.'/conf/'));
+        $this->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
         //初始化链接
         MySQLPool::init($this->dbConfig);
         foreach ($this->dbConfig as $key => $value) {
@@ -256,7 +256,7 @@ class SMProxyServer extends BaseServer
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
             $system_log = Log::get_logger('system');
             $system_log->info('server start!');
-            print_r('server start!'."\n");
+            print_r('server start!' . "\n");
         }
     }
 

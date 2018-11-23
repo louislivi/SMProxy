@@ -83,7 +83,7 @@ class MysqlProxy extends MysqlClient
                             $errorPacket->read($binaryPacket);
                             $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
                             $mysql_log = Log::get_logger('mysql');
-                            $mysql_log->error($errorPacket->errno.':'.$errorPacket->message);
+                            $mysql_log->error($errorPacket->errno . ':' . $errorPacket->message);
                             $data = getString($errorPacket->write());
 //                        switch ($errorPacket ->sqlState){
 //                            case 28000:

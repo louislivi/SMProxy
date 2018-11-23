@@ -169,7 +169,9 @@ final class ParseUtil
                 return self::parseIdentifierEscape($stmt, $aliasIndex);
             default:
                 $offset = $aliasIndex;
-                for ($stmtLen = strlen($stmt); $offset < $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]); ++$offset);
+                for ($stmtLen = strlen($stmt); $offset < $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]);
+                ++$offset) {
+                }
 
                 return substr($stmt, $aliasIndex, $offset);
         }
@@ -241,11 +243,12 @@ final class ParseUtil
      *
      * @return int 如果包含指定的字符串，则移动相应的偏移量，否则返回值=offset
      */
-    public static function nextstringIsExpectedWithIgnoreSepChar(string $stmt,
-                                                                 int $offset,
-                                                                 string $nextExpectedstring,
-                                                                 bool $checkSepChar)
-    {
+    public static function nextstringIsExpectedWithIgnoreSepChar(
+        string $stmt,
+        int $offset,
+        string $nextExpectedstring,
+        bool $checkSepChar
+    ) {
         if (null == $nextExpectedstring || strlen($nextExpectedstring) < 1) {
             return $offset;
         }

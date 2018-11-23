@@ -209,7 +209,7 @@ abstract class MySQLPacket
 
     protected function toString()
     {
-        return $this->getPacketInfo().'{length='.$this->packetLength.',id='
-            .$this->packetId.'}';
+        return $this->getPacketInfo() . '{length=' . $this->packetLength . ',id='
+            . $this->packetId . '}';
     }
 }

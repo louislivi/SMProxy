@@ -25,12 +25,12 @@ class MySqlPacketDecoder
         $data = getBytes($data);
         // 4 bytes:3 length + 1 packetId
         if (count($data) < $this->packetHeaderSize) {
-            throw new SMProxyException('Packet is empty '.$this->maxPacketSize);
+            throw new SMProxyException('Packet is empty ' . $this->maxPacketSize);
         }
         $packetLength = ByteUtil::readUB3($data);
 //        // 过载保护
         if ($packetLength > $this->maxPacketSize) {
-            throw new SMProxyException('Packet size over the limit '.$this->maxPacketSize);
+            throw new SMProxyException('Packet size over the limit ' . $this->maxPacketSize);
         }
         $packetId = $data[3];
 //        if (in.readableBytes() < packetLength) {
@@ -44,7 +44,7 @@ class MySqlPacketDecoder
         // data will not be accessed any more,so we can use this array safely
         $packet->data = $data;
         if (null == $packet->data || 0 == count($packet->data)) {
-            throw new SMProxyException('get data errorMessage,packetLength='.$packet->packetLength."\n");
+            throw new SMProxyException('get data errorMessage,packetLength=' . $packet->packetLength . "\n");
         }
 
         return $packet;

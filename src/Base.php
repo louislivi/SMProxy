@@ -61,17 +61,17 @@ class Base extends Context
                             $config['databases'][$s_key]['serverInfo']['account'] =
                                 $config['account'][$value['account']];
                         }
-                        $config['databases'][$s_key.'_'.$key] = $config['databases'][$key];
-                        $config['databases'][$s_key.'_'.$key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
-                        $config['databases'][$s_key.'_'.$key]['serverInfo']['account'] =
+                        $config['databases'][$s_key . '_' . $key] = $config['databases'][$key];
+                        $config['databases'][$s_key . '_' . $key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
+                        $config['databases'][$s_key . '_' . $key]['serverInfo']['account'] =
                             $config['account'][$value['account']];
                     } else {
-                        throw new SMProxyException('config serverInfo->'.$s_key.
+                        throw new SMProxyException('config serverInfo->' . $s_key .
                             '->account is not exists!');
                     }
                 }
             } else {
-                throw new SMProxyException('config serverInfo key '.$database['serverInfo'].'is not exists!');
+                throw new SMProxyException('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
             }
             unset($config['databases'][$key]);
         }

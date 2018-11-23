@@ -13,7 +13,7 @@ class SecurityUtil
     {
         $pass1 = getBytes(sha1($pass, true));
         $pass2 = getBytes(sha1(getString($pass1), true));
-        $pass3 = getBytes(sha1(getString($seed).getString($pass2), true));
+        $pass3 = getBytes(sha1(getString($seed) . getString($pass2), true));
         for ($i = 0; $i < count($pass3); ++$i) {
             $pass3[$i] = ($pass3[$i] ^ $pass1[$i]);
         }

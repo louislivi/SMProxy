@@ -172,7 +172,7 @@ final class ServerParse
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
             if (('E' == $c1 || 'e' == $c1) && ('G' == $c2 || 'g' == $c2) && ('I' == $c3 || 'i' == $c3)
-                && ('N' == $c4 || 'n' == $c4) && (strlen($stmt) == ++$offset || ParseUtil::isEOF($stmt.[$offset]))) {
+                && ('N' == $c4 || 'n' == $c4) && (strlen($stmt) == ++$offset || ParseUtil::isEOF($stmt . [$offset]))) {
                 return self::BEGIN;
             }
         }

@@ -118,7 +118,7 @@ function initConfig(string $dir)
             while (false !== ($file = readdir($dh))) {
                 if ('.' != $file && '..' != $file && !is_dir($file) &&
                     '.json' == substr($file, -5, 5)) {
-                    $file_config = json_decode(file_get_contents($dir.$file), true);
+                    $file_config = json_decode(file_get_contents($dir . $file), true);
                     if (is_array($file_config)) {
                         $config = array_merge($config, $file_config);
                     }
@@ -215,7 +215,7 @@ function mk_log_dir(string &$path)
  */
 function array_iconv($data, string $output = 'utf-8')
 {
-    $encode_arr = array('UTF-8', 'ASCII', 'GBK', 'GB2312', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP');
+    $encode_arr = ['UTF-8', 'ASCII', 'GBK', 'GB2312', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP'];
     $encoded = mb_detect_encoding($data, $encode_arr);
 
     if (!is_array($data)) {

@@ -25,7 +25,7 @@ class ServerCommand
                                                                
 
 LOGO;
-    protected $version = 'SMProxy version:'.SMPROXY_VERSION."\n";
+    protected $version = 'SMProxy version:' . SMPROXY_VERSION . "\n";
     public $desc = <<<'DESC'
 Options and arguments (and corresponding environment variables):
 start   : start server
@@ -40,8 +40,8 @@ DESC;
 
     public function __construct()
     {
-        $this->logo = $this->logo.$this->version;
-        $this->desc = $this->logo.$this->desc;
+        $this->logo = $this->logo . $this->version;
+        $this->desc = $this->logo . $this->desc;
     }
 
     /**
@@ -58,7 +58,7 @@ DESC;
 
             return;
         }
-        print_r($this->logo.'server starting ...'."\n");
+        print_r($this->logo . 'server starting ...' . "\n");
         new \SMProxy\SMProxyServer();
     }
 
@@ -68,11 +68,11 @@ DESC;
     public function stop()
     {
         if (!$this->isRunning()) {
-            print_r('The server is not running! cannot stop!'."\n");
+            print_r('The server is not running! cannot stop!' . "\n");
 
             return;
         }
-        print_r('SMProxy is stopping ...'."\n");
+        print_r('SMProxy is stopping ...' . "\n");
 
         $result = function () {
             // 获取master进程ID
@@ -98,14 +98,14 @@ DESC;
 
         // 停止失败
         if (!$result()) {
-            print_r('SMProxy stop fail'."\n");
+            print_r('SMProxy stop fail' . "\n");
 
             return;
         }
         //删除pid文件
         @unlink(CONFIG['server']['swoole']['pid_file']);
 
-        print_r('SMProxy stop success!'."\n");
+        print_r('SMProxy stop success!' . "\n");
     }
 
     /**
@@ -132,14 +132,14 @@ DESC;
     {
         // 是否已启动
         if (!$this->isRunning()) {
-            print_r('The server is not running! cannot reload'."\n");
+            print_r('The server is not running! cannot reload' . "\n");
 
             return;
         }
 
-        print_r('Server is reloading...'."\n");
+        print_r('Server is reloading...' . "\n");
         posix_kill($this->serverSetting['managerPid'], SIGUSR1);
-        print_r('Server reload success'."\n");
+        print_r('Server reload success' . "\n");
     }
 
     /**
@@ -149,9 +149,9 @@ DESC;
     {
         // 是否已启动
         if ($this->isRunning()) {
-            print_r('The server is running'."\n");
+            print_r('The server is running' . "\n");
         } else {
-            print_r('The server is not running'."\n");
+            print_r('The server is not running' . "\n");
         }
     }
 

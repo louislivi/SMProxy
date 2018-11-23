@@ -19,8 +19,10 @@ abstract class MysqlClient extends Base
      */
     public function __construct()
     {
-        $this->client = new \swoole_client(CONFIG['swoole_client_sock_setting']['sock_type'] ?? 1,
-            CONFIG['swoole_client_sock_setting']['sync_type'] ?? 1);
+        $this->client = new \swoole_client(
+            CONFIG['swoole_client_sock_setting']['sock_type'] ?? 1,
+            CONFIG['swoole_client_sock_setting']['sync_type'] ?? 1
+        );
         $this->client->set(CONFIG['swoole_client_setting'] ?? []);
         $this->client->on('connect', [$this, 'onClientConnect']);
         $this->client->on('receive', [$this, 'onClientReceive']);

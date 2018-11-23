@@ -97,7 +97,7 @@ class FrontendAuthenticator
         return $flag;
     }
 
-    protected function failure(int $errno, String $info)
+    protected function failure(int $errno, string $info)
     {
     }
 }

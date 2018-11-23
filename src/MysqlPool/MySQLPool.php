@@ -173,9 +173,13 @@ class MySQLPool
         $conn->database = $database;
         $conn->account = $serverInfo['account'];
         $conn->charset = self::$connsConfig[$connName]['charset'];
-        if (false == $conn->connect($serverInfo['host'], $serverInfo['port'],
-                $serverInfo['timeout'] ?? 0.1, $serverInfo['flag'] ?? 0)) {
-            throw new MySQLException('Cann\'t connect to MySQL server: '.json_encode($serverInfo));
+        if (false == $conn->connect(
+            $serverInfo['host'],
+            $serverInfo['port'],
+            $serverInfo['timeout'] ?? 0.1,
+            $serverInfo['flag'] ?? 0
+        )) {
+            throw new MySQLException('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
         }
         $client = $chan->pop();
         if (false == $client) {
@@ -183,7 +187,7 @@ class MySQLPool
                 self::initConn($server, $fd, $connName, $step--);
             } else {
                 --self::$initConnCount[$connName];
-                throw new MySQLException('Cann\'t auth to MySQL server: '.json_encode($serverInfo));
+                throw new MySQLException('Cann\'t auth to MySQL server: ' . json_encode($serverInfo));
             }
         }
         $id = spl_object_hash($client);

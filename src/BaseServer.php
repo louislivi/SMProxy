@@ -34,12 +34,19 @@ abstract class BaseServer extends Base
             } else {
                 $ports = [3366];
             }
-            $this->server = new \swoole_server(CONFIG['server']['host'] ?? '0.0.0.0',
-                $ports[0], CONFIG['server']['mode'], CONFIG['server']['sock_type']);
+            $this->server = new \swoole_server(
+                CONFIG['server']['host'] ?? '0.0.0.0',
+                $ports[0],
+                CONFIG['server']['mode'],
+                CONFIG['server']['sock_type']
+            );
             if (count($ports) > 1) {
                 for ($i = 1; $i < count($ports); ++$i) {
-                    $this->server->addListener(CONFIG['server']['host'] ?? '0.0.0.0',
-                        $ports[$i], CONFIG['server']['sock_type']);
+                    $this->server->addListener(
+                        CONFIG['server']['host'] ?? '0.0.0.0',
+                        $ports[$i],
+                        CONFIG['server']['sock_type']
+                    );
                 }
             }
             $this->server->set(CONFIG['server']['swoole']);
@@ -51,16 +58,16 @@ abstract class BaseServer extends Base
             $this->server->on('ManagerStart', [$this, 'onManagerStart']);
             $result = $this->server->start();
             if ($result) {
-                print_r('server start success!'."\n");
+                print_r('server start success!' . "\n");
             } else {
-                print_r('server start error!'."\n");
+                print_r('server start error!' . "\n");
             }
         } catch (\Swoole\Exception $exception) {
-            print_r('ERROR:'.$exception->getMessage()."\n");
+            print_r('ERROR:' . $exception->getMessage() . "\n");
         } catch (\ErrorException $exception) {
-            print_r('ERROR:'.$exception->getMessage()."\n");
+            print_r('ERROR:' . $exception->getMessage() . "\n");
         } catch (SMProxyException $exception) {
-            print_r('ERROR:'.$exception->errorMessage()."\n");
+            print_r('ERROR:' . $exception->errorMessage() . "\n");
         }
     }
 
@@ -101,7 +108,7 @@ abstract class BaseServer extends Base
         }
     }
 
-    protected function writeErrMessage(int $id, String $msg, int $errno = 0)
+    protected function writeErrMessage(int $id, string $msg, int $errno = 0)
     {
         $err = new ErrorPacket();
         $err->packetId = $id;
