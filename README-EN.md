@@ -208,15 +208,15 @@ The configuration file uppercase ROOT represents the current SMProxy and directo
 }
 ```
 
-account information | serverInfo service information | databases database connection pool information |
-| ------ | ------ | ------ |
-| account.root user ID Corresponds to serverInfo...account.root | serverInfo.server1 Service ID Corresponds to databases..serverInfo | databases.dbname database name |
-Account..user username | serverInfo..write read-write separation write write library read read library | databases..serverInfo service information |
-Account..password password | serverInfo..host database connection address | databases..maxSpareConns maximum idle connections |
-| | serverInfo..prot database port | databases..maxConns maximum number of connections |
-| | serverInfo..timeout database timeout duration (seconds) | databases..charset database encoding format |
-| | serverInfo..flag TCP type currently supports 0 blocking Not supported 1. Non-blocking | databases..maxSpareExp Maximum idle time |
-| | serverInfo..account corresponds to databases.account | |
+| account information                                           | serverInfo service information                                                        | databases database connection pool information    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| account.root user ID Corresponds to serverInfo...account.root | serverInfo.server1 Service ID Corresponds to databases..serverInfo                    | databases.dbname database name                    |
+| Account..user username                                        | serverInfo..write read-write separation write write library read read library         | databases..serverInfo service information         |
+| Account..password password                                    | serverInfo..host database connection address                                          | databases..maxSpareConns maximum idle connections |
+|                                                               | serverInfo..prot database port                                                        | databases..maxConns maximum number of connections |
+|                                                               | serverInfo..timeout database timeout duration (seconds)                               | databases..charset database encoding format       |
+|                                                               | serverInfo..flag TCP type currently supports 0 blocking Not supported 1. Non-blocking | databases..maxSpareExp Maximum idle time          |
+|                                                               | serverInfo..account corresponds to databases.account                                  |                                                   |
 
 ### server.json
 
@@ -267,17 +267,17 @@ Account..password password | serverInfo..host database connection address | data
 }
 ```
 
-|user service username | password service password | charset service code | host link address | port service port multiple, separated | mode run mode | sock_type SWOOLE_SOCK_TCP tcp | logs log configuration | swoole swoole configuration | swoole_client_setting client configuration | swoole_client_sock_setting Client sock configuration |
- | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
- |   |   |   |   |   | SWOOLE_PROCESS multi-process mode (default), SWOOLE_BASE basic mode | | logs.open log switch | worker_num work process number | package_max_length maximum packet length | sock_type SWOOLE_SOCK_TCP tcp |
-|   |   |   |   |   |   |   | logs.config log configuration item | max_coro_num maximum number of Ctrips | | sync_type SWOOLE_SOCK_ASYNC Asynchronous ,SWOOLE_SOCK_SYNC synchronous |
-|   |   |   |   |   |   |   | logs.system or mysql configuration module | open_tcp_nodelay Close Nagle merge algorithm   |   |   |
-|   |   |   |   |   |   |   | logs..log_path log directory | daemonize daemonization |
-|   |   |   |   |   |   |   | logs..log_file log file name | heartbeat_check_interval heartbeat detection |
-|   |   |   |   |   |   |   | logs..format log date format | heartbeat_idle_time maximum idle time | | |
-|   |   |   |   |   |   |   |   |  reload_async Asynchronous restart | | |
-|   |   |   |   |   |   |   |   |  log_file log directory | | |
-|   |   |   |   |   |   |   |   |  pid_file main process pid directory | | |
+| user service username | password service password | charset service code | host link address | port service port multiple, separated | mode run mode                                                       | sock_type SWOOLE_SOCK_TCP tcp | logs log configuration                    | swoole swoole configuration                  | swoole_client_setting client configuration | swoole_client_sock_setting Client sock configuration                   |
+| --------------------- | ------------------------- | -------------------- | ----------------- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------- | ----------------------------------------- | -------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- |
+|                       |                           |                      |                   |                                       | SWOOLE_PROCESS multi-process mode (default), SWOOLE_BASE basic mode |                               | logs.open log switch                      | worker_num work process number               | package_max_length maximum packet length   | sock_type SWOOLE_SOCK_TCP tcp                                          |
+|                       |                           |                      |                   |                                       |                                                                     |                               | logs.config log configuration item        | max_coro_num maximum number of Ctrips        |                                            | sync_type SWOOLE_SOCK_ASYNC Asynchronous ,SWOOLE_SOCK_SYNC synchronous |
+|                       |                           |                      |                   |                                       |                                                                     |                               | logs.system or mysql configuration module | open_tcp_nodelay Close Nagle merge algorithm |                                            |                                                                        |
+|                       |                           |                      |                   |                                       |                                                                     |                               | logs..log_path log directory              | daemonize daemonization                      |
+|                       |                           |                      |                   |                                       |                                                                     |                               | logs..log_file log file name              | heartbeat_check_interval heartbeat detection |
+|                       |                           |                      |                   |                                       |                                                                     |                               | logs..format log date format              | heartbeat_idle_time maximum idle time        |                                            |                                                                        |
+|                       |                           |                      |                   |                                       |                                                                     |                               |                                           | reload_async Asynchronous restart            |                                            |                                                                        |
+|                       |                           |                      |                   |                                       |                                                                     |                               |                                           | log_file log directory                       |                                            |                                                                        |
+|                       |                           |                      |                   |                                       |                                                                     |                               |                                           | pid_file main process pid directory          |                                            |                                                                        |
 
 ## More Documentation
 
