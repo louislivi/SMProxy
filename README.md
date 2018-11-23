@@ -41,10 +41,10 @@
 - 支持读写分离
 - 支持数据库连接池，能够有效解决PHP带来的数据库连接瓶颈
 - 支持SQL92标准
-- 遵守Mysql原生协议，跨语言，跨平台的通用中间件代理。
-- 支持多个数据库连接，多个数据库，多个用户，灵活搭配。
-- 支持mysql事物
 - 采用协程调度
+- 支持多个数据库连接，多个数据库，多个用户，灵活搭配。
+- 遵守Mysql原生协议，跨语言，跨平台的通用中间件代理。
+- 支持mysql事物
 - 支持 HandshakeV10 协议版本
 - 完美兼容mysql4.1-5.7
 - 兼容各大框架，无缝提升性能
@@ -58,8 +58,8 @@ mycat等数据库中间件会出现部分sql无法使用，例如不支持批量
 
 ## 环境
 
-- swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-- php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+- Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
+- PHP 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 
 ## 安装
 
@@ -100,13 +100,11 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 ![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
-没用：0.15148401260376  用了：0.040808916091919
-
-未使用连接池:
+未使用连接池: 0.15148401260376
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
 
-使用连接池:
+使用连接池: 0.040808916091919
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
 
@@ -199,15 +197,15 @@ QQ群：722124111
 }
 ```
 
-| account 账号信息 | serverInfo 服务信息 | databases 数据库连接池信息 |
-| ------ | ------ | ------ |
-| account.root 用户标识 与 serverInfo...account.root 对应 | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称 |
-| account..user 用户名  | serverInfo..write 读写分离 write 写库 read 读库 | databases..serverInfo 服务信息 |
-| account..password 密码  | serverInfo..host 数据库连接地址 | databases..maxSpareConns 最大空闲连接数 |
-|   | serverInfo..prot 数据库端口 | databases..maxConns 最大连接数 |
-|   | serverInfo..timeout 数据库超时时长(秒) | databases..charset 数据库编码格式 |
-|   | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞 | databases..maxSpareExp 最大空闲时间 |
-|   | serverInfo..account  与 databases.account 对应|  |
+| account 账号信息                                        | serverInfo 服务信息                                        | databases 数据库连接池信息              |
+| ------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------- |
+| account.root 用户标识 与 serverInfo...account.root 对应 | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称             |
+| account..user 用户名                                    | serverInfo..write 读写分离 write 写库 read 读库            | databases..serverInfo 服务信息          |
+| account..password 密码                                  | serverInfo..host 数据库连接地址                            | databases..maxSpareConns 最大空闲连接数 |
+|                                                         | serverInfo..prot 数据库端口                                | databases..maxConns 最大连接数          |
+|                                                         | serverInfo..timeout 数据库超时时长(秒)                     | databases..charset 数据库编码格式       |
+|                                                         | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞       | databases..maxSpareExp 最大空闲时间     |
+|                                                         | serverInfo..account  与 databases.account 对应             |                                         |
 
 ### server.json
 
@@ -258,17 +256,17 @@ QQ群：722124111
 }
 ```
 
-| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  mode 运行模式 | sock_type SWOOLE_SOCK_TCP tcp | logs 日志配置 | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-|   |   |   |   |   | SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式  |   | logs.open 日志开关  |  worker_num work进程数量 | package_max_length 最大包长  | sock_type SWOOLE_SOCK_TCP tcp  |
-|   |   |   |   |   |   |   | logs.config 日志配置项 |  max_coro_num 最大携程数  |   | sync_type SWOOLE_SOCK_SYNC 同步，SWOOLE_SOCK_ASYNC 异步  |
-|   |   |   |   |   |   |   | logs.system or mysql 配置模块  |  open_tcp_nodelay 关闭Nagle合并算法  |   |   |
-|   |   |   |   |   |   |   | logs..log_path 日志目录 |  daemonize 守护进程化 |   |   |
-|   |   |   |   |   |   |   | logs..log_file 日志文件名 |  heartbeat_check_interval 心跳检测 |   |   |
-|   |   |   |   |   |   |   | logs..format 日志日期格式 |  heartbeat_idle_time 最大空闲时间 |   |   |
-|   |   |   |   |   |   |   |   |  reload_async 异步重启 |   |   |
-|   |   |   |   |   |   |   |   |  log_file 日志目录 |   |   |
-|   |   |   |   |   |   |   |   |  pid_file 主进程pid目录 |   |   |
+| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 | mode 运行模式                                         | sock_type SWOOLE_SOCK_TCP tcp | logs 日志配置                 | swoole swoole配置                  | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置               |
+| --------------- | ----------------- | ---------------- | ------------- | ------------------------- | ----------------------------------------------------- | ----------------------------- | ----------------------------- | ---------------------------------- | -------------------------------- | ------------------------------------------------------- |
+|                 |                   |                  |               |                           | SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式 |                               | logs.open 日志开关            | worker_num work进程数量            | package_max_length 最大包长      | sock_type SWOOLE_SOCK_TCP tcp                           |
+|                 |                   |                  |               |                           |                                                       |                               | logs.config 日志配置项        | max_coro_num 最大携程数            |                                  | sync_type SWOOLE_SOCK_SYNC 同步，SWOOLE_SOCK_ASYNC 异步 |
+|                 |                   |                  |               |                           |                                                       |                               | logs.system or mysql 配置模块 | open_tcp_nodelay 关闭Nagle合并算法 |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               | logs..log_path 日志目录       | daemonize 守护进程化               |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               | logs..log_file 日志文件名     | heartbeat_check_interval 心跳检测  |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               | logs..format 日志日期格式     | heartbeat_idle_time 最大空闲时间   |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               |                               | reload_async 异步重启              |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               |                               | log_file 日志目录                  |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               |                               | pid_file 主进程pid目录             |                                  |                                                         |
 
 ## 其他学习资料
 
