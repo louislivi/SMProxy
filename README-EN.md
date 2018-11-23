@@ -24,7 +24,7 @@ English | [中文](./README.md)
 
 ## Swoole MySQL Proxy
 
-A mysql database connection pool based on mysql protocol, swoole.
+A MySQL database connection pool based on MySQL protocol and Swoole.
 
 ## Principle
 
