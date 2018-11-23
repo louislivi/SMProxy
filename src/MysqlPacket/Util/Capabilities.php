@@ -1,10 +1,11 @@
 <?php
 
 namespace SMProxy\MysqlPacket\Util;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/31
- * Time: 上午10:39
+ * Time: 上午10:39.
  */
 interface Capabilities
 {
@@ -14,7 +15,7 @@ interface Capabilities
      * <pre>
      * server:        11110111 11111111
      * client_cmd: 11 10100110 10000101
-     * client_jdbc:10 10100010 10001111
+     * client_jdbc:10 10100010 10001111.
      *
      * </pre>
      */

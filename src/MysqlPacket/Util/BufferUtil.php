@@ -1,10 +1,11 @@
 <?php
 
 namespace SMProxy\MysqlPacket\Util;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/25
- * Time: 下午7:22
+ * Time: 下午7:22.
  */
 
 /**
@@ -14,67 +15,67 @@ class BufferUtil
 {
     public static function writeUB2(array &$buffer, int $i)
     {
-        $buffer [] = $i & 0xff;
-        $buffer [] = shr16($i & 0xff << 8, 8);
+        $buffer[] = $i & 0xff;
+        $buffer[] = shr16($i & 0xff << 8, 8);
     }
 
     public static function writeUB3(array &$buffer, int $i)
     {
-        $buffer [] = $i & 0xff;
-        $buffer [] = shr16($i & 0xff << 8, 8);
-        $buffer [] = shr16($i & 0xff << 16, 16);
+        $buffer[] = $i & 0xff;
+        $buffer[] = shr16($i & 0xff << 8, 8);
+        $buffer[] = shr16($i & 0xff << 16, 16);
     }
 
     public static function writeInt(array &$buffer, int $i)
     {
-        $buffer [] = $i & 0xff;
-        $buffer [] = shr16($i & 0xff << 8, 8);
-        $buffer [] = shr16($i & 0xff << 16, 16);
-        $buffer [] = shr16($i & 0xff << 24, 24);
+        $buffer[] = $i & 0xff;
+        $buffer[] = shr16($i & 0xff << 8, 8);
+        $buffer[] = shr16($i & 0xff << 16, 16);
+        $buffer[] = shr16($i & 0xff << 24, 24);
     }
 
     public static function writeFloat(array &$buffer, int $f)
     {
-        self::writeInt($buffer, (int)($f));
+        self::writeInt($buffer, (int) ($f));
     }
 
     public static function writeUB4(array &$buffer, int $l)
     {
-        $buffer [] = $l & 0xff;
-        $buffer [] = shr16($l & 0xff << 8, 8);
-        $buffer [] = shr16($l & 0xff << 16, 16);
-        $buffer [] = shr16($l & 0xff << 24, 24);
+        $buffer[] = $l & 0xff;
+        $buffer[] = shr16($l & 0xff << 8, 8);
+        $buffer[] = shr16($l & 0xff << 16, 16);
+        $buffer[] = shr16($l & 0xff << 24, 24);
     }
 
     public static function writeLong(array &$buffer, int $l)
     {
-        $buffer [] = $l & 0xff;
-        $buffer [] = shr16($l & 0xff << 8, 8);
-        $buffer [] = shr16($l & 0xff << 16, 16);
-        $buffer [] = shr16($l & 0xff << 24, 24);
-        $buffer [] = shr16($l & 0xff << 32, 32);
-        $buffer [] = shr16($l & 0xff << 40, 40);
-        $buffer [] = shr16($l & 0xff << 48, 48);
-        $buffer [] = shr16($l & 0xff << 56, 56);
+        $buffer[] = $l & 0xff;
+        $buffer[] = shr16($l & 0xff << 8, 8);
+        $buffer[] = shr16($l & 0xff << 16, 16);
+        $buffer[] = shr16($l & 0xff << 24, 24);
+        $buffer[] = shr16($l & 0xff << 32, 32);
+        $buffer[] = shr16($l & 0xff << 40, 40);
+        $buffer[] = shr16($l & 0xff << 48, 48);
+        $buffer[] = shr16($l & 0xff << 56, 56);
     }
 
     public static function writeDouble(array &$buffer, int $d)
     {
-        self::writeLong($buffer, (float)($d));
+        self::writeLong($buffer, (float) ($d));
     }
 
     public static function writeLength(array &$buffer, int $l)
     {
         if ($l < 251) {
-            $buffer [] = $l;
-        } else if ($l < 0x10000) {
-            $buffer [] = 252;
-            self::writeUB2($buffer, (int)$l);
-        } else if ($l < 0x1000000) {
-            $buffer [] = 253;
-            self::writeUB3($buffer, (int)$l);
+            $buffer[] = $l;
+        } elseif ($l < 0x10000) {
+            $buffer[] = 252;
+            self::writeUB2($buffer, (int) $l);
+        } elseif ($l < 0x1000000) {
+            $buffer[] = 253;
+            self::writeUB3($buffer, (int) $l);
         } else {
-            $buffer [] = 254;
+            $buffer[] = 254;
 
             self::writeLong($buffer, $l);
         }
@@ -84,21 +85,21 @@ class BufferUtil
     {
         $src = is_array($src) ? $src : [$src];
         $buffer = array_merge($buffer, $src);
-        $buffer [] = 0;
+        $buffer[] = 0;
     }
 
     public static function writeWithLength(array &$buffer, $src, int $nullValue = 0)
     {
-        if ($src == null) {
+        if (null == $src) {
             $buffer[] = $nullValue;
         } else {
             $length = count($src);
             if ($length < 251) {
                 $buffer[] = $length;
-            } else if ($length < 0x10000) {
+            } elseif ($length < 0x10000) {
                 $buffer[] = 252;
                 self::writeUB2($buffer, $length);
-            } else if ($length < 0x1000000) {
+            } elseif ($length < 0x1000000) {
                 $buffer[] = 253;
                 self::writeUB3($buffer, $length);
             } else {
@@ -107,7 +108,6 @@ class BufferUtil
             }
             $buffer = array_merge($buffer, $src);
         }
-
     }
 
     public static function getLength($length)
@@ -116,9 +116,9 @@ class BufferUtil
             $length = count($length);
             if ($length < 251) {
                 return 1 + $length;
-            } else if ($length < 0x10000) {
+            } elseif ($length < 0x10000) {
                 return 3 + $length;
-            } else if ($length < 0x1000000) {
+            } elseif ($length < 0x1000000) {
                 return 4 + $length;
             } else {
                 return 9 + $length;
@@ -126,9 +126,9 @@ class BufferUtil
         } else {
             if ($length < 251) {
                 return 1;
-            } else if ($length < 0x10000) {
+            } elseif ($length < 0x10000) {
                 return 3;
-            } else if ($length < 0x1000000) {
+            } elseif ($length < 0x1000000) {
                 return 4;
             } else {
                 return 9;

@@ -8,13 +8,13 @@ use SMProxy\MysqlPacket\Util\ErrorCode;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/29
- * Time: 下午4:11
+ * Time: 下午4:11.
  */
 class ErrorPacket extends MySQLPacket
 {
-    static $FIELD_COUNT = 255;
+    public static $FIELD_COUNT = 255;
     public $marker = '#';
-    public $sqlState = "HY000";
+    public $sqlState = 'HY000';
     public $errno = ErrorCode::ER_NO_SUCH_USER;
     public $message;
 
@@ -31,6 +31,7 @@ class ErrorPacket extends MySQLPacket
             $this->sqlState = getString($mm->readBytes(5));
         }
         $this->message = getString($mm->readBytes());
+
         return $this;
     }
 
@@ -44,29 +45,29 @@ class ErrorPacket extends MySQLPacket
         BufferUtil::writeUB2($data, $this->errno);
         $data[] = ord($this->marker);
         $data = array_merge($data, getBytes($this->sqlState));
-        if ($this->message != null) {
+        if (null != $this->message) {
             $data = array_merge($data, getBytes($this->message));
         }
+
         return $data;
     }
-
 
     public function calcPacketSize()
     {
         $size = 9;
-        if ($this->message != null) {
+        if (null != $this->message) {
             $sizeData = getMysqlPackSize($size + strlen($this->message));
         } else {
             $sizeData[] = $size;
             $sizeData[] = 0;
             $sizeData[] = 0;
         }
+
         return $sizeData;
     }
 
     protected function getPacketInfo()
     {
-        return "MySQL Error Packet";
+        return 'MySQL Error Packet';
     }
-
 }
