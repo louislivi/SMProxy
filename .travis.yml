@@ -1,18 +1,24 @@
 language: php
 
-php:
-  - 7.0
-  - 7.1
-  - 7.2
+matrix:
+  include:
+    - php: 7.0
+    - php: 7.1
+    - php: 7.2
+      env: LINT=true
 
 install:
   - printf "\n" | pecl install -f swoole-4.2.8
 
 before_script:
-  - composer install --dev
+  - composer install --no-dev
   - php -v
   - php -m
 
 script:
-  - vendor/bin/phpcs
+  - |
+    if [[ $LINT != "" ]]; then
+      composer install --dev
+      vendor/bin/phpcs
+    fi
   - tests/run
