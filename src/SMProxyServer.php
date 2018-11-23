@@ -31,7 +31,6 @@ class SMProxyServer extends BaseServer
      * @param $server
      * @param $fd
      *
-     * @throws SMProxyException
      */
     public function onConnect(\swoole_server $server, int $fd)
     {
@@ -65,11 +64,11 @@ class SMProxyServer extends BaseServer
                     if (!$this->source[$fd]->auth) {
                         $authPacket = new AuthPacket();
                         $authPacket->read($bin);
-                        $checkPassword = $this->source[$fd]->checkPassword($authPacket->password, CONFIG['server']['password']);
+                        $checkPassword = $this->source[$fd]
+                            ->checkPassword($authPacket->password, CONFIG['server']['password']);
                         if (CONFIG['server']['user'] != $authPacket->user || !$checkPassword) {
                             $message = "Access denied for user '" . $authPacket->user . "'";
-                            $errMessage = $this->writeErrMessage(2, $message
-                                , ErrorCode::ER_NO_SUCH_USER);
+                            $errMessage = $this->writeErrMessage(2, $message, ErrorCode::ER_NO_SUCH_USER);
                             $mysql_log = Log::get_logger('mysql');
                             $mysql_log->error($message);
                             if ($server->exist($fd)) {
@@ -84,6 +83,7 @@ class SMProxyServer extends BaseServer
                             $this->source[$fd]->database = $authPacket->database;
                         }
                     } else {
+                        $trim_data = rtrim($data);
                         switch ($bin->data[4]) {
                             case MySQLPacket::$COM_INIT_DB:
                                 // just init the frontend
@@ -94,22 +94,37 @@ class SMProxyServer extends BaseServer
                                 $queryType = $connection->query($bin);
                                 if ($queryType == ServerParse::SELECT ||
                                     $queryType == ServerParse::SHOW ||
-                                    $queryType == ServerParse::SET ||
+                                    ($queryType == ServerParse::SET && strpos($data, 'autocommit', 4) === false) ||
                                     $queryType == ServerParse::USE
                                 ) {
-
-                                    if (!isset($this->connectHasTransaction[$fd]) || !$this->connectHasTransaction[$fd]) {
-                                        $trim_data = rtrim($data);
-                                        if ((($trim_data[-6] == 'u' || $trim_data[-6] == 'U') && ServerParse::uCheck($trim_data, -6, false) == ServerParse::UPDATE)) {
+                                    //处理读操作
+                                    if (!isset($this->connectHasTransaction[$fd]) ||
+                                        !$this->connectHasTransaction[$fd]) {
+                                        if ((($trim_data[-6] == 'u' || $trim_data[-6] == 'U') &&
+                                            ServerParse::uCheck($trim_data, -6, false) == ServerParse::UPDATE)) {
+                                            //判断悲观锁
                                             $this->connectReadState[$fd] = false;
                                         } else {
                                             $this->connectReadState[$fd] = true;
                                         }
                                     }
-                                } else if ($queryType == ServerParse::START) {
+                                } elseif ($queryType == ServerParse::START || $queryType == ServerParse::BEGIN
+                                ) {
+                                    //处理事物
                                     $this->connectHasTransaction[$fd] = true;
                                     $this->connectReadState[$fd] = false;
-                                } else if ($queryType == ServerParse::COMMIT || $queryType == ServerParse::ROLLBACK) {
+                                } elseif ($queryType == ServerParse::SET && strpos($data, 'autocommit', 4) !== false &&
+                                    $trim_data[-1] == 0) {
+                                    //处理autocommit事物
+                                    $this->connectHasAutoCommit[$fd] = true;
+                                    $this->connectHasTransaction[$fd] = true;
+                                    $this->connectReadState[$fd] = false;
+                                } elseif ($queryType == ServerParse::SET && strpos($data, 'autocommit', 4) !== false &&
+                                    $trim_data[-1] == 1) {
+                                    $this->connectHasAutoCommit[$fd] = false;
+                                    $this->connectReadState[$fd] = false;
+                                } elseif ($queryType == ServerParse::COMMIT || $queryType == ServerParse::ROLLBACK) {
+                                    //事物提交
                                     $this->connectHasTransaction[$fd] = false;
                                 } else {
                                     $this->connectReadState[$fd] = false;
@@ -153,16 +168,15 @@ class SMProxyServer extends BaseServer
                         } else {
                             $key = $this->source[$fd]->database ? $model . '_' . $this->source[$fd]->database : $model;
                             if (array_key_exists($key, $this->dbConfig)) {
-                                $client = MySQLPool::fetch($key,
-                                    $server, $fd);
+                                $client = MySQLPool::fetch($key, $server, $fd);
                                 $this->mysqlClient[$fd][$model] = $client;
                                 if ($data && $client->client->isConnected()) {
                                     $client->client->send($data);
                                 }
                             } else {
-                                $message = 'database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model . ' is not exists!';
-                                $errMessage = $this->writeErrMessage(1, $message
-                                    , ErrorCode::ER_SYNTAX_ERROR);
+                                $message = 'database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
+                                    ' is not exists!';
+                                $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR);
                                 $mysql_log = Log::get_logger('mysql');
                                 $mysql_log->error($message);
                                 if ($server->exist($fd)) {
@@ -189,6 +203,18 @@ class SMProxyServer extends BaseServer
     {
         if (isset($this->source[$fd])) {
             unset($this->source[$fd]);
+        }
+        if (isset($this->connectHasTransaction[$fd]) && $this->connectHasTransaction[$fd] === true) {
+            //回滚未关闭事物
+            $this->mysqlClient[$fd]['write']->client->send(getString([9,0,0,0,3,82,79,76,76,66,65,67,75]));
+            unset($this->connectHasTransaction[$fd]);
+        }
+        if (isset($this->connectHasAutoCommit[$fd]) && $this->connectHasAutoCommit[$fd] === true) {
+            //开启autocommit=0未关闭
+            $this->mysqlClient[$fd]['write']->client->send(getString([
+                17,0,0,0,3,115,101,116,32,97,117,116,111,99,111,109,109,105,116,61,49
+            ]));
+            unset($this->connectHasAutoCommit[$fd]);
         }
         if (isset($this->mysqlClient[$fd])) {
             foreach ($this->mysqlClient[$fd] as $mysqlClient) {
