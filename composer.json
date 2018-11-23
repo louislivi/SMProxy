@@ -13,7 +13,10 @@
     ],
     "require": {
         "php": "^7.0",
-        "ext-swoole": "^2.1"
+        "ext-swoole": "^2.1||^4.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.13"
     },
     "autoload": {
         "files": [
@@ -24,11 +27,10 @@
         }
     },
     "scripts": {
-        "test": "php ./bin/server start && php ./bin/server stop",
-        "start": "php ./bin/server start",
-        "stop": "php ./bin/server stop",
-        "restart": "php ./bin/server restart",
-        "help": "php ./bin/server -h",
-        "version": "php ./bin/server -v"
+        "smp": "php bin/server $2",
+        "stop": "php bin/server stop",
+        "restart": "php bin/server restart",
+        "smp-help": "php bin/server -h",
+        "smp-version": "php bin/server -v"
     }
 }
