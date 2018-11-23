@@ -12,22 +12,23 @@
         }
     ],
     "require": {
-        "php": "^7.0"
+        "php": "^7.0",
+        "ext-swoole": "^2.1"
     },
     "autoload": {
         "files": [
-          "src/lib/functions.php"
+            "src/lib/functions.php"
         ],
         "psr-4": {
             "SMProxy\\": "src/"
         }
     },
     "scripts": {
-      "test": "php ./bin/server start && php ./bin/server stop",
-      "start": "php ./bin/server start",
-      "stop": "php ./bin/server stop",
-      "restart": "php ./bin/server restart",
-      "help": "php ./bin/server -h",
-      "version": "php ./bin/server -v"
+        "test": "php ./bin/server start && php ./bin/server stop",
+        "start": "php ./bin/server start",
+        "stop": "php ./bin/server stop",
+        "restart": "php ./bin/server restart",
+        "help": "php ./bin/server -h",
+        "version": "php ./bin/server -v"
     }
 }
