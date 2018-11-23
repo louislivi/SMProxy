@@ -7,12 +7,12 @@ use SMProxy\MysqlPacket\Util\Capabilities;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/31
- * Time: 下午4:07
+ * Time: 下午4:07.
  */
 class BackendAuthenticator
 {
     /**
-     * 与MySQL连接时的一些特性指定
+     * 与MySQL连接时的一些特性指定.
      */
     public static function getClientFlags()
     {

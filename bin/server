@@ -2,40 +2,40 @@
 <?php
 
 date_default_timezone_set('PRC');
-/**
+/*
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/26
  * Time: 下午6:32
  *
  */
 //设置根目录
-define('ROOT', dirname(__FILE__) . '/..');
+define('ROOT', dirname(__FILE__).'/..');
 define('SMPROXY_VERSION', 1.2);
 //判断php版本
-if (PHP_VERSION < 7.0){
-    print_r('ERROR:PHP version must be greater than 7.0!' . "\n");
+if (PHP_VERSION < 7.0) {
+    print_r('ERROR:PHP version must be greater than 7.0!'."\n");
     exit(0);
 }
 
 //判断swoole版本
-if (defined('SWOOLE_VERSION')){
-    if (SWOOLE_VERSION < 2.1){
-        print_r('ERROR:Swoole version must be greater than 2.1!' . "\n");
+if (defined('SWOOLE_VERSION')) {
+    if (SWOOLE_VERSION < 2.1) {
+        print_r('ERROR:Swoole version must be greater than 2.1!'."\n");
         exit(0);
     }
-}else{
-    print_r('ERROR:Swoole not installed!' . "\n");
+} else {
+    print_r('ERROR:Swoole not installed!'."\n");
     exit(0);
 }
-include dirname(__FILE__) . "/../vendor/autoload.php";
+include dirname(__FILE__).'/../vendor/autoload.php';
 //读取配置文件
-$configName = ROOT . '/conf/';
+$configName = ROOT.'/conf/';
 if (file_exists($configName)) {
     define('CONFIG', initConfig($configName));
 } else {
     throw new \SMProxy\SMProxyException('Error:config conf/ No such file or directory!');
 }
-$version = 'SMProxy version:' . SMPROXY_VERSION . "\n";
+$version = 'SMProxy version:'.SMPROXY_VERSION."\n";
 $logo = <<<'LOGO'
 
   /$$$$$$  /$$      /$$ /$$$$$$$                                        
@@ -52,8 +52,8 @@ $logo = <<<'LOGO'
                                                                
 
 LOGO;
-$logo = $logo . $version;
-$desc = $logo . <<<DESC
+$logo = $logo.$version;
+$desc = $logo.<<<DESC
 Options and arguments (and corresponding environment variables):
 start   : start server
 stop    : stop server
@@ -64,7 +64,7 @@ reload  : graceful restart
 -v      : print server version
 DESC;
 if (!isset($argv[1])) {
-    print_r($desc . "\n");
+    print_r($desc."\n");
     exit();
 }
 
@@ -86,14 +86,14 @@ switch ($argv[1]) {
         break;
     case '-h':
     case '--help':
-        print_r($desc . "\n");
+        print_r($desc."\n");
         break;
     case '-v':
     case '--version':
-        print_r($logo . "\n");
+        print_r($logo."\n");
         break;
     default:
-        print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information." . "\n");
+        print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information."."\n");
         break;
 }
 
@@ -106,12 +106,11 @@ switch ($argv[1]) {
 function start(string $logo)
 {
     if (verifyServer()) {
-        print_r('server is running!' . "\n");
+        print_r('server is running!'."\n");
     } else {
-        print_r($logo . 'server starting ...' . "\n");
-        swoole_set_process_name("SMProxy");
-        new class extends \SMProxy\SMProxyServer
-        {
+        print_r($logo.'server starting ...'."\n");
+        swoole_set_process_name('SMProxy');
+        new class() extends \SMProxy\SMProxyServer {
         };
     }
 }
@@ -126,12 +125,12 @@ function stop()
         exec("ps -ef|grep SMProxy|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' '", $result);
         if ($result) {
             exec("kill -9 {$result[0]}", $result);
-            print_r('server stop success!' . "\n");
+            print_r('server stop success!'."\n");
         } else {
-            print_r('Notice: server is not running !' . "\n");
+            print_r('Notice: server is not running !'."\n");
         }
     } else {
-        print_r('Error: server is not running !' . "\n");
+        print_r('Error: server is not running !'."\n");
     }
 }
 
@@ -146,14 +145,14 @@ function restart(string $logo)
     if (verifyServer()) {
         stop();
         start($logo);
-        print_r('server restart success!' . "\n");
+        print_r('server restart success!'."\n");
     } else {
         start($logo);
     }
 }
 
 /**
- * 平滑重启
+ * 平滑重启.
  *
  * @throws ErrorException
  * @throws \SMProxy\SMProxyException
@@ -162,10 +161,10 @@ function reload(string $logo)
 {
     if (verifyServer()) {
         if ($pid = file_get_contents(CONFIG['server']['swoole']['pid_file'])) {
-            exec('kill -USR1 ' . $pid);
-            print_r('server restart success!' . "\n");
+            exec('kill -USR1 '.$pid);
+            print_r('server restart success!'."\n");
         } else {
-            print_r('Error: server is not running !' . "\n");
+            print_r('Error: server is not running !'."\n");
         }
     } else {
         start($logo);
@@ -178,9 +177,9 @@ function reload(string $logo)
 function status()
 {
     if (verifyServer()) {
-        print_r('server is start!' . "\n");
+        print_r('server is start!'."\n");
     } else {
-        print_r('server is not running!' . "\n");
+        print_r('server is not running!'."\n");
     }
 }
 

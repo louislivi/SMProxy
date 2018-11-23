@@ -7,7 +7,7 @@ use SMProxy\Parser\Util\ParseUtil;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/11/2
- * Time: 下午4:08
+ * Time: 下午4:08.
  */
 final class ServerParse
 {
@@ -74,13 +74,14 @@ final class ServerParse
                     return self::OTHER;
             }
         }
+
         return self::OTHER;
     }
 
-// EXPLAIN' '
-    static function explainCheck(string $stmt, int $offset)
+    // EXPLAIN' '
+    public static function explainCheck(string $stmt, int $offset)
     {
-        if (strlen($stmt) > $offset + strlen("XPLAIN ")) {
+        if (strlen($stmt) > $offset + strlen('XPLAIN ')) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
@@ -88,26 +89,27 @@ final class ServerParse
             $c5 = $stmt[++$offset];
             $c6 = $stmt[++$offset];
             $c7 = $stmt[++$offset];
-            if (($c1 == 'X' || $c1 == 'x') && ($c2 == 'P' || $c2 == 'p') && ($c3 == 'L' || $c3 == 'l')
-                && ($c4 == 'A' || $c4 == 'a') && ($c5 == 'I' || $c5 == 'i') && ($c6 == 'N' || $c6 == 'n')
-                && ($c7 == ' ' || $c7 == '\t' || $c7 == '\r' || $c7 == '\n')) {
+            if (('X' == $c1 || 'x' == $c1) && ('P' == $c2 || 'p' == $c2) && ('L' == $c3 || 'l' == $c3)
+                && ('A' == $c4 || 'a' == $c4) && ('I' == $c5 || 'i' == $c5) && ('N' == $c6 || 'n' == $c6)
+                && (' ' == $c7 || '\t' == $c7 || '\r' == $c7 || '\n' == $c7)) {
                 return ($$offset << 8) | self::EXPLAIN;
             }
         }
+
         return self::OTHER;
     }
 
     // KILL' '
-    static function killCheck(string $stmt, int $offset)
+    public static function killCheck(string $stmt, int $offset)
     {
         $stmtLen = strlen($stmt);
-        if ($stmtLen > $offset + strlen("ILL ")) {
+        if ($stmtLen > $offset + strlen('ILL ')) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
-            if (($c1 == 'I' || $c1 == 'i') && ($c2 == 'L' || $c2 == 'l') && ($c3 == 'L' || $c3 == 'l')
-                && ($c4 == ' ' || $c4 == '\t' || $c4 == '\r' || $c4 == '\n')) {
+            if (('I' == $c1 || 'i' == $c1) && ('L' == $c2 || 'l' == $c2) && ('L' == $c3 || 'l' == $c3)
+                && (' ' == $c4 || '\t' == $c4 || '\r' == $c4 || '\n' == $c4)) {
                 while ($stmtLen > ++$offset) {
                     switch ($stmt[$offset]) {
                         case ' ':
@@ -122,24 +124,26 @@ final class ServerParse
                             return ($offset << 8) | self::KILL;
                     }
                 }
+
                 return self::OTHER;
             }
         }
+
         return self::OTHER;
     }
 
     // KILL QUERY' '
-    static function killQueryCheck(string $stmt, int $offset)
+    public static function killQueryCheck(string $stmt, int $offset)
     {
         $stmtLen = strlen($stmt);
-        if ($stmtLen > $offset + strlen("UERY ")) {
+        if ($stmtLen > $offset + strlen('UERY ')) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
             $c5 = $stmt[++$offset];
-            if (($c1 == 'U' || $c1 == 'u') && ($c2 == 'E' || $c2 == 'e') && ($c3 == 'R' || $c3 == 'r')
-                && ($c4 == 'Y' || $c4 == 'y') && ($c5 == ' ' || $c5 == '\t' || $c5 == '\r' || $c5 == '\n')) {
+            if (('U' == $c1 || 'u' == $c1) && ('E' == $c2 || 'e' == $c2) && ('R' == $c3 || 'r' == $c3)
+                && ('Y' == $c4 || 'y' == $c4) && (' ' == $c5 || '\t' == $c5 || '\r' == $c5 || '\n' == $c5)) {
                 while ($stmtLen > ++$offset) {
                     switch ($stmt[$offset]) {
                         case ' ':
@@ -151,30 +155,33 @@ final class ServerParse
                             return ($offset << 8) | self::KILL_QUERY;
                     }
                 }
+
                 return self::OTHER;
             }
         }
+
         return self::OTHER;
     }
 
     // BEGIN
-    static function beginCheck(string $stmt, int $offset)
+    public static function beginCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 4) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
-            if (($c1 == 'E' || $c1 == 'e') && ($c2 == 'G' || $c2 == 'g') && ($c3 == 'I' || $c3 == 'i')
-                && ($c4 == 'N' || $c4 == 'n') && (strlen($stmt) == ++$offset || ParseUtil::isEOF($stmt . [$offset]))) {
+            if (('E' == $c1 || 'e' == $c1) && ('G' == $c2 || 'g' == $c2) && ('I' == $c3 || 'i' == $c3)
+                && ('N' == $c4 || 'n' == $c4) && (strlen($stmt) == ++$offset || ParseUtil::isEOF($stmt.[$offset]))) {
                 return self::BEGIN;
             }
         }
+
         return self::OTHER;
     }
 
     // COMMIT
-    static function commitCheck(string $stmt, int $offset)
+    public static function commitCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 5) {
             $c1 = $stmt[++$offset];
@@ -182,17 +189,18 @@ final class ServerParse
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
             $c5 = $stmt[++$offset];
-            if (($c1 == 'O' || $c1 == 'o') && ($c2 == 'M' || $c2 == 'm') && ($c3 == 'M' || $c3 == 'm')
-                && ($c4 == 'I' || $c4 == 'i') && ($c5 == 'T' || $c5 == 't')
+            if (('O' == $c1 || 'o' == $c1) && ('M' == $c2 || 'm' == $c2) && ('M' == $c3 || 'm' == $c3)
+                && ('I' == $c4 || 'i' == $c4) && ('T' == $c5 || 't' == $c5)
                 && (strlen($stmt) == ++$offset || ParseUtil::isEOF($stmt[$offset]))) {
                 return self::COMMIT;
             }
         }
+
         return self::OTHER;
     }
 
     // DELETE' '
-    static function deleteCheck(string $stmt, int $offset)
+    public static function deleteCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -201,17 +209,18 @@ final class ServerParse
             $c4 = $stmt[++$offset];
             $c5 = $stmt[++$offset];
             $c6 = $stmt[++$offset];
-            if (($c1 == 'E' || $c1 == 'e') && ($c2 == 'L' || $c2 == 'l') && ($c3 == 'E' || $c3 == 'e')
-                && ($c4 == 'T' || $c4 == 't') && ($c5 == 'E' || $c5 == 'e')
-                && ($c6 == ' ' || $c6 == '\t' || $c6 == '\r' || $c6 == '\n')) {
+            if (('E' == $c1 || 'e' == $c1) && ('L' == $c2 || 'l' == $c2) && ('E' == $c3 || 'e' == $c3)
+                && ('T' == $c4 || 't' == $c4) && ('E' == $c5 || 'e' == $c5)
+                && (' ' == $c6 || '\t' == $c6 || '\r' == $c6 || '\n' == $c6)) {
                 return self::DELETE;
             }
         }
+
         return self::OTHER;
     }
 
     // INSERT' '
-    static function insertCheck(string $stmt, int $offset)
+    public static function insertCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -220,16 +229,17 @@ final class ServerParse
             $c4 = $stmt[++$offset];
             $c5 = $stmt[++$offset];
             $c6 = $stmt[++$offset];
-            if (($c1 == 'N' || $c1 == 'n') && ($c2 == 'S' || $c2 == 's') && ($c3 == 'E' || $c3 == 'e')
-                && ($c4 == 'R' || $c4 == 'r') && ($c5 == 'T' || $c5 == 't')
-                && ($c6 == ' ' || $c6 == '\t' || $c6 == '\r' || $c6 == '\n')) {
+            if (('N' == $c1 || 'n' == $c1) && ('S' == $c2 || 's' == $c2) && ('E' == $c3 || 'e' == $c3)
+                && ('R' == $c4 || 'r' == $c4) && ('T' == $c5 || 't' == $c5)
+                && (' ' == $c6 || '\t' == $c6 || '\r' == $c6 || '\n' == $c6)) {
                 return self::INSERT;
             }
         }
+
         return self::OTHER;
     }
 
-    static function rCheck(string $stmt, int $offset)
+    public static function rCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -243,11 +253,12 @@ final class ServerParse
                     return self::OTHER;
             }
         }
+
         return self::OTHER;
     }
 
     // REPLACE' '
-    static function replaceCheck(string $stmt, int $offset)
+    public static function replaceCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -256,17 +267,18 @@ final class ServerParse
             $c4 = $stmt[++$offset];
             $c5 = $stmt[++$offset];
             $c6 = $stmt[++$offset];
-            if (($c1 == 'P' || $c1 == 'p') && ($c2 == 'L' || $c2 == 'l') && ($c3 == 'A' || $c3 == 'a')
-                && ($c4 == 'C' || $c4 == 'c') && ($c5 == 'E' || $c5 == 'e')
-                && ($c6 == ' ' || $c6 == '\t' || $c6 == '\r' || $c6 == '\n')) {
+            if (('P' == $c1 || 'p' == $c1) && ('L' == $c2 || 'l' == $c2) && ('A' == $c3 || 'a' == $c3)
+                && ('C' == $c4 || 'c' == $c4) && ('E' == $c5 || 'e' == $c5)
+                && (' ' == $c6 || '\t' == $c6 || '\r' == $c6 || '\n' == $c6)) {
                 return self::REPLACE;
             }
         }
+
         return self::OTHER;
     }
 
     // ROLLBACK
-    static function rollabckCheck(string $stmt, int $offset)
+    public static function rollabckCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
@@ -275,16 +287,17 @@ final class ServerParse
             $c4 = $stmt[++$offset];
             $c5 = $stmt[++$offset];
             $c6 = $stmt[++$offset];
-            if (($c1 == 'L' || $c1 == 'l') && ($c2 == 'L' || $c2 == 'l') && ($c3 == 'B' || $c3 == 'b')
-                && ($c4 == 'A' || $c4 == 'a') && ($c5 == 'C' || $c5 == 'c') && ($c6 == 'K' || $c6 == 'k')
+            if (('L' == $c1 || 'l' == $c1) && ('L' == $c2 || 'l' == $c2) && ('B' == $c3 || 'b' == $c3)
+                && ('A' == $c4 || 'a' == $c4) && ('C' == $c5 || 'c' == $c5) && ('K' == $c6 || 'k' == $c6)
                 && (strlen($stmt) == ++$offset || ParseUtil::isEOF($stmt[$offset]))) {
                 return self::ROLLBACK;
             }
         }
+
         return self::OTHER;
     }
 
-    static function sCheck(string $stmt, int $offset)
+    public static function sCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -304,11 +317,12 @@ final class ServerParse
                     return self::OTHER;
             }
         }
+
         return self::OTHER;
     }
 
     // SAVEPOINT
-    static function savepointCheck(string $stmt, int $offset)
+    public static function savepointCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 8) {
             $c1 = $stmt[++$offset];
@@ -319,16 +333,17 @@ final class ServerParse
             $c6 = $stmt[++$offset];
             $c7 = $stmt[++$offset];
             $c8 = $stmt[++$offset];
-            if (($c1 == 'V' || $c1 == 'v') && ($c2 == 'E' || $c2 == 'e') && ($c3 == 'P' || $c3 == 'p')
-                && ($c4 == 'O' || $c4 == 'o') && ($c5 == 'I' || $c5 == 'i') && ($c6 == 'N' || $c6 == 'n')
-                && ($c7 == 'T' || $c7 == 't') && ($c8 == ' ' || $c8 == '\t' || $c8 == '\r' || $c8 == '\n')) {
+            if (('V' == $c1 || 'v' == $c1) && ('E' == $c2 || 'e' == $c2) && ('P' == $c3 || 'p' == $c3)
+                && ('O' == $c4 || 'o' == $c4) && ('I' == $c5 || 'i' == $c5) && ('N' == $c6 || 'n' == $c6)
+                && ('T' == $c7 || 't' == $c7) && (' ' == $c8 || '\t' == $c8 || '\r' == $c8 || '\n' == $c8)) {
                 return self::SAVEPOINT;
             }
         }
+
         return self::OTHER;
     }
 
-    static function seCheck(string $stmt, int $offset)
+    public static function seCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -339,67 +354,72 @@ final class ServerParse
                 case 't':
                     if (strlen($stmt) > ++$offset) {
                         $c = $stmt[$offset];
-                        if ($c == ' ' || $c == '\r' || $c == '\n' || $c == '\t' || $c == '/' || $c == '#') {
+                        if (' ' == $c || '\r' == $c || '\n' == $c || '\t' == $c || '/' == $c || '#' == $c) {
                             return ($offset << 8) | self::SET;
                         }
                     }
+
                     return self::OTHER;
                 default:
                     return self::OTHER;
             }
         }
+
         return self::OTHER;
     }
 
     // SELECT' '
-    static function selectCheck(string $stmt, int $offset)
+    public static function selectCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 4) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
-            if (($c1 == 'E' || $c1 == 'e') && ($c2 == 'C' || $c2 == 'c') && ($c3 == 'T' || $c3 == 't')
-                && ($c4 == ' ' || $c4 == '\t' || $c4 == '\r' || $c4 == '\n' || $c4 == '/' || $c4 == '#')) {
+            if (('E' == $c1 || 'e' == $c1) && ('C' == $c2 || 'c' == $c2) && ('T' == $c3 || 't' == $c3)
+                && (' ' == $c4 || '\t' == $c4 || '\r' == $c4 || '\n' == $c4 || '/' == $c4 || '#' == $c4)) {
                 return ($offset << 8) | self::SELECT;
             }
         }
+
         return self::OTHER;
     }
 
     // SHOW' '
-    static function showCheck(string $stmt, int $offset)
+    public static function showCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 3) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
-            if (($c1 == 'O' || $c1 == 'o') && ($c2 == 'W' || $c2 == 'w')
-                && ($c3 == ' ' || $c3 == '\t' || $c3 == '\r' || $c3 == '\n')) {
+            if (('O' == $c1 || 'o' == $c1) && ('W' == $c2 || 'w' == $c2)
+                && (' ' == $c3 || '\t' == $c3 || '\r' == $c3 || '\n' == $c3)) {
                 return ($offset << 8) | self::SHOW;
             }
         }
+
         return self::OTHER;
     }
 
     // START' '
-    static function startCheck(string $stmt, int $offset)
+    public static function startCheck(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset + 4) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
             $c4 = $stmt[++$offset];
-            if (($c1 == 'A' || $c1 == 'a') && ($c2 == 'R' || $c2 == 'r') && ($c3 == 'T' || $c3 == 't')
-                && ($c4 == ' ' || $c4 == '\t' || $c4 == '\r' || $c4 == '\n')) {
+            if (('A' == $c1 || 'a' == $c1) && ('R' == $c2 || 'r' == $c2) && ('T' == $c3 || 't' == $c3)
+                && (' ' == $c4 || '\t' == $c4 || '\r' == $c4 || '\n' == $c4)) {
                 return ($offset << 8) | self::START;
             }
         }
+
         return self::OTHER;
     }
 
     // UPDATE' ' | USE' '
-    static function uCheck(string $stmt, int $offset, bool $has_Space = true)
+    public static function uCheck(string $stmt, int $offset, bool $has_Space = true)
     {
         if (strlen($stmt) > ++$offset) {
             switch ($stmt[$offset]) {
@@ -411,8 +431,8 @@ final class ServerParse
                         $c3 = $stmt[++$offset];
                         $c4 = $stmt[++$offset];
                         $c5 = $stmt[++$offset];
-                        if (($c1 == 'D' || $c1 == 'd') && ($c2 == 'A' || $c2 == 'a') && ($c3 == 'T' || $c3 == 't')
-                            && ($c4 == 'E' || $c4 == 'e') && ($has_Space ? ($c5 == ' ' || $c5 == '\t' || $c5 == '\r' || $c5 == '\n') : true)) {
+                        if (('D' == $c1 || 'd' == $c1) && ('A' == $c2 || 'a' == $c2) && ('T' == $c3 || 't' == $c3)
+                            && ('E' == $c4 || 'e' == $c4) && ($has_Space ? (' ' == $c5 || '\t' == $c5 || '\r' == $c5 || '\n' == $c5) : true)) {
                             return self::UPDATE;
                         }
                     }
@@ -422,7 +442,7 @@ final class ServerParse
                     if (strlen($stmt) > $offset + 2) {
                         $c1 = $stmt[++$offset];
                         $c2 = $stmt[++$offset];
-                        if (($c1 == 'E' || $c1 == 'e') && ($c2 == ' ' || $c2 == '\t' || $c2 == '\r' || $c2 == '\n')) {
+                        if (('E' == $c1 || 'e' == $c1) && (' ' == $c2 || '\t' == $c2 || '\r' == $c2 || '\n' == $c2)) {
                             return ($offset << 8) | self::USE;
                         }
                     }
@@ -431,7 +451,7 @@ final class ServerParse
                     return self::OTHER;
             }
         }
+
         return self::OTHER;
     }
-
 }

@@ -1,14 +1,15 @@
 <?php
 
 namespace SMProxy\MysqlPacket;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/25
- * Time: 下午6:35
+ * Time: 下午6:35.
  */
 
 /**
- * MySql包 外层结构
+ * MySql包 外层结构.
  *
  * @Author Louis Livi <574747417@qq.com>
  */
@@ -25,12 +26,11 @@ class BinaryPacket extends MySQLPacket
 
     public function calcPacketSize()
     {
-        return $this->data == null ? 0 : count($this->data);
+        return null == $this->data ? 0 : count($this->data);
     }
-
 
     protected function getPacketInfo()
     {
-        return "MySQL Binary Packet";
+        return 'MySQL Binary Packet';
     }
 }

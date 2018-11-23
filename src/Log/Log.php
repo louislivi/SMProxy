@@ -2,13 +2,13 @@
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/11/12
- * Time: 上午9:56
+ * Time: 上午9:56.
  */
 
 namespace SMProxy\Log;
 
 /**
- * 日志类
+ * 日志类.
  *
  * Description:
  * 1.自定义日志根目录及日志文件名称。
@@ -29,7 +29,7 @@ namespace SMProxy\Log;
  */
 class Log
 {
-// 日志根目录
+    // 日志根目录
     private $_log_path = '.';
 
     // 日志文件
@@ -47,10 +47,10 @@ class Log
     public static $open = true;
 
     /**
-     * 设置配置
+     * 设置配置.
      *
-     * @param  array $config 总配置设定
-     * @param bool $open 日志开关
+     * @param array $config 总配置设定
+     * @param bool  $open   日志开关
      */
     public static function set_config(array $config = [], bool $open = true)
     {
@@ -61,30 +61,27 @@ class Log
     /**
      * 获取日志类对象
      *
-     * @param  array $config 总配置设定
+     * @param array $config 总配置设定
      */
     public static function get_logger(string $tag = 'system')
     {
-
         // 根据tag从总配置中获取对应设定，如不存在使用system设定
         $config = isset(self::$_CONFIG[$tag]) ? self::$_CONFIG[$tag] : (isset(self::$_CONFIG['system']) ? self::$_CONFIG['system'] : array());
 
         // 设置标签
-        $config['tag'] = $tag != '' && $tag != 'system' ? $tag : '-';
+        $config['tag'] = '' != $tag && 'system' != $tag ? $tag : '-';
 
         // 返回日志类对象
         return new Log($config);
-
     }
 
     /**
-     * 初始化
+     * 初始化.
      *
      * @param array $config 配置设定
      */
     public function __construct(array $config = [])
     {
-
         // 日志根目录
         if (isset($config['log_path'])) {
             $this->_log_path = $config['log_path'];
@@ -104,15 +101,14 @@ class Log
         if (isset($config['tag'])) {
             $this->_tag = $config['tag'];
         }
-
     }
 
     /**
-     * 写入信息日志
+     * 写入信息日志.
      *
-     * @param  String $data 信息数据
+     * @param string $data 信息数据
      *
-     * @return Boolean
+     * @return bool
      */
     public function info(string $data)
     {
@@ -120,11 +116,11 @@ class Log
     }
 
     /**
-     * 写入警告日志
+     * 写入警告日志.
      *
-     * @param  String $data 警告数据
+     * @param string $data 警告数据
      *
-     * @return Boolean
+     * @return bool
      */
     public function warn(string $data)
     {
@@ -132,11 +128,11 @@ class Log
     }
 
     /**
-     * 写入错误日志
+     * 写入错误日志.
      *
-     * @param  String $data 错误数据
+     * @param string $data 错误数据
      *
-     * @return Boolean
+     * @return bool
      */
     public function error(string $data)
     {
@@ -144,12 +140,12 @@ class Log
     }
 
     /**
-     * 写入日志
+     * 写入日志.
      *
-     * @param  String $type 日志类型
-     * @param  String $data 日志数据
+     * @param string $type 日志类型
+     * @param string $data 日志数据
      *
-     * @return Boolean
+     * @return bool
      */
     private function add(string $type, string $data)
     {
@@ -161,10 +157,10 @@ class Log
             $is_create = $this->create_log_path(dirname($log_file));
 
             // 创建日期时间对象
-            $dt = new \DateTime;
+            $dt = new \DateTime();
 
             // 日志内容
-            $log_data = sprintf('[%s] %-5s %s %s' . PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->_tag, $data);
+            $log_data = sprintf('[%s] %-5s %s %s'.PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->_tag, $data);
 
             // 写入日志文件
             if ($is_create) {
@@ -173,41 +169,38 @@ class Log
                 } catch (\Exception $exception) {
                     return file_put_contents($log_file, $log_data, FILE_APPEND);
                 }
-
             }
         }
-        return false;
 
+        return false;
     }
 
     /**
-     * 创建日志目录
+     * 创建日志目录.
      *
-     * @param  String $log_path 日志目录
+     * @param string $log_path 日志目录
      *
-     * @return Boolean
+     * @return bool
      */
     private function create_log_path(string $log_path)
     {
         if (!is_dir($log_path)) {
             return mkdir($log_path, 0777, true);
         }
+
         return true;
     }
 
     /**
-     * 获取日志文件名称
+     * 获取日志文件名称.
      *
-     * @return String
+     * @return string
      */
     private function get_log_file()
     {
-
         // 创建日期时间对象writeFile
         $dt = new \DateTime();
         // 计算日志目录格式
-        return sprintf("%s/%s/%s", $this->_log_path, $dt->format($this->_format), $this->_log_file);
-
+        return sprintf('%s/%s/%s', $this->_log_path, $dt->format($this->_format), $this->_log_file);
     }
-
 }

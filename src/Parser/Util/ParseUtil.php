@@ -1,31 +1,33 @@
 <?php
 
 namespace SMProxy\Parser\Util;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/11/3
- * Time: 上午9:30
+ * Time: 上午9:30.
  */
 final class ParseUtil
 {
-
     public static function isEOF($c)
     {
-        return ($c == ' ' || $c == "\t" || $c == "\n" || $c == "\r" || $c == ';');
+        return ' ' == $c || "\t" == $c || "\n" == $c || "\r" == $c || ';' == $c;
     }
 
     public static function getSQLId(string $stmt)
     {
         $offset = strpos($stmt, '=');
-        if ($offset != -1 && strlen($stmt) > ++$offset) {
+        if (-1 != $offset && strlen($stmt) > ++$offset) {
             $id = trim(substr($stmt, $offset));
+
             return $id;
         }
+
         return 0;
     }
 
     /**
-     * <code>'abc'</code>
+     * <code>'abc'</code>.
      *
      * @param int offset stmt.charAt(offset) == first <code>'</code>
      */
@@ -35,7 +37,7 @@ final class ParseUtil
         $stmtLen = strlen($stmt);
         for (++$offset; $offset < $stmtLen; ++$offset) {
             $c = $stmt[$offset];
-            if ($c == '\\') {
+            if ('\\' == $c) {
                 switch ($c = $stmt[++$offset]) {
                     case '0':
                         $sb .= "\0";
@@ -58,8 +60,8 @@ final class ParseUtil
                     default:
                         $sb .= $c;
                 }
-            } else if ($c == '\'') {
-                if ($offset + 1 < strlen($stmt) && $stmt[$offset + 1] == '\'') {
+            } elseif ('\'' == $c) {
+                if ($offset + 1 < strlen($stmt) && '\'' == $stmt[$offset + 1]) {
                     ++$offset;
                     $sb .= '\'';
                 } else {
@@ -69,11 +71,12 @@ final class ParseUtil
                 $sb .= $c;
             }
         }
+
         return $sb;
     }
 
     /**
-     * <code>"abc"</code>
+     * <code>"abc"</code>.
      *
      * @param int offset stmt.charAt(offset) == first <code>"</code>
      */
@@ -84,7 +87,7 @@ final class ParseUtil
              $offset < strlen($stmt);
              ++$offset) {
             $c = $stmt = [$offset];
-            if ($c == '\\') {
+            if ('\\' == $c) {
                 switch ($c = $stmt[++$offset]) {
                     case '0':
                         $sb .= "\0";
@@ -106,38 +109,36 @@ final class ParseUtil
                         break;
                     default:
                         $sb .= $c;
-
                 }
-            } else
-                if ($c == '"') {
-                    if ($offset + 1 < strlen($stmt) && $stmt [$offset + 1] == '"') {
-                        ++$offset;
-                        $sb .= '"';
-                    } else {
-                        break;
-                    }
+            } elseif ('"' == $c) {
+                if ($offset + 1 < strlen($stmt) && '"' == $stmt[$offset + 1]) {
+                    ++$offset;
+                    $sb .= '"';
                 } else {
-                    $sb .= $c;
+                    break;
                 }
+            } else {
+                $sb .= $c;
+            }
         }
+
         return $sb;
     }
 
     /**
-     * <code>AS `abc`</code>
+     * <code>AS `abc`</code>.
      *
      * @param offset stmt.charAt(offset) == first <code>`</code>
      */
-    private
-    static function parseIdentifierEscape(string $stmt, int $offset)
+    private static function parseIdentifierEscape(string $stmt, int $offset)
     {
         $sb = '';
         for (++$offset;
              $offset < strlen($stmt);
              ++$offset) {
             $c = $stmt[$offset];
-            if ($c == '`') {
-                if ($offset + 1 < strlen($stmt) && $stmt[$offset + 1] == '`') {
+            if ('`' == $c) {
+                if ($offset + 1 < strlen($stmt) && '`' == $stmt[$offset + 1]) {
                     ++$offset;
                     $sb .= '`';
                 } else {
@@ -147,14 +148,14 @@ final class ParseUtil
                 $sb .= $c;
             }
         }
+
         return $sb;
     }
 
     /**
      * @param aliasIndex for <code>AS id</code>, index of 'i'
      */
-    public
-    static function parseAlias(string $stmt, int $aliasIndex)
+    public static function parseAlias(string $stmt, int $aliasIndex)
     {
         if ($aliasIndex < 0 || $aliasIndex >= strlen($stmt)) {
             return null;
@@ -168,7 +169,8 @@ final class ParseUtil
                 return self::parseIdentifierEscape($stmt, $aliasIndex);
             default:
                 $offset = $aliasIndex;
-                for ($stmtLen = strlen($stmt); $offset < $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]); ++$offset) ;
+                for ($stmtLen = strlen($stmt); $offset < $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]); ++$offset);
+
                 return substr($stmt, $aliasIndex, $offset);
         }
     }
@@ -179,12 +181,14 @@ final class ParseUtil
         $n = $offset;
         switch ($stmt[$n]) {
             case '/':
-                if ($len > ++$n && $stmt[$n++] == '*' && $len > $n + 1 && $stmt[$n] != '!') {
+                if ($len > ++$n && '*' == $stmt[$n++] && $len > $n + 1 && '!' != $stmt[$n]) {
                     for ($i = $n; $i < $len;
                          ++$i) {
-                        if ($stmt [$i] == '*') {
+                        if ('*' == $stmt[$i]) {
                             $m = $i + 1;
-                            if ($len > $m && $stmt[$m] == '/') return $m;
+                            if ($len > $m && '/' == $stmt[$m]) {
+                                return $m;
+                            }
                         }
                     }
                 }
@@ -192,15 +196,17 @@ final class ParseUtil
             case '#':
                 for ($i = $n + 1; $i < $len;
                      ++$i) {
-                    if ($stmt[$i] == "\n") return $i;
+                    if ("\n" == $stmt[$i]) {
+                        return $i;
+                    }
                 }
                 break;
         }
+
         return $offset;
     }
 
-    public
-    static function currentCharIsSep(string $stmt, int $offset)
+    public static function currentCharIsSep(string $stmt, int $offset)
     {
         if (strlen($stmt) > $offset) {
             switch ($stmt[$offset]) {
@@ -213,6 +219,7 @@ final class ParseUtil
                     return false;
             }
         }
+
         return true;
     }
 
@@ -239,11 +246,13 @@ final class ParseUtil
                                                                  string $nextExpectedstring,
                                                                  bool $checkSepChar)
     {
-        if ($nextExpectedstring == null || strlen($nextExpectedstring) < 1) return $offset;
+        if (null == $nextExpectedstring || strlen($nextExpectedstring) < 1) {
+            return $offset;
+        }
         $i = $offset;
         $index = 0;
         for ($stmtLen = strlen($stmt); $i < $stmtLen && $index < strlen($nextExpectedstring); ++$i) {
-            if ($index == 0) {
+            if (0 == $index) {
                 $isSep = self::currentCharIsSep($stmt, $i);
                 if ($isSep) {
                     continue;
@@ -260,13 +269,16 @@ final class ParseUtil
             if ($checkSepChar) {
                 $ok = self::nextCharIsSep($stmt, $i);
             }
-            if ($ok) return $i;
+            if ($ok) {
+                return $i;
+            }
         }
+
         return $offset;
     }
 
-    private const JSON = "json";
-    private const EQ = "=";
+    private const JSON = 'json';
+    private const EQ = '=';
 
     //private static final string WHERE = "where";
     //private static final string SET = "set";
@@ -300,6 +312,7 @@ final class ParseUtil
         if ($k <= $i) {
             return $offset;
         }
+
         return $i;
     }
 
@@ -322,6 +335,7 @@ final class ParseUtil
                     return $i + $length;
             }
         }
+
         return $i;
     }
 
@@ -334,9 +348,10 @@ final class ParseUtil
                     return false;
                 }
             }
+
             return true;
         }
+
         return false;
     }
-
 }
