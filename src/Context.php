@@ -7,13 +7,13 @@ use Swoole\Coroutine;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/30
- * Time: 下午4:48
+ * Time: 下午4:48.
  */
 class Context
 {
     protected static $pool = [];
 
-    static function get(string $key)
+    public static function get(string $key)
     {
         $cid = Coroutine::getuid();
         if ($cid < 0) {
@@ -22,19 +22,19 @@ class Context
         if (isset(self::$pool[$cid][$key])) {
             return self::$pool[$cid][$key];
         }
+
         return null;
     }
 
-    static function put(string $key, $item)
+    public static function put(string $key, $item)
     {
         $cid = Coroutine::getuid();
         if ($cid > 0) {
             self::$pool[$cid][$key] = $item;
         }
-
     }
 
-    static function delete(string $key = null)
+    public static function delete(string $key = null)
     {
         $cid = Coroutine::getuid();
         if ($cid > 0) {

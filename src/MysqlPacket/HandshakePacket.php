@@ -5,13 +5,12 @@ namespace SMProxy\MysqlPacket;
 use SMProxy\MysqlPacket\Util\BufferUtil;
 
 /**
- * MySql握手包
+ * MySql握手包.
  *
  * @Author lizhuyang
  */
 class HandshakePacket extends MySQLPacket
 {
-
     private static $FILLER_13 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     public $protocolVersion;
@@ -39,45 +38,43 @@ class HandshakePacket extends MySQLPacket
         $this->serverStatus = $mm->readUB2();
         $mm->move(13);
         $this->restOfScrambleBuff = $mm->readBytesWithNull();
+
         return $this;
     }
 
-    /**
-     *
-     */
     public function write()
     {
         // default init 256,so it can avoid buff extract
         $buffer = [];
         BufferUtil::writeUB3($buffer, $this->calcPacketSize());
-        $buffer [] = $this->packetId;
-        $buffer [] = $this->protocolVersion;
+        $buffer[] = $this->packetId;
+        $buffer[] = $this->protocolVersion;
         BufferUtil::writeWithNull($buffer, $this->serverVersion);
         BufferUtil::writeUB4($buffer, $this->threadId);
         BufferUtil::writeWithNull($buffer, $this->seed);
         BufferUtil::writeUB2($buffer, $this->serverCapabilities);
-        $buffer [] = $this->serverCharsetIndex;
+        $buffer[] = $this->serverCharsetIndex;
         BufferUtil::writeUB2($buffer, $this->serverStatus);
         $buffer = array_merge($buffer, self::$FILLER_13);
         BufferUtil::writeWithNull($buffer, $this->restOfScrambleBuff);
+
         return $buffer;
     }
 
     public function calcPacketSize()
     {
         $size = 1;
-        $size += count($this->serverVersion);// n
-        $size += 5;// 1+4
-        $size += count($this->seed);// 8
-        $size += 19;// 1+2+1+2+13
-        $size += count($this->restOfScrambleBuff);// 12
-        $size += 1;// 1
+        $size += count($this->serverVersion); // n
+        $size += 5; // 1+4
+        $size += count($this->seed); // 8
+        $size += 19; // 1+2+1+2+13
+        $size += count($this->restOfScrambleBuff); // 12
+        ++$size; // 1
         return $size;
     }
 
-
     protected function getPacketInfo()
     {
-        return "MySQL Handshake Packet";
+        return 'MySQL Handshake Packet';
     }
 }

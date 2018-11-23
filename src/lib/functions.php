@@ -2,11 +2,11 @@
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/26
- * Time: 下午5:33
+ * Time: 下午5:33.
  */
 
 /**
- * 获取bytes 数组
+ * 获取bytes 数组.
  *
  * @param $data
  *
@@ -16,15 +16,16 @@ function getBytes(string $data)
 {
     $bytes = [];
     $count = strlen($data);
-    for ($i = 0; $i < $count; $i++) {
+    for ($i = 0; $i < $count; ++$i) {
         $byte = ord($data[$i]);
         $bytes[] = $byte;
     }
+
     return $bytes;
 }
 
 /**
- * 获取 string
+ * 获取 string.
  *
  * @param $data
  *
@@ -34,15 +35,16 @@ function getString(array $bytes)
 {
     $string = '';
     $count = count($bytes);
-    for ($i = 0; $i < $count; $i++) {
+    for ($i = 0; $i < $count; ++$i) {
         $str = chr($bytes[$i]);
         $string .= $str;
     }
+
     return $string;
 }
 
 /**
- * 数组复制
+ * 数组复制.
  *
  * @param $array
  * @param $start
@@ -53,14 +55,15 @@ function getString(array $bytes)
 function array_copy(array $array, int $start, int $len)
 {
     $newArray = [];
-    for ($i = 0; $i < $len; $i++) {
+    for ($i = 0; $i < $len; ++$i) {
         $newArray[] = $array[$start + $i];
     }
+
     return $newArray;
 }
 
 /**
- * 计算mysql包的大小
+ * 计算mysql包的大小.
  *
  * @param $size
  *
@@ -85,15 +88,15 @@ function getMysqlPackSize(int $size)
             $sizeData[] = $size;
         }
     }
+
     return $sizeData;
 }
 
 /**
- * 无符号16位右移
+ * 无符号16位右移.
  *
- * @param int $x 要进行操作的数字
+ * @param int $x    要进行操作的数字
  * @param int $bits 右移位数
- *
  */
 function shr16(int $x, int $bits)
 {
@@ -101,7 +104,7 @@ function shr16(int $x, int $bits)
 }
 
 /**
- * 初始化配置文件
+ * 初始化配置文件.
  *
  * @param $dir
  */
@@ -112,10 +115,10 @@ function initConfig(string $dir)
         //打开
         if ($dh = @opendir($dir)) {
             //读取
-            while (($file = readdir($dh)) !== false) {
-                if ($file != '.' && $file != '..' && !is_dir($file) &&
-                    substr($file, -5, 5) == '.json') {
-                    $file_config = json_decode(file_get_contents($dir . $file), true);
+            while (false !== ($file = readdir($dh))) {
+                if ('.' != $file && '..' != $file && !is_dir($file) &&
+                    '.json' == substr($file, -5, 5)) {
+                    $file_config = json_decode(file_get_contents($dir.$file), true);
                     if (is_array($file_config)) {
                         $config = array_merge($config, $file_config);
                     }
@@ -128,26 +131,26 @@ function initConfig(string $dir)
 
     //替换swoole 常量
     if (isset($config['server']['mode'])) {
-        replace_constant($config['server']['mode'],SWOOLE_PROCESS);
+        replace_constant($config['server']['mode'], SWOOLE_PROCESS);
     } else {
         $config['server']['mode'] = SWOOLE_PROCESS;
     }
 
     if (isset($config['server']['sock_type'])) {
-        replace_constant($config['server']['sock_type'],SWOOLE_SOCK_TCP);
+        replace_constant($config['server']['sock_type'], SWOOLE_SOCK_TCP);
     } else {
         $config['server']['sock_type'] = SWOOLE_SOCK_TCP;
     }
 
     if (isset($config['server']['swoole_client_sock_setting']['sock_type'])) {
-        replace_constant($config['server']['swoole_client_sock_setting']['sock_type'],SWOOLE_SOCK_TCP);
-    }else{
+        replace_constant($config['server']['swoole_client_sock_setting']['sock_type'], SWOOLE_SOCK_TCP);
+    } else {
         $config['server']['swoole_client_sock_setting']['sock_type'] = SWOOLE_SOCK_TCP;
     }
 
     if (isset($config['server']['swoole_client_sock_setting']['sync_type'])) {
-        replace_constant($config['server']['swoole_client_sock_setting']['sync_type'],SWOOLE_SOCK_ASYNC);
-    }else{
+        replace_constant($config['server']['swoole_client_sock_setting']['sync_type'], SWOOLE_SOCK_ASYNC);
+    } else {
         $config['server']['swoole_client_sock_setting']['sync_type'] = SWOOLE_SOCK_ASYNC;
     }
 
@@ -172,6 +175,7 @@ function initConfig(string $dir)
     } else {
         throw new \SMProxy\SMProxyException('ERROR:server.swoole.pid_file 配置项不存在!');
     }
+
     return $config;
 }
 
@@ -181,17 +185,17 @@ function initConfig(string $dir)
  * @param string $const
  * @param string $default
  */
-function replace_constant(string &$const,string $default = '')
+function replace_constant(string &$const, string $default = '')
 {
-    if (defined($const)){
+    if (defined($const)) {
         $const = constant($const);
-    }else{
+    } else {
         $const = $default;
     }
 }
 
 /**
- * 创建日志目录
+ * 创建日志目录.
  *
  * @param string $path
  */
@@ -204,10 +208,10 @@ function mk_log_dir(string &$path)
 }
 
 /**
- * 对数据进行编码转换
+ * 对数据进行编码转换.
  *
- * @param array/string $data       数组
- * @param string $output 转换后的编码
+ * @param array/string $data   数组
+ * @param string       $output 转换后的编码
  */
 function array_iconv($data, string $output = 'utf-8')
 {
@@ -225,7 +229,7 @@ function array_iconv($data, string $output = 'utf-8')
                 $data[$key] = mb_convert_encoding($data, $output, $encoded);
             }
         }
+
         return $data;
     }
 }
-

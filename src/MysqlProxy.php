@@ -16,7 +16,7 @@ use SMProxy\MysqlPacket\Util\SecurityUtil;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/26
- * Time: 下午5:51
+ * Time: 下午5:51.
  */
 class MysqlProxy extends MysqlClient
 {
@@ -37,11 +37,10 @@ class MysqlProxy extends MysqlClient
 
     public function onClientConnect(\swoole_client $cli)
     {
-
     }
 
     /**
-     * mysql 客户端消息转发
+     * mysql 客户端消息转发.
      *
      * @param $cli
      * @param $data
@@ -84,7 +83,7 @@ class MysqlProxy extends MysqlClient
                             $errorPacket->read($binaryPacket);
                             $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
                             $mysql_log = Log::get_logger('mysql');
-                            $mysql_log->error($errorPacket->errno . ':' . $errorPacket->message);
+                            $mysql_log->error($errorPacket->errno.':'.$errorPacket->message);
                             $data = getString($errorPacket->write());
 //                        switch ($errorPacket ->sqlState){
 //                            case 28000:

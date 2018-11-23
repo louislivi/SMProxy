@@ -5,11 +5,11 @@ namespace SMProxy\MysqlPacket;
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/25
- * Time: 下午6:42
+ * Time: 下午6:42.
  */
 
 /**
- * For netty MySql
+ * For netty MySql.
  *
  * @author lizhuyang
  */
@@ -63,6 +63,7 @@ class MySQLMessage
         if ($i) {
             return $this->data[$i];
         }
+
         return $this->data[$this->position++];
     }
 
@@ -71,6 +72,7 @@ class MySQLMessage
         $b = $this->data;
         $i = $b[$this->position++];
         $i |= ($b[$this->position++]) << 8;
+
         return $i;
     }
 
@@ -80,6 +82,7 @@ class MySQLMessage
         $i = $b[$this->position++];
         $i |= ($b[$this->position++]) << 8;
         $i |= ($b[$this->position++]) << 16;
+
         return $i;
     }
 
@@ -90,6 +93,7 @@ class MySQLMessage
         $l |= $b[$this->position++] << 8;
         $l |= $b[$this->position++] << 16;
         $l |= $b[$this->position++] << 24;
+
         return $l;
     }
 
@@ -100,12 +104,13 @@ class MySQLMessage
         $i |= ($b[$this->position++]) << 8;
         $i |= ($b[$this->position++]) << 16;
         $i |= ($b[$this->position++]) << 24;
+
         return $i;
     }
 
     public function readFloat()
     {
-        return (float)($this->readInt());
+        return (float) ($this->readInt());
     }
 
     public function readLong()
@@ -119,6 +124,7 @@ class MySQLMessage
         $l |= $b[$this->position++] << 40;
         $l |= $b[$this->position++] << 48;
         $l |= $b[$this->position++] << 56;
+
         return $l;
     }
 
@@ -152,10 +158,10 @@ class MySQLMessage
             if ($this->position >= $this->length) {
                 return self::$EMPTY_BYTES;
             }
+
             return array_copy($this->data, $this->position, $this->length - $this->position);
         }
     }
-
 
     public function readBytesWithNull()
     {
@@ -164,8 +170,8 @@ class MySQLMessage
             return self::$EMPTY_BYTES;
         }
         $offset = -1;
-        for ($i = $this->position; $i < $this->length; $i++) {
-            if ($b[$i] == 0) {
+        for ($i = $this->position; $i < $this->length; ++$i) {
+            if (0 == $b[$i]) {
                 $offset = $i;
                 break;
             }
@@ -174,25 +180,29 @@ class MySQLMessage
             case -1:
                 $ab1 = array_copy($b, $this->position, $this->length - $this->position);
                 $this->position = $this->length;
+
                 return $ab1;
             case 0:
                 $this->position++;
+
                 return self::$EMPTY_BYTES;
             default:
                 $ab2 = array_copy($b, $this->position, $offset - $this->position);
                 $this->position = $offset + 1;
+
                 return $ab2;
         }
     }
 
     public function readBytesWithLength()
     {
-        $length = (int)$this->readLength();
+        $length = (int) $this->readLength();
         if ($length <= 0) {
             return [self::$EMPTY_BYTES];
         }
         $ab = array_copy($this->data, $this->position, $length);
         $this->position += $length;
+
         return $ab;
     }
 
@@ -203,8 +213,8 @@ class MySQLMessage
             return null;
         }
         $offset = -1;
-        for ($i = $this->position; $i < $this->length; $i++) {
-            if ($b[$i] == 0) {
+        for ($i = $this->position; $i < $this->length; ++$i) {
+            if (0 == $b[$i]) {
                 $offset = $i;
                 break;
             }
@@ -212,30 +222,35 @@ class MySQLMessage
         if ($charset) {
             switch ($offset) {
                 case -1:
-                    $s1 = getString(array_copy($b, $this->position, $this->length - $this->position));;
+                    $s1 = getString(array_copy($b, $this->position, $this->length - $this->position));
                     $this->position = $this->length;
+
                     return $s1;
                 case 0:
                     $this->position++;
+
                     return null;
                 default:
-                    $s2 = getString(array_copy($b, $this->position, $offset - $this->position));;
+                    $s2 = getString(array_copy($b, $this->position, $offset - $this->position));
                     $this->position = $offset + 1;
+
                     return $s2;
             }
         } else {
-            if ($offset == -1) {
-
+            if (-1 == $offset) {
                 $s = getString(array_copy($b, $this->position, $this->length - $this->position));
                 $this->position = $this->length;
+
                 return $s;
             }
             if ($offset > $this->position) {
                 $s = getString(array_copy($b, $this->position, $offset - $this->position));
                 $this->position = $offset + 1;
+
                 return $s;
             } else {
-                $this->position++;
+                ++$this->position;
+
                 return null;
             }
         }
@@ -248,7 +263,7 @@ class MySQLMessage
         }
         $s = getString(array_copy($this->data, $this->position, $this->length - $this->position));
         $this->position = $this->length;
+
         return $s;
     }
-
 }
