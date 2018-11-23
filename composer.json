@@ -2,7 +2,7 @@
     "name": "louislivi/smproxy",
     "description": "A mysql database connection pool based on mysql protocol, swoole development",
     "type": "project",
-    "keywords": ["smproxy","mysql","pool","connection","database","swoole"],
+    "keywords": ["smproxy", "mysql", "pool", "connection", "database", "swoole"],
     "homepage": "https://github.com/louislivi/smproxy",
     "license": "MIT",
     "authors": [
