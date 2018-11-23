@@ -203,7 +203,7 @@ function mk_log_dir(string &$path)
 {
     $path = str_replace('ROOT', ROOT, $path);
     if (!file_exists(dirname($path))) {
-        mkdir(dirname($path), 755, true);
+        mkdir(dirname($path), 0755, true);
     }
 }
 
