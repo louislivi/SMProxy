@@ -22,6 +22,25 @@
 [![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
 [![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
 
+- [SMProxy](#smproxy)
+  - [Swoole MySQL Proxy](#swoole-mysql-proxy)
+  - [原理](#%E5%8E%9F%E7%90%86)
+  - [特性](#%E7%89%B9%E6%80%A7)
+  - [设计初衷](#%E8%AE%BE%E8%AE%A1%E5%88%9D%E8%A1%B7)
+  - [环境](#%E7%8E%AF%E5%A2%83)
+  - [安装](#%E5%AE%89%E8%A3%85)
+  - [运行](#%E8%BF%90%E8%A1%8C)
+  - [SMProxy连接测试](#smproxy%E8%BF%9E%E6%8E%A5%E6%B5%8B%E8%AF%95)
+    - [没用框架的php7.2.6](#%E6%B2%A1%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84php726)
+    - [Thinkphp5.0](#thinkphp50)
+    - [Laravel5.7](#laravel57)
+    - [mysql 连接数](#mysql-%E8%BF%9E%E6%8E%A5%E6%95%B0)
+  - [交流](#%E4%BA%A4%E6%B5%81)
+  - [配置文件](#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+    - [database.json](#databasejson)
+    - [server.json](#serverjson)
+  - [其他学习资料](#%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99)
+
 ## Swoole MySQL Proxy
 
 一个基于mysql协议，swoole 开发的mysql数据库连接池。

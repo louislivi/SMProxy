@@ -22,6 +22,25 @@ English | [中文](./README.md)
 [![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
 [![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
 
+- [SMProxy](#smproxy)
+  - [Swoole MySQL Proxy](#swoole-mysql-proxy)
+  - [Principle](#principle)
+  - [Features](#features)
+  - [Why This](#why-this)
+  - [Environment Requirements](#environment-requirements)
+  - [Installation](#installation)
+  - [Run](#run)
+  - [Connection Test](#connection-test)
+    - [PHP 7.2.6 Without Framework](#php-726-without-framework)
+    - [ThinkPHP 5.0](#thinkphp-50)
+    - [Laravel 5.7](#laravel-57)
+    - [Number of MySQL Connections](#number-of-mysql-connections)
+  - [Communities & Groups](#communities--groups)
+  - [Configuration](#configuration)
+    - [database.json](#databasejson)
+    - [server.json](#serverjson)
+  - [More Documentation](#more-documentation)
+
 ## Swoole MySQL Proxy
 
 A MySQL database connection pool based on MySQL protocol and Swoole.
