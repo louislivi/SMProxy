@@ -73,16 +73,9 @@ Do not parse all sql packages like mycat, increasing the complexity.
 
 ## Installation
 
-Download the file directly and extract it.
-
 ```bash
-git clont https://github.com/louislivi/smproxy.git
-```
-
-Or
-
-```bash
-composer create-project --prefer-dist louislivi/smproxy smproxy
+git clone https://github.com/louislivi/smproxy.git
+composer install
 ```
 
 ## Run
@@ -163,50 +156,9 @@ QQ group: 722124111
 
 ## Configuration
 
-The configuration file is located in the smproxy/conf directory
-The configuration file uppercase ROOT represents the current SMProxy and directory
+The configuration files are located in the `smproxy/conf` directory, the uppercase `ROOT` represents the SMProxy root directory.
 
 ### database.json
-
-```json
-{
-  "database": {
-    "account": {
-      "root": {
-        "user": "root", 
-        "password": "123456"
-      }
-    },
-    "serverInfo": {
-      "server1": {
-        "write": {
-          "host": "127.0.0.1",
-          "port": 3306,
-          "timeout": 0.5,
-          "flag": 0,
-          "account": "root"
-        },
-        "read": {
-          "host": "127.0.0.1",
-          "port": 3306,
-          "timeout": 0.5,
-          "flag": 0,
-          "account": "root"
-        }
-      }
-    },
-    "databases": {
-      "dbname": {
-        "serverInfo": "server1",
-        "maxSpareConns": 10,
-        "maxSpareExp": 3600,
-        "maxConns": 20,
-        "charset": "utf-8"
-      }
-    }
-  }
-}
-```
 
 | account information                                           | serverInfo service information                                                        | databases database connection pool information    |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------- |
@@ -219,53 +171,6 @@ The configuration file uppercase ROOT represents the current SMProxy and directo
 |                                                               | serverInfo..account corresponds to databases.account                                  |                                                   |
 
 ### server.json
-
-```json
-{
-  "server": {
-    "user": "root",
-    "password": "123456",
-    "charset": "utf8mb4",
-    "host": "0.0.0.0",
-    "port": "3366",
-    "mode": "SWOOLE_PROCESS",
-    "sock_type": "SWOOLE_SOCK_TCP",
-    "logs": {
-      "open":true,
-      "config": {
-        "system": {
-          "log_path": "ROOT/logs",
-          "log_file": "system.log",
-          "format": "Y/m/d"
-        },
-        "mysql": {
-          "log_path": "ROOT/logs",
-          "log_file": "mysql.log",
-          "format": "Y/m/d"
-        }
-      }
-    },
-    "swoole": {
-      "worker_num": 1,
-      "max_coro_num": 6000,
-      "open_tcp_nodelay": true,
-      "daemonize": 1,
-      "heartbeat_check_interval": 60,
-      "heartbeat_idle_time": 600,
-      "reload_async": true,
-      "log_file": "ROOT/logs/error.log",
-      "pid_file": "ROOT/logs/pid/server.pid"
-    },
-    "swoole_client_setting": {
-      "package_max_length": 16777216
-    },
-    "swoole_client_sock_setting": {
-      "sock_type": "SWOOLE_SOCK_TCP",
-      "sync_type": "SWOOLE_SOCK_ASYNC"
-    }
-  }
-}
-```
 
 | user service username | password service password | charset service code | host link address | port service port multiple, separated | mode run mode                                                       | sock_type SWOOLE_SOCK_TCP tcp | logs log configuration                    | swoole swoole configuration                  | swoole_client_setting client configuration | swoole_client_sock_setting Client sock configuration                   |
 | --------------------- | ------------------------- | -------------------- | ----------------- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------- | ----------------------------------------- | -------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- |

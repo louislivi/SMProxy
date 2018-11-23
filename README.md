@@ -59,20 +59,13 @@ mycat等数据库中间件会出现部分sql无法使用，例如不支持批量
 ## 环境
 
 - Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-- PHP 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+- PHP 7.0+     ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 
 ## 安装
 
-下载的文件直接解压即可。
-
 ```bash
-git clont https://github.com/louislivi/smproxy.git
-```
-
-或
-
-```bash
-composer create-project --prefer-dist louislivi/smproxy smproxy
+git clone https://github.com/louislivi/smproxy.git
+composer install
 ```
 
 ## 运行
@@ -152,50 +145,9 @@ QQ群：722124111
 
 ## 配置文件
 
-配置文件位于 `smproxy/conf` 目录中
-配置文件大写ROOT 代表当前SMProxy跟目录
+配置文件位于 `smproxy/conf` 目录中，其中大写 `ROOT` 代表当前 SMProxy 根目录。
 
 ### database.json
-
-```json
-{
-  "database": {
-    "account": {
-      "root": {
-        "user": "root", 
-        "password": "123456"
-      }
-    },
-    "serverInfo": {
-      "server1": {
-        "write": {
-          "host": "127.0.0.1",
-          "port": 3306,
-          "timeout": 0.5,
-          "flag": 0,
-          "account": "root"
-        },
-        "read": {
-          "host": "127.0.0.1",
-          "port": 3306,
-          "timeout": 0.5,
-          "flag": 0,
-          "account": "root"
-        }
-      }
-    },
-    "databases": {
-      "dbname": {
-        "serverInfo": "server1",
-        "maxSpareConns": 10,
-        "maxSpareExp": 3600,
-        "maxConns": 20,
-        "charset": "utf-8"
-      }
-    }
-  }
-}
-```
 
 | account 账号信息                                        | serverInfo 服务信息                                        | databases 数据库连接池信息              |
 | ------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------- |
@@ -208,53 +160,6 @@ QQ群：722124111
 |                                                         | serverInfo..account  与 databases.account 对应             |                                         |
 
 ### server.json
-
-```json
-{
-  "server": {
-    "user": "root",
-    "password": "123456",
-    "charset": "utf8mb4",
-    "host": "0.0.0.0",
-    "port": "3366",
-    "mode": "SWOOLE_PROCESS",
-    "sock_type": "SWOOLE_SOCK_TCP",
-    "logs": {
-      "open":true,
-      "config": {
-        "system": {
-          "log_path": "ROOT/logs",
-          "log_file": "system.log",
-          "format": "Y/m/d"
-        },
-        "mysql": {
-          "log_path": "ROOT/logs",
-          "log_file": "mysql.log",
-          "format": "Y/m/d"
-        }
-      }
-    },
-    "swoole": {
-      "worker_num": 1,
-      "max_coro_num": 6000,
-      "open_tcp_nodelay": true,
-      "daemonize": 1,
-      "heartbeat_check_interval": 60,
-      "heartbeat_idle_time": 600,
-      "reload_async": true,
-      "log_file": "ROOT/logs/error.log",
-      "pid_file": "ROOT/logs/pid/server.pid"
-    },
-    "swoole_client_setting": {
-      "package_max_length": 16777216
-    },
-    "swoole_client_sock_setting": {
-      "sock_type": "SWOOLE_SOCK_TCP",
-      "sync_type": "SWOOLE_SOCK_ASYNC"
-    }
-  }
-}
-```
 
 | user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 | mode 运行模式                                         | sock_type SWOOLE_SOCK_TCP tcp | logs 日志配置                 | swoole swoole配置                  | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置               |
 | --------------- | ----------------- | ---------------- | ------------- | ------------------------- | ----------------------------------------------------- | ----------------------------- | ----------------------------- | ---------------------------------- | -------------------------------- | ------------------------------------------------------- |
