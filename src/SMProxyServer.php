@@ -4,6 +4,7 @@ namespace SMProxy;
 
 use SMProxy\Handler\Frontend\FrontendAuthenticator;
 use SMProxy\Handler\Frontend\FrontendConnection;
+use SMProxy\Helper\ProcessHelper;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;
 use SMProxy\MysqlPacket\MySqlPacketDecoder;
@@ -239,6 +240,11 @@ class SMProxyServer extends BaseServer
      */
     public function onWorkerStart(\swoole_server $server, int $worker_id)
     {
+        if ($worker_id >= CONFIG['server']['swoole']['worker_num']) {
+            ProcessHelper::setProcessTitle('SMProxy task process');
+        } else {
+            ProcessHelper::setProcessTitle('SMProxy worker process');
+        }
         $this->dbConfig = $this->parseDbConfig(initConfig(ROOT.'/conf/'));
         //初始化链接
         MySQLPool::init($this->dbConfig);

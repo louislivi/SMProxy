@@ -2,6 +2,7 @@
 
 namespace SMProxy;
 
+use SMProxy\Helper\ProcessHelper;
 use SMProxy\MysqlPacket\ErrorPacket;
 use Swoole\Coroutine;
 
@@ -45,7 +46,9 @@ abstract class BaseServer extends Base
             $this->server->on('connect', [$this, 'onConnect']);
             $this->server->on('receive', [$this, 'onReceive']);
             $this->server->on('close', [$this, 'onClose']);
+            $this->server->on('start', [$this, 'onStart']);
             $this->server->on('WorkerStart', [$this, 'onWorkerStart']);
+            $this->server->on('ManagerStart', [$this, 'onManagerStart']);
             $result = $this->server->start();
             if ($result) {
                 print_r('server start success!'."\n");
@@ -71,6 +74,17 @@ abstract class BaseServer extends Base
 
     protected function onWorkerStart(\swoole_server $server, int $worker_id)
     {
+    }
+
+    public function onStart(\swoole_server $server)
+    {
+        \file_put_contents(CONFIG['server']['swoole']['pid_file'], $server->master_pid . ',' . $server->manager_pid);
+        ProcessHelper::setProcessTitle('SMProxy master process');
+    }
+
+    public function onManagerStart(\swoole_server $server)
+    {
+        ProcessHelper::setProcessTitle('SMProxy manager process');
     }
 
     /**
