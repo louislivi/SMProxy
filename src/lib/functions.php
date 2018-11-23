@@ -233,3 +233,16 @@ function array_iconv($data, string $output = 'utf-8')
         return $data;
     }
 }
+
+function absorb_version_from_git()
+{
+    $tagName = exec('git describe --tags --abbrev=6');
+
+    $matched = preg_match('/^([Vv]\d+\.\d+\.\d+)(?:-(\d+)-g(\w+))?$/', $tagName, $matches);
+
+    if ($matched == 0) {
+        throw new \RuntimeException('Could not absorb version from git.');
+    }
+
+    return ($matches[1] ?? '') . '-' . ($matches[3] ?? 'release');
+}
