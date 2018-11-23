@@ -14,6 +14,7 @@ abstract class BaseServer extends Base
 {
     protected $connectReadState = [];
     protected $connectHasTransaction = [];
+    protected $connectHasAutoCommit = [];
     protected $server;
 
     /**
