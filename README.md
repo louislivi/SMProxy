@@ -197,15 +197,15 @@ QQ群：722124111
 }
 ```
 
-| account 账号信息 | serverInfo 服务信息 | databases 数据库连接池信息 |
-| ------ | ------ | ------ |
-| account.root 用户标识 与 serverInfo...account.root 对应 | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称 |
-| account..user 用户名  | serverInfo..write 读写分离 write 写库 read 读库 | databases..serverInfo 服务信息 |
-| account..password 密码  | serverInfo..host 数据库连接地址 | databases..maxSpareConns 最大空闲连接数 |
-|   | serverInfo..prot 数据库端口 | databases..maxConns 最大连接数 |
-|   | serverInfo..timeout 数据库超时时长(秒) | databases..charset 数据库编码格式 |
-|   | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞 | databases..maxSpareExp 最大空闲时间 |
-|   | serverInfo..account  与 databases.account 对应|  |
+| account 账号信息                                        | serverInfo 服务信息                                        | databases 数据库连接池信息              |
+| ------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------- |
+| account.root 用户标识 与 serverInfo...account.root 对应 | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称             |
+| account..user 用户名                                    | serverInfo..write 读写分离 write 写库 read 读库            | databases..serverInfo 服务信息          |
+| account..password 密码                                  | serverInfo..host 数据库连接地址                            | databases..maxSpareConns 最大空闲连接数 |
+|                                                         | serverInfo..prot 数据库端口                                | databases..maxConns 最大连接数          |
+|                                                         | serverInfo..timeout 数据库超时时长(秒)                     | databases..charset 数据库编码格式       |
+|                                                         | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞       | databases..maxSpareExp 最大空闲时间     |
+|                                                         | serverInfo..account  与 databases.account 对应             |                                         |
 
 ### server.json
 
@@ -256,17 +256,17 @@ QQ群：722124111
 }
 ```
 
-| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 |  mode 运行模式 | sock_type SWOOLE_SOCK_TCP tcp | logs 日志配置 | swoole swoole配置 | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置 |
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-|   |   |   |   |   | SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式  |   | logs.open 日志开关  |  worker_num work进程数量 | package_max_length 最大包长  | sock_type SWOOLE_SOCK_TCP tcp  |
-|   |   |   |   |   |   |   | logs.config 日志配置项 |  max_coro_num 最大携程数  |   | sync_type SWOOLE_SOCK_SYNC 同步，SWOOLE_SOCK_ASYNC 异步  |
-|   |   |   |   |   |   |   | logs.system or mysql 配置模块  |  open_tcp_nodelay 关闭Nagle合并算法  |   |   |
-|   |   |   |   |   |   |   | logs..log_path 日志目录 |  daemonize 守护进程化 |   |   |
-|   |   |   |   |   |   |   | logs..log_file 日志文件名 |  heartbeat_check_interval 心跳检测 |   |   |
-|   |   |   |   |   |   |   | logs..format 日志日期格式 |  heartbeat_idle_time 最大空闲时间 |   |   |
-|   |   |   |   |   |   |   |   |  reload_async 异步重启 |   |   |
-|   |   |   |   |   |   |   |   |  log_file 日志目录 |   |   |
-|   |   |   |   |   |   |   |   |  pid_file 主进程pid目录 |   |   |
+| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 | mode 运行模式                                         | sock_type SWOOLE_SOCK_TCP tcp | logs 日志配置                 | swoole swoole配置                  | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置               |
+| --------------- | ----------------- | ---------------- | ------------- | ------------------------- | ----------------------------------------------------- | ----------------------------- | ----------------------------- | ---------------------------------- | -------------------------------- | ------------------------------------------------------- |
+|                 |                   |                  |               |                           | SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式 |                               | logs.open 日志开关            | worker_num work进程数量            | package_max_length 最大包长      | sock_type SWOOLE_SOCK_TCP tcp                           |
+|                 |                   |                  |               |                           |                                                       |                               | logs.config 日志配置项        | max_coro_num 最大携程数            |                                  | sync_type SWOOLE_SOCK_SYNC 同步，SWOOLE_SOCK_ASYNC 异步 |
+|                 |                   |                  |               |                           |                                                       |                               | logs.system or mysql 配置模块 | open_tcp_nodelay 关闭Nagle合并算法 |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               | logs..log_path 日志目录       | daemonize 守护进程化               |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               | logs..log_file 日志文件名     | heartbeat_check_interval 心跳检测  |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               | logs..format 日志日期格式     | heartbeat_idle_time 最大空闲时间   |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               |                               | reload_async 异步重启              |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               |                               | log_file 日志目录                  |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               |                               | pid_file 主进程pid目录             |                                  |                                                         |
 
 ## 其他学习资料
 
