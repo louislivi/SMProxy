@@ -1,4 +1,10 @@
-/logs
+# IDE Configuration
 /.idea
-/conf
+/.vscode
+
+# Configuration
+/conf/*.json
+
+# Other
 /vendor
+/logs
