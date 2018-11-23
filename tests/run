@@ -1,0 +1,5 @@
+#!/bin/sh
+
+EXEC="`dirname $0`/../bin/server"
+
+$EXEC start && $EXEC stop
