@@ -16,7 +16,8 @@
         "ext-swoole": "^2.1||^4.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.13"
+        "friendsofphp/php-cs-fixer": "^2.13",
+        "squizlabs/php_codesniffer": "^3.3"
     },
     "autoload": {
         "files": [
