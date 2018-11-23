@@ -6,6 +6,8 @@
     <arg name="basepath" value="."/>
     <arg name="parallel" value="75"/>
 
+    <exclude-pattern>src/Log/Log.php</exclude-pattern>
+
     <arg name="colors"/>
     <arg value="np"/>
 
