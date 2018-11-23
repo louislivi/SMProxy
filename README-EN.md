@@ -40,23 +40,22 @@ you can also configure the parameters of the connection pool, like:
 
 ...etc.
 
-It's also possible to monitor the number of database connections, 
-usage, etc. through its own management system.
+It's also possible to monitor the number of database connections, usage, etc. through its own management system.
 
 If the maximum number of connections is exceeded, the coroutine will be suspended and wait until a connection is released.
 
 ## Features
 
-- Support for reading and writing separation
-- Support database connection pool, can effectively solve the database connection bottleneck brought by PHP
-- Support SQL92 standard
-- Comply with Mysql native protocol, cross-language, cross-platform universal middleware agent.
-- Support multiple database connections, multiple databases, multiple users, flexible matching.
-- Support mysql transaction
-- Coroutine scheduling
-- Support for the HandshakeV10 protocol version
-- Perfectly compatible with mysql4.1 -5.7
-- Compatible with major frameworks to seamlessly improve performance
+- Read/Write Splitting
+- Connection Pool
+- SQL92 Standard
+- Coroutine Scheduling
+- Multiple database connections, multiple databases, multiple users...
+- Build with MySQL native protocol, cross-language, cross-platform.
+- Compatible with MySQL Transaction
+- Compatible with HandshakeV10
+- Compatible with MySQL 4.1 - 5.7
+- Compatible with Various Frameworks
 
 ## Why This
 
@@ -69,8 +68,8 @@ Do not parse all sql packages like mycat, increasing the complexity.
 
 ## Environment Requirements
 
-* swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-* php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+- Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
+- PHP 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 
 ## Installation
 
@@ -112,25 +111,23 @@ Tool connections are also available.
 
 ![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
-Unused:0.15148401260376  Use:0.040808916091919
-
-Unused connection pool:
-
+Native: 0.15148401260376
+ 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
 
-Use connection pool:
+With SMProxy: 0.040808916091919
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
 
-### Thinkphp 5.0
+### ThinkPHP 5.0
 
 ![Thinkphp5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
 
-Unused connection pool:
+Native:
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542685140126.jpg)
 
-Use connection pool:
+With SMProxy:
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542685109798.jpg)
 
@@ -138,21 +135,21 @@ Use connection pool:
 
 ![Laravel5.7](https://file.gesmen.com.cn/smproxy/3FE76B55-9422-40DB-B8CE-7024F36BB5A9.png)
 
-Unused connection pool:
+Native:
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542686575874.jpg)
 
-Use connection pool:
+With SMProxy:
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542686580551.jpg)
 
-### MySQL Connection Number
+### Number of MySQL Connections
 
-Unused connection pool:
+Native:
 
 ![mysql](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
 
-Use connection pool:
+With SMProxy:
 
 ![mysql](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
 

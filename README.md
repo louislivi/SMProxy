@@ -41,10 +41,10 @@
 - 支持读写分离
 - 支持数据库连接池，能够有效解决PHP带来的数据库连接瓶颈
 - 支持SQL92标准
-- 遵守Mysql原生协议，跨语言，跨平台的通用中间件代理。
-- 支持多个数据库连接，多个数据库，多个用户，灵活搭配。
-- 支持mysql事物
 - 采用协程调度
+- 支持多个数据库连接，多个数据库，多个用户，灵活搭配。
+- 遵守Mysql原生协议，跨语言，跨平台的通用中间件代理。
+- 支持mysql事物
 - 支持 HandshakeV10 协议版本
 - 完美兼容mysql4.1-5.7
 - 兼容各大框架，无缝提升性能
@@ -58,8 +58,8 @@ mycat等数据库中间件会出现部分sql无法使用，例如不支持批量
 
 ## 环境
 
-- swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-- php 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+- Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
+- PHP 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 
 ## 安装
 
@@ -100,13 +100,11 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 ![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
-没用：0.15148401260376  用了：0.040808916091919
-
-未使用连接池:
+未使用连接池: 0.15148401260376
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
 
-使用连接池:
+使用连接池: 0.040808916091919
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
 
