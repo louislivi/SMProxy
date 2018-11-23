@@ -25,12 +25,5 @@
         "psr-4": {
             "SMProxy\\": "src/"
         }
-    },
-    "scripts": {
-        "smp": "php bin/server $2",
-        "stop": "php bin/server stop",
-        "restart": "php bin/server restart",
-        "smp-help": "php bin/server -h",
-        "smp-version": "php bin/server -v"
     }
 }
