@@ -26,5 +26,11 @@
         "psr-4": {
             "SMProxy\\": "src/"
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "cp -n conf/database.json.example conf/database.json",
+            "cp -n conf/server.json.example conf/server.json"
+        ]
     }
 }
