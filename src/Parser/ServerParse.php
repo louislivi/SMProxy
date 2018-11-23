@@ -11,24 +11,24 @@ use SMProxy\Parser\Util\ParseUtil;
  */
 final class ServerParse
 {
-    public const OTHER = -1;
-    public const BEGIN = 1;
-    public const COMMIT = 2;
-    public const DELETE = 3;
-    public const INSERT = 4;
-    public const REPLACE = 5;
-    public const ROLLBACK = 6;
-    public const SELECT = 7;
-    public const SET = 8;
-    public const SHOW = 9;
-    public const START = 10;
-    public const UPDATE = 11;
-    public const KILL = 12;
-    public const SAVEPOINT = 13;
-    public const USE = 14;
-    public const EXPLAIN = 15;
-    public const KILL_QUERY = 16;
-    public const MODEL = 17;
+    const OTHER = -1;
+    const BEGIN = 1;
+    const COMMIT = 2;
+    const DELETE = 3;
+    const INSERT = 4;
+    const REPLACE = 5;
+    const ROLLBACK = 6;
+    const SELECT = 7;
+    const SET = 8;
+    const SHOW = 9;
+    const START = 10;
+    const UPDATE = 11;
+    const KILL = 12;
+    const SAVEPOINT = 13;
+    const USE = 14;
+    const EXPLAIN = 15;
+    const KILL_QUERY = 16;
+    const MODEL = 17;
 
     public static function parse(string $stmt)
     {
