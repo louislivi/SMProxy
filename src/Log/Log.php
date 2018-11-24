@@ -30,19 +30,19 @@ namespace SMProxy\Log;
 class Log
 {
     // 日志根目录
-    private $_log_path = '.';
+    private $logPath = '.';
 
     // 日志文件
-    private $_log_file = 'system.log';
+    private $logFile = 'system.log';
 
     // 日志自定义目录
-    private $_format = 'Y/m/d';
+    private $format = 'Y/m/d';
 
     // 日志标签
-    private $_tag = 'system';
+    private $tag = 'system';
 
     // 总配置设定
-    private static $_CONFIG = [];
+    private static $CONFIG = [];
 
     public static $open = true;
 
@@ -55,14 +55,14 @@ class Log
      */
     public static function get_logger(string $tag = 'system')
     {
-        if (!is_array(self::$_CONFIG) || empty(self::$_CONFIG)) {
-            self::$_CONFIG = CONFIG['server']['logs']['config'];
+        if (!is_array(self::$CONFIG) || empty(self::$CONFIG)) {
+            self::$CONFIG = CONFIG['server']['logs']['config'];
             self::$open = CONFIG['server']['logs']['open'];
         }
 
         // 根据tag从总配置中获取对应设定，如不存在使用system设定
-        $config = isset(self::$_CONFIG[$tag]) ? self::$_CONFIG[$tag] :
-            (isset(self::$_CONFIG['system']) ? self::$_CONFIG['system'] : []);
+        $config = isset(self::$CONFIG[$tag]) ? self::$CONFIG[$tag] :
+            (isset(self::$CONFIG['system']) ? self::$CONFIG['system'] : []);
 
         // 设置标签
         $config['tag'] = '' != $tag && 'system' != $tag ? $tag : '-';
@@ -80,22 +80,22 @@ class Log
     {
         // 日志根目录
         if (isset($config['log_path'])) {
-            $this->_log_path = $config['log_path'];
+            $this->logPath = $config['log_path'];
         }
 
         // 日志文件
         if (isset($config['log_file'])) {
-            $this->_log_file = $config['log_file'];
+            $this->logFile = $config['log_file'];
         }
 
         // 日志自定义目录
         if (isset($config['format'])) {
-            $this->_format = $config['format'];
+            $this->format = $config['format'];
         }
 
         // 日志标签
         if (isset($config['tag'])) {
-            $this->_tag = $config['tag'];
+            $this->tag = $config['tag'];
         }
     }
 
@@ -156,7 +156,7 @@ class Log
             $dt = new \DateTime();
 
             // 日志内容
-            $log_data = sprintf('[%s] %-5s %s %s'.PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->_tag, $data);
+            $log_data = sprintf('[%s] %-5s %s %s'.PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->tag, $data);
 
             // 写入日志文件
             if ($is_create) {
@@ -197,6 +197,6 @@ class Log
         // 创建日期时间对象writeFile
         $dt = new \DateTime();
         // 计算日志目录格式
-        return sprintf('%s/%s/%s', $this->_log_path, $dt->format($this->_format), $this->_log_file);
+        return sprintf('%s/%s/%s', $this->logPath, $dt->format($this->format), $this->logFile);
     }
 }
