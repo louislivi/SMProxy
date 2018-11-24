@@ -34,11 +34,5 @@
             "cp -n conf/database.json.example conf/database.json",
             "cp -n conf/server.json.example conf/server.json"
         ]
-    },
-    "repositories": {
-        "packagist": {
-            "type": "composer",
-            "url": "https://packagist.phpcomposer.com"
-        }
     }
 }
