@@ -44,7 +44,7 @@ class MySqlPacketDecoder
         // data will not be accessed any more,so we can use this array safely
         $packet->data = $data;
         if (null == $packet->data || 0 == count($packet->data)) {
-            throw new SMProxyException('get data errorMessage,packetLength=' . $packet->packetLength . "\n");
+            throw new SMProxyException('get data errorMessage,packetLength=' . $packet->packetLength );
         }
 
         return $packet;
