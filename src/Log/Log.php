@@ -62,6 +62,7 @@ class Log
      * 获取日志类对象
      *
      * @param array $config 总配置设定
+     * @return Log
      */
     public static function get_logger(string $tag = 'system')
     {
