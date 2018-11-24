@@ -246,3 +246,26 @@ function absorb_version_from_git()
 
     return ($matches[1] ?? '') . '-' . ($matches[3] ?? 'release');
 }
+
+function smproxy_error($message, $exitCode = 0)
+{
+    $parts = explode(':', $message, 2);
+
+    $parts[0] = strtoupper($parts[0]);
+
+    $prefixExists = in_array($parts[0], [
+        'ERROR', 'WARNING', 'NOTICE'
+    ]);
+
+    if ($prefixExists) {
+        $message = $parts[0] . ': ' .  trim($parts[1]);
+    } else {
+        $message = 'ERROR: ' . $message;
+    }
+
+    error_log($message);
+
+    if (!$prefixExists || $parts[0] == 'ERROR') {
+        exit($exitCode);
+    }
+}
