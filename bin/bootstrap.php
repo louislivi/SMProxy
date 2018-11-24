@@ -5,9 +5,9 @@
  * Time: 下午2:33.
  */
 
-define('ROOT', realpath(__DIR__ . '/..'));
+define('ROOT', dirname(Phar::running(false)) ?: realpath(__DIR__ . '/..'));
 
-include ROOT . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 define('SMPROXY_VERSION', absorb_version_from_git());
 
