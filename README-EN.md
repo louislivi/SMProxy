@@ -92,9 +92,15 @@ Do not parse all sql packages like mycat, increasing the complexity.
 
 ## Installation
 
+(Recommended) Directly download PHAR in latest release:
+
+<https://github.com/louislivi/smproxy/releases/latest>
+
+Or use git to checkout any version:
+
 ```bash
 git clone https://github.com/louislivi/smproxy.git
-composer install
+composer install --no-dev # If you want to contribute to this repo, please DO NOT use --no-dev.
 ```
 
 ## Run

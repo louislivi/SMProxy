@@ -82,14 +82,21 @@ mycat等数据库中间件会出现部分sql无法使用，例如不支持批量
 
 ## 安装
 
+（推荐）直接下载最新发行版的 PHAR 文件，解压即用：
+
+<https://github.com/louislivi/smproxy/releases/latest>
+
+或者使用 Git 切换任意版本：
+
 ```bash
 git clone https://github.com/louislivi/smproxy.git
-composer install
+composer install --no-dev # 如果你想贡献你的代码，请不要使用 --no-dev 参数。
 ```
 
 ## 运行
 
-需要给予 bin/server 执行权限
+需要给予 bin/server 执行权限。
+
 - `bin/server start`   : 运行服务
 - `bin/server stop`    : 停止服务
 - `bin/server restart` : 重启服务
