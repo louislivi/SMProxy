@@ -5,6 +5,7 @@ matrix:
     - php: 7.0
     - php: 7.1
     - php: 7.2
+    - php: 7.2
       env: LINT=true
     - php: 7.2
       env: PHAR=true
@@ -23,6 +24,7 @@ script:
       composer install --dev
       vendor/bin/phpcs
     elif [[ $PHAR != "" ]]; then
+      composer install --dev
       vendor/bin/box compile
       ./release.phar
     else
