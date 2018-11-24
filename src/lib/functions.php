@@ -236,15 +236,13 @@ function array_iconv($data, string $output = 'utf-8')
 
 function absorb_version_from_git()
 {
-    $tagName = exec('git describe --tags --abbrev=6');
+    $tagInfo = \SMProxy\Helper\ProcessHelper::run('git describe --tags HEAD')[1];
 
-    $matched = preg_match('/^([Vv]\d+\.\d+\.\d+)(?:-(\d+)-g(\w+))?$/', $tagName, $matches);
-
-    if ($matched == 0) {
+    if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $tagInfo, $matches)) {
+        return sprintf('%s@%s', $matches['tag'], $matches['hash']);
+    } else {
         throw new \RuntimeException('Could not absorb version from git.');
     }
-
-    return ($matches[1] ?? '') . '-' . ($matches[3] ?? 'release');
 }
 
 function smproxy_error($message, $exitCode = 0)
