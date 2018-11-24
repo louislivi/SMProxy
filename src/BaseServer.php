@@ -3,6 +3,7 @@
 namespace SMProxy;
 
 use SMProxy\Helper\ProcessHelper;
+use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\ErrorPacket;
 use Swoole\Coroutine;
 
@@ -27,6 +28,8 @@ abstract class BaseServer extends Base
     {
         try {
             if (!(CONFIG['server']['swoole'] ?? false)) {
+                $system_log = Log::get_logger('system');
+                $system_log->error('config [swoole] is not found !');
                 throw new SMProxyException('config [swoole] is not found !');
             }
             if ((CONFIG['server']['port'] ?? false)) {

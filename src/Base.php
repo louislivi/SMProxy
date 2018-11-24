@@ -57,20 +57,26 @@ class Base extends Context
                     if (isset($config['account'][$value['account']])) {
                         if (!isset($config['databases'][$s_key])) {
                             $config['databases'][$s_key] = $config['databases'][$key];
-                            $config['databases'][$s_key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
+                            $config['databases'][$s_key]['serverInfo'] =
+                                $config['serverInfo'][$database['serverInfo']][$s_key];
                             $config['databases'][$s_key]['serverInfo']['account'] =
                                 $config['account'][$value['account']];
                         }
                         $config['databases'][$s_key . '_' . $key] = $config['databases'][$key];
-                        $config['databases'][$s_key . '_' . $key]['serverInfo'] = $config['serverInfo'][$database['serverInfo']][$s_key];
+                        $config['databases'][$s_key . '_' . $key]['serverInfo'] =
+                            $config['serverInfo'][$database['serverInfo']][$s_key];
                         $config['databases'][$s_key . '_' . $key]['serverInfo']['account'] =
                             $config['account'][$value['account']];
                     } else {
-                        throw new SMProxyException('config serverInfo->' . $s_key .
+                        $mysql_log = Log::get_logger('system');
+                        $mysql_log->error('config serverInfo->' . $s_key .
                             '->account is not exists!');
+                        throw new SMProxyException('config serverInfo->' . $s_key . '->account is not exists!');
                     }
                 }
             } else {
+                $mysql_log = Log::get_logger('system');
+                $mysql_log->error('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
                 throw new SMProxyException('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
             }
             unset($config['databases'][$key]);

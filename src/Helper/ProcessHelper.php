@@ -7,6 +7,8 @@
 
 namespace SMProxy\Helper;
 
+use SMProxy\Log\Log;
+
 /**
  * 进程帮助类
  *
@@ -53,7 +55,9 @@ class ProcessHelper
         $process = proc_open($command, $descriptors, $pipes, $cwd);
 
         if (!\is_resource($process)) {
-            throw new \RuntimeException("Can't open resource with proc_open.");
+            $system_log = Log::get_logger('system');
+            $system_log->error('Can\'t open resource with proc_open.');
+            throw new \RuntimeException('Can\'t open resource with proc_open.');
         }
 
         // Nothing to push to input.

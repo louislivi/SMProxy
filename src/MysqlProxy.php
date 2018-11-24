@@ -59,7 +59,8 @@ class MysqlProxy extends MysqlClient
                 $authPacket = new AuthPacket();
                 $authPacket->packetId = 1;
                 $authPacket->clientFlags = BackendAuthenticator::getClientFlags();
-                $authPacket->maxPacketSize = CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
+                $authPacket->maxPacketSize =
+                    CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
                 $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf-8');
                 $authPacket->user = $this->account['user'];
                 $authPacket->password = $password;
@@ -85,11 +86,6 @@ class MysqlProxy extends MysqlClient
                             $mysql_log = Log::get_logger('mysql');
                             $mysql_log->error($errorPacket->errno . ':' . $errorPacket->message);
                             $data = getString($errorPacket->write());
-//                        switch ($errorPacket ->sqlState){
-//                            case 28000:
-//                                throw new \ErrorException($errorPacket->message);
-//                                break;
-//                        }
                             break;
                     }
                 }

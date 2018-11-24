@@ -2,6 +2,7 @@
 
 namespace SMProxy\MysqlPool;
 
+use SMProxy\Log\Log;
 use SMProxy\MysqlProxy;
 
 /**
@@ -40,6 +41,8 @@ class MySQLPool
             self::$resumeFetchCount[$name] = 0;
             self::$initConnCount[$name] = 0;
             if ($config['maxSpareConns'] <= 0 || $config['maxConns'] <= 0) {
+                $mysql_log = Log::get_logger('mysql');
+                $mysql_log->warn("Invalid maxSpareConns or maxConns in {$name}");
                 throw new MySQLException("Invalid maxSpareConns or maxConns in {$name}");
             }
         }
@@ -54,6 +57,8 @@ class MySQLPool
     public static function recycle(MysqlProxy $conn)
     {
         if (!self::$init) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log->warn('Should call MySQLPool::init.');
             throw new MySQLException('Should call MySQLPool::init.');
         }
         $id = spl_object_hash($conn);
@@ -61,11 +66,14 @@ class MySQLPool
         if (isset(self::$busyConns[$connName][$id])) {
             unset(self::$busyConns[$connName][$id]);
         } else {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log->warn('Unknow MySQL connection.');
             throw new MySQLException('Unknow MySQL connection.');
         }
         $connsPool = &self::$spareConns[$connName];
         if ($conn->client->isConnected()) {
-            if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
+            if (((count($connsPool) + self::$initConnCount[$connName]) >=
+                    self::$connsConfig[$connName]['maxSpareConns']) &&
                 ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
             ) {
                 $conn->client->close();
@@ -97,9 +105,13 @@ class MySQLPool
     public static function fetch(string $connName, \swoole_server $server, int $fd)
     {
         if (!self::$init) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log->warn('Should call MySQLPool::init!');
             throw new MySQLException('Should call MySQLPool::init!');
         }
         if (!isset(self::$connsConfig[$connName])) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log->warn("Unvalid connName: {$connName}.");
             throw new MySQLException("Unvalid connName: {$connName}.");
         }
         $connsPool = &self::$spareConns[$connName];
@@ -116,13 +128,16 @@ class MySQLPool
                 return $conn;
             }
         }
-        if ((count(self::$busyConns[$connName]) + count($connsPool) + self::$pendingFetchCount[$connName] + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxConns']) {
+        if ((count(self::$busyConns[$connName]) + count($connsPool) + self::$pendingFetchCount[$connName] +
+                self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxConns']) {
             if (!isset(self::$yieldChannel[$connName])) {
                 self::$yieldChannel[$connName] = new \Swoole\Coroutine\Channel(1);
             }
             ++self::$pendingFetchCount[$connName];
             if (false == self::$yieldChannel[$connName]->pop()) {
                 --self::$pendingFetchCount[$connName];
+                $mysql_log = Log::get_logger('mysql');
+                $mysql_log->warn('Reach max connections! Cann\'t pending fetch!');
                 throw new MySQLException('Reach max connections! Cann\'t pending fetch!');
             }
             --self::$resumeFetchCount[$connName];
@@ -153,17 +168,16 @@ class MySQLPool
     /**
      * 初始化链接.
      *
-     * @param $server
-     * @param $fd
-     * @param $chan
-     * @param $connName
+     * @param \swoole_server $server
+     * @param int            $fd
+     * @param string         $connName
      *
      * @return mixed
      *
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    public static function initConn(\swoole_server $server, int $fd, string $connName, int $step = 3)
+    public static function initConn(\swoole_server $server, int $fd, string $connName)
     {
         ++self::$initConnCount[$connName];
         $chan = new \Swoole\Coroutine\Channel(1);
@@ -179,15 +193,36 @@ class MySQLPool
             $serverInfo['timeout'] ?? 0.1,
             $serverInfo['flag'] ?? 0
         )) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log->warn('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
             throw new MySQLException('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
         }
-        $client = $chan->pop();
-        if (false == $client) {
-            if (0 != $step) {
-                self::initConn($server, $fd, $connName, $step--);
-            } else {
+        if (version_compare(swoole_version(), '4.0.3', '>=')) {
+            $client = $chan->pop($serverInfo['timeout']);
+            if ($client === false) {
                 --self::$initConnCount[$connName];
-                throw new MySQLException('Cann\'t auth to MySQL server: ' . json_encode($serverInfo));
+                $mysql_log = Log::get_logger('mysql');
+                $mysql_log->warn('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
+                throw new MySQLException('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
+            }
+        } else {
+            if (0 == $serverInfo['timeout']) {
+                $client = $chan->pop();
+            } else {
+                $writes = [];
+                $reads = [$chan];
+                $result = $chan->select($reads, $writes, $serverInfo['timeout']);
+
+                if (false === $result || empty($reads)) {
+                    --self::$initConnCount[$connName];
+                    $system_log = Log::get_logger('mysql');
+                    $system_log->warn('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
+                    throw new MySQLException('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
+                }
+
+                $readChannel = $reads[0];
+
+                $client = $readChannel->pop();
             }
         }
         $id = spl_object_hash($client);

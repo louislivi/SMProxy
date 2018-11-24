@@ -106,7 +106,11 @@ function shr16(int $x, int $bits)
 /**
  * 初始化配置文件.
  *
- * @param $dir
+ * @param string $dir
+ *
+ * @return array
+ *
+ * @throws \SMProxy\SMProxyException
  */
 function initConfig(string $dir)
 {
@@ -153,26 +157,30 @@ function initConfig(string $dir)
     } else {
         $config['server']['swoole_client_sock_setting']['sync_type'] = SWOOLE_SOCK_ASYNC;
     }
-
+    $system_log = \SMProxy\Log\Log::get_logger('system');
     //生成日志目录
     if (isset($config['server']['logs']['config']['system']['log_path'])) {
         mk_log_dir($config['server']['logs']['config']['system']['log_path']);
     } else {
+        $system_log->error('ERROR:server.logs.config.system.log_path 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.logs.config.system.log_path 配置项不存在!');
     }
     if (isset($config['server']['logs']['config']['mysql']['log_path'])) {
         mk_log_dir($config['server']['logs']['config']['mysql']['log_path']);
     } else {
+        $system_log->error('ERROR:server.logs.config.mysql.log_path 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.logs.config.mysql.log_path 配置项不存在!');
     }
     if (isset($config['server']['swoole']['log_file'])) {
         mk_log_dir($config['server']['swoole']['log_file']);
     } else {
+        $system_log->error('ERROR:server.swoole.log_file 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.swoole.log_file 配置项不存在!');
     }
     if (isset($config['server']['swoole']['pid_file'])) {
         mk_log_dir($config['server']['swoole']['pid_file']);
     } else {
+        $system_log->error('ERROR:server.swoole.pid_file 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.swoole.pid_file 配置项不存在!');
     }
 
@@ -234,9 +242,14 @@ function array_iconv($data, string $output = 'utf-8')
     }
 }
 
+/**
+ * get version.
+ *
+ * @return string
+ */
 function absorb_version_from_git()
 {
-    $tagInfo = \SMProxy\Helper\ProcessHelper::run('cd '.ROOT.' && git describe --tags HEAD')[1];
+    $tagInfo = \SMProxy\Helper\ProcessHelper::run('cd ' . ROOT . ' && git describe --tags HEAD')[1];
 
     if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $tagInfo, $matches)) {
         return sprintf('%s@%s', $matches['tag'], $matches['hash']);
@@ -245,6 +258,12 @@ function absorb_version_from_git()
     }
 }
 
+/**
+ * error.
+ *
+ * @param $message
+ * @param int $exitCode
+ */
 function smproxy_error($message, $exitCode = 0)
 {
     $parts = explode(':', $message, 2);
@@ -256,14 +275,14 @@ function smproxy_error($message, $exitCode = 0)
     ]);
 
     if ($prefixExists) {
-        $message = $parts[0] . ': ' .  trim($parts[1]);
+        $message = $parts[0] . ': ' . trim($parts[1]);
     } else {
         $message = 'ERROR: ' . $message;
     }
 
     error_log($message);
 
-    if (!$prefixExists || $parts[0] == 'ERROR') {
+    if (!$prefixExists || 'ERROR' == $parts[0]) {
         exit($exitCode);
     }
 }

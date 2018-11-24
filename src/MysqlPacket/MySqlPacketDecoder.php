@@ -2,6 +2,7 @@
 
 namespace SMProxy\MysqlPacket;
 
+use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\Util\ByteUtil;
 use SMProxy\SMProxyException;
 
@@ -25,11 +26,15 @@ class MySqlPacketDecoder
         $data = getBytes($data);
         // 4 bytes:3 length + 1 packetId
         if (count($data) < $this->packetHeaderSize) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log ->warn('Packet is empty ' . $this->maxPacketSize);
             throw new SMProxyException('Packet is empty ' . $this->maxPacketSize);
         }
         $packetLength = ByteUtil::readUB3($data);
 //        // 过载保护
         if ($packetLength > $this->maxPacketSize) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log ->warn('Packet size over the limit ' . $this->maxPacketSize);
             throw new SMProxyException('Packet size over the limit ' . $this->maxPacketSize);
         }
         $packetId = $data[3];
@@ -44,6 +49,8 @@ class MySqlPacketDecoder
         // data will not be accessed any more,so we can use this array safely
         $packet->data = $data;
         if (null == $packet->data || 0 == count($packet->data)) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log ->warn('get data errorMessage,packetLength=' . $packet->packetLength);
             throw new SMProxyException('get data errorMessage,packetLength=' . $packet->packetLength);
         }
 

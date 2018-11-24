@@ -2,6 +2,8 @@
 
 namespace SMProxy;
 
+use SMProxy\Log\Log;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/26
@@ -30,9 +32,23 @@ abstract class MysqlClient extends Base
         $this->client->on('close', [$this, 'onClientClose']);
     }
 
+    /**
+     * connect.
+     *
+     * @param string $host
+     * @param int    $port
+     * @param float  $timeout
+     * @param int    $flag
+     *
+     * @return \swoole_client
+     *
+     * @throws SMProxyException
+     */
     public function connect(string $host, int $port, float $timeout = 0.1, int $flag = 0)
     {
         if (!$this->client->connect($host, $port, $timeout = 0.1, $flag = 0)) {
+            $mysql_log = Log::get_logger('mysql');
+            $mysql_log->error("connect {$host}:{$port} failed. Error: {$this->client->errCode}\n");
             throw new SMProxyException("connect {$host}:{$port} failed. Error: {$this->client->errCode}\n");
         } else {
             return $this->client;

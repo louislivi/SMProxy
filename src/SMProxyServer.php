@@ -54,6 +54,8 @@ class SMProxyServer extends BaseServer
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
             if (!isset($this->source[$fd]->auth)) {
+                $system_log = Log::get_logger('system');
+                $system_log->error('Cannot connect SMProxy send message!');
                 throw new SMProxyException('Cannot connect SMProxy send message!');
             }
             $packages = $this->packageSplit($data, $this->source[$fd]->auth ?: false);
@@ -252,7 +254,6 @@ class SMProxyServer extends BaseServer
             //初始化连接
             MySQLPool::recycle(MySQLPool::fetch($key, $server, 1));
         }
-        Log::set_config(CONFIG['server']['logs']['config'], CONFIG['server']['logs']['open']);
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
             $system_log = Log::get_logger('system');
             $system_log->info('Worker started!');

@@ -42,32 +42,27 @@ class Log
     private $_tag = 'system';
 
     // 总配置设定
-    private static $_CONFIG;
+    private static $_CONFIG = [];
 
     public static $open = true;
-
-    /**
-     * 设置配置.
-     *
-     * @param array $config 总配置设定
-     * @param bool  $open   日志开关
-     */
-    public static function set_config(array $config = [], bool $open = true)
-    {
-        self::$_CONFIG = $config;
-        self::$open = $open;
-    }
 
     /**
      * 获取日志类对象
      *
      * @param array $config 总配置设定
+     *
      * @return Log
      */
     public static function get_logger(string $tag = 'system')
     {
+        if (!is_array(self::$_CONFIG) || empty(self::$_CONFIG)) {
+            self::$_CONFIG = CONFIG['server']['logs']['config'];
+            self::$open = CONFIG['server']['logs']['open'];
+        }
+
         // 根据tag从总配置中获取对应设定，如不存在使用system设定
-        $config = isset(self::$_CONFIG[$tag]) ? self::$_CONFIG[$tag] : (isset(self::$_CONFIG['system']) ? self::$_CONFIG['system'] : []);
+        $config = isset(self::$_CONFIG[$tag]) ? self::$_CONFIG[$tag] :
+            (isset(self::$_CONFIG['system']) ? self::$_CONFIG['system'] : []);
 
         // 设置标签
         $config['tag'] = '' != $tag && 'system' != $tag ? $tag : '-';
@@ -161,7 +156,7 @@ class Log
             $dt = new \DateTime();
 
             // 日志内容
-            $log_data = sprintf('[%s] %-5s %s %s' . PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->_tag, $data);
+            $log_data = sprintf('[%s] %-5s %s %s'.PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->_tag, $data);
 
             // 写入日志文件
             if ($is_create) {
