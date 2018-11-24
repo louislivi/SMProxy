@@ -6,6 +6,8 @@ matrix:
     - php: 7.1
     - php: 7.2
       env: LINT=true
+    - php: 7.2
+      env: PHAR=true
 
 install:
   - printf "\n" | pecl install -f swoole-4.2.8
@@ -20,5 +22,9 @@ script:
     if [[ $LINT != "" ]]; then
       composer install --dev
       vendor/bin/phpcs
+    elif [[ $PHAR != "" ]]; then
+      vendor/bin/box compile
+      ./release.phar
+    else
+      tests/run
     fi
-  - tests/run
