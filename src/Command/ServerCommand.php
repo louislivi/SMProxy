@@ -25,7 +25,7 @@ class ServerCommand
                                                                
 
 LOGO;
-    protected $version = 'SMProxy version:' . SMPROXY_VERSION . "\n";
+    protected $version = 'SMProxy version: ' . SMPROXY_VERSION ;
     public $desc = <<<'DESC'
 Options and arguments (and corresponding environment variables):
 start   : start server
