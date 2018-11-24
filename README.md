@@ -31,10 +31,10 @@
   - [安装](#%E5%AE%89%E8%A3%85)
   - [运行](#%E8%BF%90%E8%A1%8C)
   - [SMProxy连接测试](#smproxy%E8%BF%9E%E6%8E%A5%E6%B5%8B%E8%AF%95)
-    - [没用框架的php7.2.6](#%E6%B2%A1%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84php726)
-    - [Thinkphp5.0](#thinkphp50)
-    - [Laravel5.7](#laravel57)
-    - [mysql 连接数](#mysql-%E8%BF%9E%E6%8E%A5%E6%95%B0)
+    - [没用框架的 PHP 7.2.6](#%E6%B2%A1%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84-php-726)
+    - [ThinkPHP 5.0](#thinkphp-50)
+    - [Laravel 5.7](#laravel-57)
+    - [MySQL 连接数](#mysql-%E8%BF%9E%E6%8E%A5%E6%95%B0)
   - [交流](#%E4%BA%A4%E6%B5%81)
   - [配置文件](#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
     - [database.json](#databasejson)
@@ -43,7 +43,7 @@
 
 ## Swoole MySQL Proxy
 
-一个基于mysql协议，swoole 开发的mysql数据库连接池。
+一个基于MySQL协议，swoole 开发的MySQL数据库连接池。
 
 ## 原理
 
@@ -63,14 +63,14 @@
 - 采用协程调度
 - 支持多个数据库连接，多个数据库，多个用户，灵活搭配。
 - 遵守Mysql原生协议，跨语言，跨平台的通用中间件代理。
-- 支持mysql事物
+- 支持MySQL事物
 - 支持 HandshakeV10 协议版本
-- 完美兼容mysql4.1-5.7
+- 完美兼容MySQL4.1-5.7
 - 兼容各大框架，无缝提升性能
 
 ## 设计初衷
 
-php没有连接池，所以高并发时数据库会出现连接打满的情况，
+PHP没有连接池，所以高并发时数据库会出现连接打满的情况，
 mycat等数据库中间件会出现部分sql无法使用，例如不支持批量添加等，而且过于臃肿。
 所以就自己编写了这个仅支持连接池和读写分离的轻量级中间件，
 使用swoole协程调度HandshakeV10协议转发使程序更加稳定不用像mycat一样解析所有sql包体，增加复杂度。
@@ -82,14 +82,21 @@ mycat等数据库中间件会出现部分sql无法使用，例如不支持批量
 
 ## 安装
 
+（推荐）直接下载最新发行版的 PHAR 文件，解压即用：
+
+<https://github.com/louislivi/smproxy/releases/latest>
+
+或者使用 Git 切换任意版本：
+
 ```bash
 git clone https://github.com/louislivi/smproxy.git
-composer install
+composer install --no-dev # 如果你想贡献你的代码，请不要使用 --no-dev 参数。
 ```
 
 ## 运行
 
-需要给予 bin/server 执行权限
+需要给予 bin/server 执行权限。
+
 - `bin/server start`   : 运行服务
 - `bin/server stop`    : 停止服务
 - `bin/server restart` : 重启服务
@@ -100,17 +107,19 @@ composer install
 
 ## SMProxy连接测试
 
-测试SMProxy与测试mysql完全一致，mysql怎么连接，SMProxy就怎么连接。
+测试SMProxy与测试MySQL完全一致，MySQL怎么连接，SMProxy就怎么连接。
 
 推荐先采用命令行测试：
 
+```
 mysql -uroot -p123456 -P3366 -h127.0.0.1
+```
 
 也可采用工具连接。
 
-### 没用框架的php7.2.6
+### 没用框架的 PHP 7.2.6
 
-![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
+![PHP7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
 未使用连接池: 0.15148401260376
 
@@ -120,9 +129,9 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
 
-### Thinkphp5.0
+### ThinkPHP 5.0
 
-![Thinkphp5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
+![ThinkPHP5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
 
 未使用连接池:
 
@@ -132,7 +141,7 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542685109798.jpg)
 
-### Laravel5.7
+### Laravel 5.7
 
 ![Laravel5.7](https://file.gesmen.com.cn/smproxy/3FE76B55-9422-40DB-B8CE-7024F36BB5A9.png)
 
@@ -144,15 +153,15 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542686580551.jpg)
 
-### mysql 连接数
+### MySQL 连接数
 
 未使用连接池:
 
-![mysql](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
+![MySQL](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
 
 使用连接池:
 
-![mysql](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
+![MySQL](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
 
 请以实际压测为准，根数据量，网络环境，数据库配置有关。
 测试中因超出最大连接数会采用协程挂起 等到有连接关闭再恢复协程继续操作，
@@ -184,7 +193,7 @@ QQ群：722124111
 | --------------- | ----------------- | ---------------- | ------------- | ------------------------- | ----------------------------------------------------- | ----------------------------- | ----------------------------- | ---------------------------------- | -------------------------------- | ------------------------------------------------------- |
 |                 |                   |                  |               |                           | SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式 |                               | logs.open 日志开关            | worker_num work进程数量            | package_max_length 最大包长      | sock_type SWOOLE_SOCK_TCP tcp                           |
 |                 |                   |                  |               |                           |                                                       |                               | logs.config 日志配置项        | max_coro_num 最大携程数            |                                  | sync_type SWOOLE_SOCK_SYNC 同步，SWOOLE_SOCK_ASYNC 异步 |
-|                 |                   |                  |               |                           |                                                       |                               | logs.system or mysql 配置模块 | open_tcp_nodelay 关闭Nagle合并算法 |                                  |                                                         |
+|                 |                   |                  |               |                           |                                                       |                               | logs.system or MySQL 配置模块 | open_tcp_nodelay 关闭Nagle合并算法 |                                  |                                                         |
 |                 |                   |                  |               |                           |                                                       |                               | logs..log_path 日志目录       | daemonize 守护进程化               |                                  |                                                         |
 |                 |                   |                  |               |                           |                                                       |                               | logs..log_file 日志文件名     | heartbeat_check_interval 心跳检测  |                                  |                                                         |
 |                 |                   |                  |               |                           |                                                       |                               | logs..format 日志日期格式     | heartbeat_idle_time 最大空闲时间   |                                  |                                                         |
@@ -194,7 +203,7 @@ QQ群：722124111
 
 ## 其他学习资料
 
-- mysql协议分析 ：https://www.cnblogs.com/davygeek/p/5647175.html
-- mysql官方协议文档 ：https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
-- mycat源码 ：https://github.com/MyCATApache/Mycat-Server
-- swoole ：https://www.swoole.com/
+- MySQL协议分析 ：https://www.cnblogs.com/davygeek/p/5647175.html
+- MySQL官方协议文档 ：https://dev.MySQL.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
+- Mycat源码 ：https://github.com/MyCATApache/Mycat-Server
+- Swoole ：https://www.swoole.com/
