@@ -54,7 +54,7 @@ class SMProxyServer extends BaseServer
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
             if (!isset($this->source[$fd]->auth)) {
-                $system_log = Log::get_logger('system');
+                $system_log = Log::getLogger('system');
                 $system_log->error('Cannot connect SMProxy send message!');
                 throw new SMProxyException('Cannot connect SMProxy send message!');
             }
@@ -71,7 +71,7 @@ class SMProxyServer extends BaseServer
                         if (CONFIG['server']['user'] != $authPacket->user || !$checkPassword) {
                             $message = "Access denied for user '" . $authPacket->user . "'";
                             $errMessage = $this->writeErrMessage(2, $message, ErrorCode::ER_NO_SUCH_USER);
-                            $mysql_log = Log::get_logger('mysql');
+                            $mysql_log = Log::getLogger('mysql');
                             $mysql_log->error($message);
                             if ($server->exist($fd)) {
                                 $server->send($fd, getString($errMessage));
@@ -180,7 +180,7 @@ class SMProxyServer extends BaseServer
                                 $message = 'Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
                                     ' is not exists!';
                                 $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR);
-                                $mysql_log = Log::get_logger('mysql');
+                                $mysql_log = Log::getLogger('mysql');
                                 $mysql_log->error($message);
                                 if ($server->exist($fd)) {
                                     $server->send($fd, getString($errMessage));
@@ -255,7 +255,7 @@ class SMProxyServer extends BaseServer
             MySQLPool::recycle(MySQLPool::fetch($key, $server, 1));
         }
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
-            $system_log = Log::get_logger('system');
+            $system_log = Log::getLogger('system');
             $system_log->info('Worker started!');
             echo 'Worker started!', PHP_EOL;
         }

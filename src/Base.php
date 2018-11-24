@@ -33,7 +33,7 @@ class Base extends Context
                     unset(self::$pool[\Swoole\Coroutine::getuid()]);
                 }
             } catch (SMProxyException $SMProxyException) {
-                $system_log = Log::get_logger('system');
+                $system_log = Log::getLogger('system');
                 $system_log->warn($SMProxyException->errorMessage());
             }
         });
@@ -68,14 +68,14 @@ class Base extends Context
                         $config['databases'][$s_key . '_' . $key]['serverInfo']['account'] =
                             $config['account'][$value['account']];
                     } else {
-                        $mysql_log = Log::get_logger('system');
+                        $mysql_log = Log::getLogger('system');
                         $mysql_log->error('config serverInfo->' . $s_key .
                             '->account is not exists!');
                         throw new SMProxyException('config serverInfo->' . $s_key . '->account is not exists!');
                     }
                 }
             } else {
-                $mysql_log = Log::get_logger('system');
+                $mysql_log = Log::getLogger('system');
                 $mysql_log->error('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
                 throw new SMProxyException('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
             }

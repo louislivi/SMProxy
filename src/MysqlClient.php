@@ -47,7 +47,7 @@ abstract class MysqlClient extends Base
     public function connect(string $host, int $port, float $timeout = 0.1, int $flag = 0)
     {
         if (!$this->client->connect($host, $port, $timeout = 0.1, $flag = 0)) {
-            $mysql_log = Log::get_logger('mysql');
+            $mysql_log = Log::getLogger('mysql');
             $mysql_log->error("connect {$host}:{$port} failed. Error: {$this->client->errCode}\n");
             throw new SMProxyException("connect {$host}:{$port} failed. Error: {$this->client->errCode}\n");
         } else {
