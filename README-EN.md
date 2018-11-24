@@ -78,7 +78,7 @@ If the maximum number of connections is exceeded, the coroutine will be suspende
 
 ## Why This
 
-Php does not have a connection pool, so the database will be full when the concurrency is high.
+PHP does not have a connection pool, so the database will be full when the concurrency is high.
 Database middleware such as mycat will appear some sql can not be used, 
 for example, does not support batch addition, etc., and is too bloated.
 So I wrote this lightweight middleware that only supports connection pooling and read-write separation.
@@ -117,11 +117,13 @@ composer install --no-dev # If you want to contribute to this repo, please DO NO
 
 ## Connection Test
 
-Testing SMProxy is exactly the same as testing mysql. How to connect mysql, how to connect SMProxy.
+Testing SMProxy is exactly the same as testing MySQL. How to connect MySQL, how to connect SMProxy.
 
 It is recommended to use the command line test first:
 
+```
 mysql -uroot -p123456 -P3366 -h127.0.0.1
+```
 
 Tool connections are also available.
 
@@ -165,11 +167,11 @@ With SMProxy:
 
 Native:
 
-![mysql](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
+![MySQL](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
 
 With SMProxy:
 
-![mysql](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
+![MySQL](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
 
 Please take the actual pressure measurement as the standard, the root data volume, network environment, database configuration.
 In the test, the maximum number of connections will be exceeded, and the coroutine will be suspended. Wait until the connection is closed and the coroutine is resumed.
@@ -201,7 +203,7 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 | --------------------- | ------------------------- | -------------------- | ----------------- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------- | ----------------------------------------- | -------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- |
 |                       |                           |                      |                   |                                       | SWOOLE_PROCESS multi-process mode (default), SWOOLE_BASE basic mode |                               | logs.open log switch                      | worker_num work process number               | package_max_length maximum packet length   | sock_type SWOOLE_SOCK_TCP tcp                                          |
 |                       |                           |                      |                   |                                       |                                                                     |                               | logs.config log configuration item        | max_coro_num maximum number of Ctrips        |                                            | sync_type SWOOLE_SOCK_ASYNC Asynchronous ,SWOOLE_SOCK_SYNC synchronous |
-|                       |                           |                      |                   |                                       |                                                                     |                               | logs.system or mysql configuration module | open_tcp_nodelay Close Nagle merge algorithm |                                            |                                                                        |
+|                       |                           |                      |                   |                                       |                                                                     |                               | logs.system or MySQL configuration module | open_tcp_nodelay Close Nagle merge algorithm |                                            |                                                                        |
 |                       |                           |                      |                   |                                       |                                                                     |                               | logs..log_path log directory              | daemonize daemonization                      |
 |                       |                           |                      |                   |                                       |                                                                     |                               | logs..log_file log file name              | heartbeat_check_interval heartbeat detection |
 |                       |                           |                      |                   |                                       |                                                                     |                               | logs..format log date format              | heartbeat_idle_time maximum idle time        |                                            |                                                                        |
@@ -211,7 +213,7 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 
 ## More Documentation
 
-- mysql protocol analysis: https://www.cnblogs.com/davygeek/p/5647175.html
-- mysql official protocol documentation: https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
-- mycat source code: https://github.com/MyCATApache/Mycat-Server
-- swoole :https://www.swoole.com/
+- MySQL protocol analysis: https://www.cnblogs.com/davygeek/p/5647175.html
+- MySQL official protocol documentation: https://dev.MySQL.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
+- Mycat source code: https://github.com/MyCATApache/Mycat-Server
+- Swoole :https://www.swoole.com/
