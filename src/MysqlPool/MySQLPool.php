@@ -197,13 +197,15 @@ class MySQLPool
             $mysql_log->warn('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
             throw new MySQLException('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
         }
+        $timeout_message = 'Connection ' . $serverInfo['host'] . ':' . $serverInfo['port'] .
+            ' waiting timeout, timeout=' . $serverInfo['timeout'];
         if (version_compare(swoole_version(), '4.0.3', '>=')) {
             $client = $chan->pop($serverInfo['timeout']);
             if ($client === false) {
                 --self::$initConnCount[$connName];
                 $mysql_log = Log::get_logger('mysql');
-                $mysql_log->warn('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
-                throw new MySQLException('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
+                $mysql_log->warn($timeout_message);
+                throw new MySQLException($timeout_message);
             }
         } else {
             if (0 == $serverInfo['timeout']) {
@@ -212,12 +214,11 @@ class MySQLPool
                 $writes = [];
                 $reads = [$chan];
                 $result = $chan->select($reads, $writes, $serverInfo['timeout']);
-
                 if (false === $result || empty($reads)) {
                     --self::$initConnCount[$connName];
                     $system_log = Log::get_logger('mysql');
-                    $system_log->warn('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
-                    throw new MySQLException('Connection pool waiting queue timeout, timeout=' . $serverInfo['timeout']);
+                    $system_log->warn($timeout_message);
+                    throw new MySQLException($timeout_message);
                 }
 
                 $readChannel = $reads[0];
