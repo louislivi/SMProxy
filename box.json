@@ -1,0 +1,34 @@
+{
+    "main": "bin/server",
+    "output": "release.phar",
+    "alias": "deploy",
+    "directories": [
+        "bin",
+        "src"
+    ],
+    "finder": [
+        {
+            "notName": "/LICENSE|.*\\.md|.*\\.dist|composer\\.json|composer\\.lock/",
+            "exclude": [
+                "doc",
+                "test",
+                "test_old",
+                "tests",
+                "Tests",
+                "vendor-bin"
+            ],
+            "in": "vendor"
+        },
+        {
+            "name": "composer.json",
+            "in": "."
+        }
+    ],
+    "compression": "GZ",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Json",
+        "KevinGH\\Box\\Compactor\\Php"
+    ],
+    "git-commit": "git-commit",
+    "git-version": "git-version"
+}
