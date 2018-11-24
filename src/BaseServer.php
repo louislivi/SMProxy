@@ -28,7 +28,7 @@ abstract class BaseServer extends Base
     {
         try {
             if (!(CONFIG['server']['swoole'] ?? false)) {
-                $system_log = Log::get_logger('system');
+                $system_log = Log::getLogger('system');
                 $system_log->error('config [swoole] is not found !');
                 throw new SMProxyException('config [swoole] is not found !');
             }

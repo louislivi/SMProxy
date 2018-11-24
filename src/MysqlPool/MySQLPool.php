@@ -41,7 +41,7 @@ class MySQLPool
             self::$resumeFetchCount[$name] = 0;
             self::$initConnCount[$name] = 0;
             if ($config['maxSpareConns'] <= 0 || $config['maxConns'] <= 0) {
-                $mysql_log = Log::get_logger('mysql');
+                $mysql_log = Log::getLogger('mysql');
                 $mysql_log->warn("Invalid maxSpareConns or maxConns in {$name}");
                 throw new MySQLException("Invalid maxSpareConns or maxConns in {$name}");
             }
@@ -57,7 +57,7 @@ class MySQLPool
     public static function recycle(MysqlProxy $conn)
     {
         if (!self::$init) {
-            $mysql_log = Log::get_logger('mysql');
+            $mysql_log = Log::getLogger('mysql');
             $mysql_log->warn('Should call MySQLPool::init.');
             throw new MySQLException('Should call MySQLPool::init.');
         }
@@ -66,7 +66,7 @@ class MySQLPool
         if (isset(self::$busyConns[$connName][$id])) {
             unset(self::$busyConns[$connName][$id]);
         } else {
-            $mysql_log = Log::get_logger('mysql');
+            $mysql_log = Log::getLogger('mysql');
             $mysql_log->warn('Unknow MySQL connection.');
             throw new MySQLException('Unknow MySQL connection.');
         }
@@ -105,12 +105,12 @@ class MySQLPool
     public static function fetch(string $connName, \swoole_server $server, int $fd)
     {
         if (!self::$init) {
-            $mysql_log = Log::get_logger('mysql');
+            $mysql_log = Log::getLogger('mysql');
             $mysql_log->warn('Should call MySQLPool::init!');
             throw new MySQLException('Should call MySQLPool::init!');
         }
         if (!isset(self::$connsConfig[$connName])) {
-            $mysql_log = Log::get_logger('mysql');
+            $mysql_log = Log::getLogger('mysql');
             $mysql_log->warn("Unvalid connName: {$connName}.");
             throw new MySQLException("Unvalid connName: {$connName}.");
         }
@@ -136,7 +136,7 @@ class MySQLPool
             ++self::$pendingFetchCount[$connName];
             if (false == self::$yieldChannel[$connName]->pop()) {
                 --self::$pendingFetchCount[$connName];
-                $mysql_log = Log::get_logger('mysql');
+                $mysql_log = Log::getLogger('mysql');
                 $mysql_log->warn('Reach max connections! Cann\'t pending fetch!');
                 throw new MySQLException('Reach max connections! Cann\'t pending fetch!');
             }
@@ -193,7 +193,7 @@ class MySQLPool
             $serverInfo['timeout'] ?? 0.1,
             $serverInfo['flag'] ?? 0
         )) {
-            $mysql_log = Log::get_logger('mysql');
+            $mysql_log = Log::getLogger('mysql');
             $mysql_log->warn('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
             throw new MySQLException('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
         }
@@ -203,7 +203,7 @@ class MySQLPool
             $client = $chan->pop($serverInfo['timeout']);
             if ($client === false) {
                 --self::$initConnCount[$connName];
-                $mysql_log = Log::get_logger('mysql');
+                $mysql_log = Log::getLogger('mysql');
                 $mysql_log->warn($timeout_message);
                 throw new MySQLException($timeout_message);
             }
@@ -216,7 +216,7 @@ class MySQLPool
                 $result = $chan->select($reads, $writes, $serverInfo['timeout']);
                 if (false === $result || empty($reads)) {
                     --self::$initConnCount[$connName];
-                    $system_log = Log::get_logger('mysql');
+                    $system_log = Log::getLogger('mysql');
                     $system_log->warn($timeout_message);
                     throw new MySQLException($timeout_message);
                 }

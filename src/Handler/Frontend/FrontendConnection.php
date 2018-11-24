@@ -32,7 +32,7 @@ class FrontendConnection
         $mm->position(5);
         $sql = $mm->readString();
         if (null == $sql || 0 == strlen($sql)) {
-            $mysql_log = Log::get_logger('mysql');
+            $mysql_log = Log::getLogger('mysql');
             $mysql_log->error('Empty SQL');
 
             return false;
