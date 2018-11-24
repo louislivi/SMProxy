@@ -236,7 +236,7 @@ function array_iconv($data, string $output = 'utf-8')
 
 function absorb_version_from_git()
 {
-    $tagInfo = \SMProxy\Helper\ProcessHelper::run('git describe --tags HEAD')[1];
+    $tagInfo = \SMProxy\Helper\ProcessHelper::run('cd '.ROOT.' && git describe --tags HEAD')[1];
 
     if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $tagInfo, $matches)) {
         return sprintf('%s@%s', $matches['tag'], $matches['hash']);

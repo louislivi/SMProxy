@@ -58,7 +58,7 @@ DESC;
         }
 
         echo $this->logo, PHP_EOL;
-        echo 'Server starting ...' ;
+        echo 'Server starting ...', PHP_EOL;
         new \SMProxy\SMProxyServer();
     }
 
