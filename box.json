@@ -29,6 +29,5 @@
         "KevinGH\\Box\\Compactor\\Json",
         "KevinGH\\Box\\Compactor\\Php"
     ],
-    "git-commit": "git-commit",
-    "git-version": "git-version"
+    "git": "phar-version"
 }

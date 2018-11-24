@@ -5,10 +5,12 @@
  * Time: 下午2:33.
  */
 
-define('ROOT', dirname(Phar::running(false)) ?: realpath(__DIR__ . '/..'));
+define('IN_PHAR', boolval(Phar::running(false)));
+
+define('ROOT', IN_PHAR ? dirname(Phar::running(false)) : realpath(__DIR__ . '/..'));
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-define('SMPROXY_VERSION', absorb_version_from_git());
+define('SMPROXY_VERSION', IN_PHAR ? '@phar-version@' : absorb_version_from_git());
 
 (new \SMProxy\Bootstrap())->bootstrap();
