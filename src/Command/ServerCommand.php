@@ -68,7 +68,7 @@ DESC;
     public function stop()
     {
         if (!$this->isRunning()) {
-            smproxy_error('ERROR: The server is not running! cannot stop!' );
+            smproxy_error('ERROR: The server is not running! cannot stop!');
         }
 
         echo 'SMProxy is stopping ...', PHP_EOL;
@@ -97,7 +97,7 @@ DESC;
 
         // 停止失败
         if (!$result()) {
-            smproxy_error('SMProxy shutting down failed!' );
+            smproxy_error('SMProxy shutting down failed!');
         }
 
         // 删除pid文件

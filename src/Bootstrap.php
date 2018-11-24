@@ -25,7 +25,7 @@ class Bootstrap
                 smproxy_error('ERROR: Swoole version must be greater than 2.1!');
             }
         } else {
-            exit('ERROR: Swoole not installed!' );
+            exit('ERROR: Swoole not installed!');
         }
 
         // 读取配置文件

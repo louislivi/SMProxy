@@ -254,7 +254,7 @@ function smproxy_error($message, $exitCode = 0)
     $parts[0] = strtoupper($parts[0]);
 
     $prefixExists = in_array($parts[0], [
-        'ERROR', 'WARNING', 'NOTICE'
+        'ERROR', 'WARNING', 'NOTICE',
     ]);
 
     if ($prefixExists) {

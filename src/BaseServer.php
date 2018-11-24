@@ -60,14 +60,14 @@ abstract class BaseServer extends Base
             if ($result) {
                 echo 'NOTICE: Server start success!', PHP_EOL;
             } else {
-                smproxy_error('ERROR: Server start failed!' );
+                smproxy_error('ERROR: Server start failed!');
             }
         } catch (\Swoole\Exception $exception) {
-            smproxy_error('ERROR:' . $exception->getMessage() );
+            smproxy_error('ERROR:' . $exception->getMessage());
         } catch (\ErrorException $exception) {
-            smproxy_error('ERROR:' . $exception->getMessage() );
+            smproxy_error('ERROR:' . $exception->getMessage());
         } catch (SMProxyException $exception) {
-            smproxy_error('ERROR:' . $exception->errorMessage() );
+            smproxy_error('ERROR:' . $exception->errorMessage());
         }
     }
 
