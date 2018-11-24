@@ -157,30 +157,25 @@ function initConfig(string $dir)
     } else {
         $config['server']['swoole_client_sock_setting']['sync_type'] = SWOOLE_SOCK_ASYNC;
     }
-    $system_log = \SMProxy\Log\Log::get_logger('system');
     //生成日志目录
     if (isset($config['server']['logs']['config']['system']['log_path'])) {
         mk_log_dir($config['server']['logs']['config']['system']['log_path']);
     } else {
-        $system_log->error('ERROR:server.logs.config.system.log_path 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.logs.config.system.log_path 配置项不存在!');
     }
     if (isset($config['server']['logs']['config']['mysql']['log_path'])) {
         mk_log_dir($config['server']['logs']['config']['mysql']['log_path']);
     } else {
-        $system_log->error('ERROR:server.logs.config.mysql.log_path 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.logs.config.mysql.log_path 配置项不存在!');
     }
     if (isset($config['server']['swoole']['log_file'])) {
         mk_log_dir($config['server']['swoole']['log_file']);
     } else {
-        $system_log->error('ERROR:server.swoole.log_file 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.swoole.log_file 配置项不存在!');
     }
     if (isset($config['server']['swoole']['pid_file'])) {
         mk_log_dir($config['server']['swoole']['pid_file']);
     } else {
-        $system_log->error('ERROR:server.swoole.pid_file 配置项不存在!');
         throw new \SMProxy\SMProxyException('ERROR:server.swoole.pid_file 配置项不存在!');
     }
 
