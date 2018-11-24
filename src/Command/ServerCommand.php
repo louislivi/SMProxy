@@ -54,11 +54,11 @@ DESC;
     {
         // 是否正在运行
         if ($this->isRunning()) {
-            print_r("The server have been running!(PID: {$this->serverSetting['masterPid']})\n");
-
-            return;
+            smproxy_error("The server have been running! (PID: {$this->serverSetting['masterPid']})");
         }
-        print_r($this->logo . 'server starting ...' . "\n");
+
+        echo $this->logo, PHP_EOL;
+        echo 'Server starting ...' ;
         new \SMProxy\SMProxyServer();
     }
 
@@ -68,11 +68,10 @@ DESC;
     public function stop()
     {
         if (!$this->isRunning()) {
-            print_r('The server is not running! cannot stop!' . "\n");
-
-            return;
+            smproxy_error('ERROR: The server is not running! cannot stop!' );
         }
-        print_r('SMProxy is stopping ...' . "\n");
+
+        echo 'SMProxy is stopping ...', PHP_EOL;
 
         $result = function () {
             // 获取master进程ID
@@ -98,14 +97,13 @@ DESC;
 
         // 停止失败
         if (!$result()) {
-            print_r('SMProxy stop fail' . "\n");
-
-            return;
+            smproxy_error('SMProxy shutting down failed!' );
         }
-        //删除pid文件
+
+        // 删除pid文件
         @unlink(CONFIG['server']['swoole']['pid_file']);
 
-        print_r('SMProxy stop success!' . "\n");
+        echo 'SMProxy has been shutting down.', PHP_EOL;
     }
 
     /**
@@ -132,14 +130,14 @@ DESC;
     {
         // 是否已启动
         if (!$this->isRunning()) {
-            print_r('The server is not running! cannot reload' . "\n");
+            echo 'The server is not running! cannot reload', PHP_EOL;
 
             return;
         }
 
-        print_r('Server is reloading...' . "\n");
+        echo 'Server is reloading...', PHP_EOL;
         posix_kill($this->serverSetting['managerPid'], SIGUSR1);
-        print_r('Server reload success' . "\n");
+        echo 'Server reload success', PHP_EOL;
     }
 
     /**
@@ -149,9 +147,9 @@ DESC;
     {
         // 是否已启动
         if ($this->isRunning()) {
-            print_r('The server is running' . "\n");
+            echo 'The server is running', PHP_EOL;
         } else {
-            print_r('The server is not running' . "\n");
+            echo 'The server is not running', PHP_EOL;
         }
     }
 

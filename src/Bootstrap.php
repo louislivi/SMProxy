@@ -14,31 +14,26 @@ class Bootstrap
      */
     public function bootstrap()
     {
-        //判断php版本
+        // 判断php版本
         if (PHP_VERSION < 7.0) {
-            print_r('ERROR:PHP version must be greater than 7.0!' . "\n");
-
-            return;
+            smproxy_error('ERROR: PHP version must be greater than 7.0!');
         }
 
-        //判断swoole版本
+        // 判断swoole版本
         if (defined('SWOOLE_VERSION')) {
             if (SWOOLE_VERSION < 2.1) {
-                print_r('ERROR:Swoole version must be greater than 2.1!' . "\n");
-
-                return;
+                smproxy_error('ERROR: Swoole version must be greater than 2.1!');
             }
         } else {
-            print_r('ERROR:Swoole not installed!' . "\n");
-
-            return;
+            exit('ERROR: Swoole not installed!' );
         }
-        //读取配置文件
+
+        // 读取配置文件
         $configName = ROOT . '/conf/';
         if (file_exists($configName)) {
             define('CONFIG', initConfig($configName));
         } else {
-            throw new \SMProxy\SMProxyException('Error:config conf/ No such file or directory!');
+            smproxy_error("ERROR: $configName No such file or directory!");
         }
     }
 }

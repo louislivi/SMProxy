@@ -58,16 +58,16 @@ abstract class BaseServer extends Base
             $this->server->on('ManagerStart', [$this, 'onManagerStart']);
             $result = $this->server->start();
             if ($result) {
-                print_r('server start success!' . "\n");
+                echo 'NOTICE: Server start success!', PHP_EOL;
             } else {
-                print_r('server start error!' . "\n");
+                smproxy_error('ERROR: Server start failed!' );
             }
         } catch (\Swoole\Exception $exception) {
-            print_r('ERROR:' . $exception->getMessage() . "\n");
+            smproxy_error('ERROR:' . $exception->getMessage() );
         } catch (\ErrorException $exception) {
-            print_r('ERROR:' . $exception->getMessage() . "\n");
+            smproxy_error('ERROR:' . $exception->getMessage() );
         } catch (SMProxyException $exception) {
-            print_r('ERROR:' . $exception->errorMessage() . "\n");
+            smproxy_error('ERROR:' . $exception->errorMessage() );
         }
     }
 

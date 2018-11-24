@@ -54,7 +54,7 @@ class SMProxyServer extends BaseServer
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
             if (!isset($this->source[$fd]->auth)) {
-                throw new SMProxyException('can\'t connect SMProxy send message !');
+                throw new SMProxyException('Cannot connect SMProxy send message!');
             }
             $packages = $this->packageSplit($data, $this->source[$fd]->auth ?: false);
             foreach ($packages as $package) {
@@ -175,7 +175,7 @@ class SMProxyServer extends BaseServer
                                     $client->client->send($data);
                                 }
                             } else {
-                                $message = 'database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
+                                $message = 'Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
                                     ' is not exists!';
                                 $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR);
                                 $mysql_log = Log::get_logger('mysql');
@@ -255,8 +255,8 @@ class SMProxyServer extends BaseServer
         Log::set_config(CONFIG['server']['logs']['config'], CONFIG['server']['logs']['open']);
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
             $system_log = Log::get_logger('system');
-            $system_log->info('server start!');
-            print_r('server start!' . "\n");
+            $system_log->info('Worker started!');
+            echo 'Worker started!', PHP_EOL;
         }
     }
 

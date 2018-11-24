@@ -19,17 +19,17 @@ class Command
     {
         $serverCommand = new ServerCommand();
         if (!isset($argv[1]) || '-h' == $argv[1] || '--help' == $argv[1]) {
-            print_r($serverCommand->desc . "\n");
+            echo $serverCommand->desc, PHP_EOL;
 
             return;
         }
         if ('-v' == $argv[1] || '--version' == $argv[1]) {
-            print_r($serverCommand->logo . "\n");
+            echo $serverCommand->logo, PHP_EOL;
 
             return;
         }
         if (!method_exists($serverCommand, $argv[1])) {
-            print_r("Unknown option:{$argv[1]}\nTry `server -h' for more information.\n");
+            smproxy_error("ERROR: Unknown option \"{$argv[1]}\"" . PHP_EOL . "Try `server -h' for more information.");
 
             return;
         }
