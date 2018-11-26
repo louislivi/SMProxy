@@ -14,7 +14,8 @@
     "require": {
         "php": "^7.0",
         "ext-swoole": "^2.1||^4.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.13",

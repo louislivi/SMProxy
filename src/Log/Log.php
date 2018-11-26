@@ -7,27 +7,16 @@
 
 namespace SMProxy\Log;
 
+use Swoole\Coroutine;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LogLevel;
+use Psr\Log\InvalidArgumentException;
+
 /**
  * 日志类.
- *
- * Description:
- * 1.自定义日志根目录及日志文件名称。
- * 2.使用日期时间格式自定义日志目录。
- * 3.自动创建不存在的日志目录。
- * 4.记录不同分类的日志，例如信息日志，警告日志，错误日志。
- * 5.可自定义日志配置，日志根据标签调用不同的日志配置。
- *
- * Func
- * public  static set_config 设置配置
- * public  static getLogger 获取日志类对象
- * public  info              写入信息日志
- * public  warn              写入警告日志
- * public  error             写入错误日志
- * private add               写入日志
- * private createLogPath   创建日志目录
- * private getLogFile      获取日志文件名称
  */
-class Log
+
+class Log extends AbstractLogger
 {
     // 日志根目录
     private $logPath = '.';
@@ -46,37 +35,26 @@ class Log
 
     public static $open = true;
 
-    /**
-     * 获取日志类对象
-     *
-     * @param array $config 总配置设定
-     *
-     * @return Log
-     */
-    public static function getLogger(string $tag = 'system')
-    {
-        if (!is_array(self::$CONFIG) || empty(self::$CONFIG)) {
-            self::$CONFIG = CONFIG['server']['logs']['config'];
-            self::$open = CONFIG['server']['logs']['open'];
-        }
+    private static $levels = [
+        LogLevel::DEBUG     => 0,
+        LogLevel::INFO      => 1,
+        LogLevel::NOTICE    => 2,
+        LogLevel::WARNING   => 3,
+        LogLevel::ERROR     => 4,
+        LogLevel::CRITICAL  => 5,
+        LogLevel::ALERT     => 6,
+        LogLevel::EMERGENCY => 7,
+    ];
 
-        // 根据tag从总配置中获取对应设定，如不存在使用system设定
-        $config = isset(self::$CONFIG[$tag]) ? self::$CONFIG[$tag] :
-            (isset(self::$CONFIG['system']) ? self::$CONFIG['system'] : []);
-
-        // 设置标签
-        $config['tag'] = '' != $tag && 'system' != $tag ? $tag : '-';
-
-        // 返回日志类对象
-        return new Log($config);
-    }
+    private $minLevelIndex;
 
     /**
-     * 初始化.
+     * Log constructor.
      *
-     * @param array $config 配置设定
+     * @param array $config
+     * @param null $minLevel
      */
-    public function __construct(array $config = [])
+    public function __construct(array $config, $minLevel = null)
     {
         // 日志根目录
         if (isset($config['log_path'])) {
@@ -97,78 +75,126 @@ class Log
         if (isset($config['tag'])) {
             $this->tag = $config['tag'];
         }
+
+        if (null === $minLevel) {
+            $minLevel = LogLevel::WARNING;
+
+            if (isset($_ENV['SHELL_VERBOSITY']) || isset($_SERVER['SHELL_VERBOSITY'])) {
+                switch ((int) (isset($_ENV['SHELL_VERBOSITY']) ? $_ENV['SHELL_VERBOSITY'] : $_SERVER['SHELL_VERBOSITY'])) {
+                    case -1:
+                        $minLevel = LogLevel::ERROR;
+                        break;
+                    case 1:
+                        $minLevel = LogLevel::NOTICE;
+                        break;
+                    case 2:
+                        $minLevel = LogLevel::INFO;
+                        break;
+                    case 3:
+                        $minLevel = LogLevel::DEBUG;
+                        break;
+                }
+            }
+        }
+
+        if (!isset(self::$levels[$minLevel])) {
+            throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $minLevel));
+        }
+
+        $this->minLevelIndex = self::$levels[$minLevel];
     }
 
     /**
-     * 写入信息日志.
+     * 添加日志。
      *
-     * @param string $data 信息数据
-     *
-     * @return bool
+     * @param mixed $level
+     * @param string $message
+     * @param array $context
      */
-    public function info(string $data)
-    {
-        return $this->add('INFO', $data);
-    }
-
-    /**
-     * 写入警告日志.
-     *
-     * @param string $data 警告数据
-     *
-     * @return bool
-     */
-    public function warn(string $data)
-    {
-        return $this->add('WARN', $data);
-    }
-
-    /**
-     * 写入错误日志.
-     *
-     * @param string $data 错误数据
-     *
-     * @return bool
-     */
-    public function error(string $data)
-    {
-        return $this->add('ERROR', $data);
-    }
-
-    /**
-     * 写入日志.
-     *
-     * @param string $type 日志类型
-     * @param string $data 日志数据
-     *
-     * @return bool
-     */
-    private function add(string $type, string $data)
+    public function log($level, $message, array $context = [])
     {
         if (self::$open) {
+            if (!isset(self::$levels[$level])) {
+                throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $level));
+            }
+
+            if (self::$levels[$level] < $this->minLevelIndex) {
+                return;
+            }
+
+            $log_data = $this ->format($level, $message, $context);
+
             // 获取日志文件
             $log_file = $this->getLogFile();
 
             // 创建日志目录
             $is_create = $this->createLogPath(dirname($log_file));
-
-            // 创建日期时间对象
-            $dt = new \DateTime();
-
-            // 日志内容
-            $log_data = sprintf('[%s] %-5s %s %s' . PHP_EOL, $dt->format('Y-m-d H:i:s'), $type, $this->tag, $data);
-
             // 写入日志文件
             if ($is_create) {
-                try {
-                    return \Swoole\Coroutine::writeFile($log_file, $log_data, FILE_APPEND);
-                } catch (\Exception $exception) {
-                    return file_put_contents($log_file, $log_data, FILE_APPEND);
+                if (Coroutine::getuid() > 0) {
+                    // 协程写
+                    $this->coWrite($log_file, $log_data);
+                } else {
+                    $this->syncWrite($log_file, $log_data);
                 }
             }
         }
+    }
 
-        return false;
+    /**
+     * 格式化输出信息。
+     *
+     * @param string $level
+     * @param string $message
+     * @param array $context
+     *
+     * @return string
+     */
+    private function format(string $level, string $message, array $context): string
+    {
+        if (false !== strpos($message, '{')) {
+            $replacements = [];
+            foreach ($context as $key => $val) {
+                if (null === $val || is_scalar($val) || (\is_object($val) && method_exists($val, '__toString'))) {
+                    $replacements["{{$key}}"] = $val;
+                } elseif ($val instanceof \DateTimeInterface) {
+                    $replacements["{{$key}}"] = $val->format('Y-m-d H:i:s');
+                } elseif (\is_object($val)) {
+                    $replacements["{{$key}}"] = '[object ' . \get_class($val) . ']';
+                } else {
+                    $replacements["{{$key}}"] = '[' . \gettype($val) . ']';
+                }
+            }
+
+            $message = strtr($message, $replacements);
+        }
+
+        return sprintf('%s [%s] %s', date('Y-m-d H:i:s'), $level, $message) . \PHP_EOL;
+    }
+
+    /**
+     * 获取日志类对象。
+     *
+     * @param string $tag
+     *
+     * @return Log
+     */
+    public static function getLogger(string $tag = 'system')
+    {
+        if (!is_array(self::$CONFIG) || empty(self::$CONFIG)) {
+            self::$CONFIG = CONFIG['server']['logs']['config'];
+            self::$open = CONFIG['server']['logs']['open'];
+        }
+
+        // 根据tag从总配置中获取对应设定，如不存在使用system设定
+        $config = isset(self::$CONFIG[$tag]) ? self::$CONFIG[$tag] :
+            (isset(self::$CONFIG['system']) ? self::$CONFIG['system'] : []);
+
+        // 设置标签
+        $config['tag'] = '' != $tag && 'system' != $tag ? $tag : '-';
+
+        // 返回日志类对象
+        return new Log($config, LogLevel::DEBUG);
     }
 
     /**
@@ -198,5 +224,39 @@ class Log
         $dt = new \DateTime();
         // 计算日志目录格式
         return sprintf('%s/%s/%s', $this->logPath, $dt->format($this->format), $this->logFile);
+    }
+
+    /**
+     * 协程写文件
+     *
+     * @param string $logFile     日志路径
+     * @param string $messageText 文本信息
+     */
+    private function coWrite(string $logFile, string $messageText)
+    {
+        go(function () use ($logFile, $messageText) {
+            $res = Coroutine::writeFile($logFile, $messageText, FILE_APPEND);
+            if ($res === false) {
+                throw new \InvalidArgumentException("Unable to append to log file: {$this->logFile}");
+            }
+        });
+    }
+
+    /**
+     * 同步写文件
+     *
+     * @param string $logFile     日志路径
+     * @param string $messageText 文本信息
+     */
+    private function syncWrite(string $logFile, string $messageText)
+    {
+        $fp = fopen($logFile, 'a');
+        if ($fp === false) {
+            throw new \InvalidArgumentException("Unable to append to log file: {$this->logFile}");
+        }
+        flock($fp, LOCK_EX);
+        fwrite($fp, $messageText);
+        flock($fp, LOCK_UN);
+        fclose($fp);
     }
 }

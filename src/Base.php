@@ -34,7 +34,7 @@ class Base extends Context
                 }
             } catch (SMProxyException $SMProxyException) {
                 $system_log = Log::getLogger('system');
-                $system_log->warn($SMProxyException->errorMessage());
+                $system_log->warning($SMProxyException->errorMessage());
             }
         });
     }

@@ -2,7 +2,7 @@
   "database": {
     "account": {
       "root": {
-        "user": "root", 
+        "user": "root",
         "password": "123456"
       }
     },
