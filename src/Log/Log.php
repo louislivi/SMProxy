@@ -15,7 +15,6 @@ use Psr\Log\InvalidArgumentException;
 /**
  * 日志类.
  */
-
 class Log extends AbstractLogger
 {
     // 日志根目录
@@ -207,7 +206,7 @@ class Log extends AbstractLogger
     private function createLogPath(string $log_path)
     {
         if (!is_dir($log_path)) {
-            return mkdir($log_path, 0777, true);
+            return mkdir($log_path, 0644, true);
         }
 
         return true;
