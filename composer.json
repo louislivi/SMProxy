@@ -31,9 +31,9 @@
         }
     },
     "scripts": {
-        "post-install-cmd": [
-            "cp -n conf/database.json.example conf/database.json",
-            "cp -n conf/server.json.example conf/server.json"
+        "post-package-install": [
+            "@php -r \"file_exists('conf/database.json') || copy('conf/database.json.example', 'conf/database.json');\"",
+            "@php -r \"file_exists('conf/server.json') || copy('conf/server.json.example', 'conf/server.json');\""
         ]
     }
 }
