@@ -49,8 +49,7 @@ A MySQL database connection pool based on MySQL protocol and Swoole.
 
 Store the database connection as an object in memory. When users need to access the database, a connection will be established for the first time. After that, instead of establishing a new connection, free connections will be retrieved from the connection pool when users require. Also, users don't need to close connection but put it back into the connection pool for other requests to use.
 
-All these things, connecting, disconnecting are managed by the connection pool itself. At the same time, 
-you can also configure the parameters of the connection pool, like:
+All these things, connecting, disconnecting are managed by the connection pool itself. At the same time, you can also configure the parameters of the connection pool, like:
 
 - The initial number of connections
 - Min / Max number of connections
@@ -88,7 +87,7 @@ Do not parse all sql packages like mycat, increasing the complexity.
 ## Environment Requirements
 
 - Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-- PHP 7.0+    ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+- PHP 7.0+     ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
 
 ## Installation
 
@@ -213,7 +212,7 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 
 ## More Documentation
 
-- MySQL protocol analysis: https://www.cnblogs.com/davygeek/p/5647175.html
-- MySQL official protocol documentation: https://dev.MySQL.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
-- Mycat source code: https://github.com/MyCATApache/Mycat-Server
-- Swoole :https://www.swoole.com/
+- MySQL protocol analysis: <https://www.cnblogs.com/davygeek/p/5647175.html>
+- MySQL official protocol documentation: <https://dev.MySQL.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake>
+- Mycat source code: <https://github.com/MyCATApache/Mycat-Server>
+- Swoole: <https://www.swoole.com/>
