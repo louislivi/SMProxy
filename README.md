@@ -178,14 +178,14 @@ QQ群：722124111
 ### database.json
 
 | account 账号信息                                        | serverInfo 服务信息                                        | databases 数据库连接池信息              |
-| ------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------- |
-| account.root 用户标识 与 serverInfo...account.root 对应 | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称             |
+| ------------------------------------------------------ | ---------------------------------------------------------- | --------------------------------------- |
+| account.root 用户标识 与 serverInfo...account.root 对应  | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称             |
 | account..user 用户名                                    | serverInfo..write 读写分离 write 写库 read 读库            | databases..serverInfo 服务信息          |
-| account..password 密码                                  | serverInfo..host 数据库连接地址                            | databases..maxSpareConns 最大空闲连接数 |
-|                                                         | serverInfo..prot 数据库端口                                | databases..maxConns 最大连接数          |
-|                                                         | serverInfo..timeout 数据库超时时长(秒)                     | databases..charset 数据库编码格式       |
-|                                                         | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞       | databases..maxSpareExp 最大空闲时间     |
-|                                                         | serverInfo..account  与 databases.account 对应             |                                         |
+| account..password 密码                                 | serverInfo..host 数据库连接地址\[数组:多读多写\]             | databases..maxSpareConns 最大空闲连接数  |
+|                                                       | serverInfo..prot 数据库端口                                | databases..maxConns 最大连接数          |
+|                                                       | serverInfo..timeout 数据库超时时长(秒)                      | databases..charset 数据库编码格式        |
+|                                                       | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞          | databases..maxSpareExp 最大空闲时间      |
+|                                                       | serverInfo..account  与 databases.account 对应            |  databases..startConns 服务启动连接数     |
 
 ### server.json
 

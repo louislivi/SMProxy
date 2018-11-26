@@ -9,14 +9,14 @@
     "serverInfo": {
       "server1": {
         "write": {
-          "host": "127.0.0.1",
+          "host": ["127.0.0.1"],
           "port": 3306,
           "timeout": 0.5,
           "flag": 0,
           "account": "root"
         },
         "read": {
-          "host": "127.0.0.1",
+          "host": ["127.0.0.1"],
           "port": 3306,
           "timeout": 0.5,
           "flag": 0,
@@ -27,6 +27,7 @@
     "databases": {
       "dbname": {
         "serverInfo": "server1",
+        "startConns": 0,
         "maxSpareConns": 10,
         "maxSpareExp": 3600,
         "maxConns": 20,

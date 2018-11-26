@@ -250,9 +250,29 @@ class SMProxyServer extends BaseServer
         $this->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
         //初始化链接
         MySQLPool::init($this->dbConfig);
-        foreach ($this->dbConfig as $key => $value) {
-            //初始化连接
-            MySQLPool::recycle(MySQLPool::fetch($key, $server, 1));
+        try{
+            foreach ($this->dbConfig as $key => $value) {
+                //初始化连接
+                if (isset($value['startConns']) && $value['startConns'] > 1){
+                    $value['startConns'] = ($value['startConns'] > $value['maxSpareConns']) ?
+                        $value['maxSpareConns'] : $value['startConns'];
+                    $clients = [];
+                    while($value['startConns']){
+                        $clients[] = MySQLPool::fetch($key, $server, 1);
+                        $value['startConns']--;
+                    }
+                    foreach ($clients as $client){
+                        MySQLPool::recycle($client);
+                    }
+                    unset($clients);
+                }else{
+                    MySQLPool::recycle(MySQLPool::fetch($key, $server, 1));
+                }
+            }
+        }catch (MySQLException $exception){
+            $server ->shutdown();
+            echo 'ERROR:' . $exception ->getMessage(), PHP_EOL;
+            return;
         }
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
             $system_log = Log::getLogger('system');

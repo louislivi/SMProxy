@@ -61,7 +61,7 @@ abstract class BaseServer extends Base
             $this->server->on('ManagerStart', [$this, 'onManagerStart']);
             $result = $this->server->start();
             if ($result) {
-                echo 'NOTICE: Server start success!', PHP_EOL;
+                smproxy_error('WARNING: Server is shutdown!');
             } else {
                 smproxy_error('ERROR: Server start failed!');
             }
