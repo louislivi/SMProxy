@@ -27,7 +27,7 @@
     "databases": {
       "dbname": {
         "serverInfo": "server1",
-        "startConns": 0,
+        "startConns": 10,
         "maxSpareConns": 10,
         "maxSpareExp": 3600,
         "maxConns": 20,
