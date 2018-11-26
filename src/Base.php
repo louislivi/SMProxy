@@ -56,7 +56,7 @@ class Base extends Context
                 foreach ($config['serverInfo'][$database['serverInfo']] as $s_key => $value) {
                     if (isset($config['account'][$value['account']])) {
                         $host = &$config['serverInfo'][$database['serverInfo']][$s_key]['host'];
-                        if (is_array($host)){
+                        if (is_array($host)) {
                             $host = $host[array_rand($host)];
                         }
                         if (!isset($config['databases'][$s_key])) {
