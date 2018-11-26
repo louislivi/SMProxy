@@ -117,6 +117,8 @@ mysql -uroot -p123456 -P3366 -h127.0.0.1
 
 ![PHP7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
+没用：0.15148401260376,用了：0.040808916091919
+
 未使用连接池: 0.15148401260376
 
 ![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)

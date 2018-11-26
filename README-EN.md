@@ -130,6 +130,9 @@ Tool connections are also available.
 
 ![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
 
+Native:0.15148401260376,With SMProxy:0.040808916091919
+
+
 Native: 0.15148401260376
  
 ![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
