@@ -244,64 +244,64 @@ class SMProxyServer extends BaseServer
         $this->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
         //初始化链接
         MySQLPool::init($this->dbConfig);
-        try {
-            foreach ($this->dbConfig as $key => $value) {
-                if (count(explode('_', $key)) < 2) {
-                    continue;
-                }
-                //测试数据库host port是否可连接
-                $test_client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
-                if (!$test_client->connect($value['serverInfo']['host'], $value['serverInfo']['port'], $value['serverInfo']['timeout'])) {
-                    throw new MySQLException('connect ' . $key . ' failed. Error: ' . $test_client->errCode . "\n");
-                }
-                $test_client->close();
-                //初始化连接
-                if (!isset($value['startConns'])) {
-                    $value['startConns'] = 1;
-                }
-                $value['startConns'] = ($value['startConns'] > $value['maxSpareConns']) ?
-                    $value['maxSpareConns'] : $value['startConns'];
-                $clients = [];
-                while ($value['startConns']) {
-                    //初始化startConns
-                    $mysql = new \Swoole\Coroutine\MySQL();
-                    $mysql->connect([
-                        'host'     => CONFIG['server']['host'],
-                        'user'     => CONFIG['server']['user'],
-                        'port'     => CONFIG['server']['port'],
-                        'password' => CONFIG['server']['password'],
-                        'database' => explode('_', $key)[1],
-                    ]);
-                    if ($mysql ->connect_errno) {
-                        throw new MySQLException(CONFIG['server']['host'] . ':' . CONFIG['server']['port'] . $mysql ->connect_error);
-                    }
-                    $mysql->setDefer();
-                    switch (explode('_', $key)[0]) {
-                        case 'read':
-                            $mysql->query('select sleep(1)');
-                            break;
-                        case 'write':
-                            $mysql->query('select sleep(1) for update');
-                            break;
-                    }
-                    $clients[] = $mysql;
-                    $value['startConns']--;
-                }
-                foreach ($clients as $client) {
-                    $client->recv();
-                    if ($client ->errno) {
-                        throw new MySQLException($client ->error);
-                    }
-                    $client->close();
-                }
-                unset($clients);
-            }
-        } catch (MySQLException $exception) {
-            $server ->shutdown();
-            echo 'ERROR:' . $exception ->getMessage(), PHP_EOL;
-            return;
-        }
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
+            try {
+                foreach ($this->dbConfig as $key => $value) {
+                    if (count(explode('_', $key)) < 2) {
+                        continue;
+                    }
+                    //测试数据库host port是否可连接
+                    $test_client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
+                    if (!$test_client->connect($value['serverInfo']['host'], $value['serverInfo']['port'], $value['serverInfo']['timeout'])) {
+                        throw new MySQLException('connect ' . $key . ' failed. Error: ' . $test_client->errCode . "\n");
+                    }
+                    $test_client->close();
+                    //初始化连接
+                    if (!isset($value['startConns'])) {
+                        $value['startConns'] = 1;
+                    }
+                    $value['startConns'] = ($value['startConns'] > $value['maxSpareConns']) ?
+                        $value['maxSpareConns'] : $value['startConns'];
+                    $clients = [];
+                    while ($value['startConns']) {
+                        //初始化startConns
+                        $mysql = new \Swoole\Coroutine\MySQL();
+                        $mysql->connect([
+                            'host'     => CONFIG['server']['host'],
+                            'user'     => CONFIG['server']['user'],
+                            'port'     => CONFIG['server']['port'],
+                            'password' => CONFIG['server']['password'],
+                            'database' => explode('_', $key)[1],
+                        ]);
+                        if ($mysql ->connect_errno) {
+                            throw new MySQLException(CONFIG['server']['host'] . ':' . CONFIG['server']['port'] . $mysql ->connect_error);
+                        }
+                        $mysql->setDefer();
+                        switch (explode('_', $key)[0]) {
+                            case 'read':
+                                $mysql->query('select sleep(1)');
+                                break;
+                            case 'write':
+                                $mysql->query('select sleep(1) for update');
+                                break;
+                        }
+                        $clients[] = $mysql;
+                        $value['startConns']--;
+                    }
+                    foreach ($clients as $client) {
+                        $client->recv();
+                        if ($client ->errno) {
+                            throw new MySQLException($client ->error);
+                        }
+                        $client->close();
+                    }
+                    unset($clients);
+                }
+            } catch (MySQLException $exception) {
+                $server ->shutdown();
+                echo 'ERROR:' . $exception ->getMessage(), PHP_EOL;
+                return;
+            }
             $system_log = Log::getLogger('system');
             $system_log->info('Worker started!');
             echo 'Worker started!', PHP_EOL;
