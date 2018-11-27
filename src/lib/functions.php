@@ -132,6 +132,12 @@ function initConfig(string $dir)
             closedir($dh);
         }
     }
+    //计算worker_num
+    if (isset($config['server']['swoole']['worker_num'])) {
+        $config['server']['swoole']['worker_num'] = eval('return ' . $config['server']['swoole']['worker_num'] . ';');
+    } else {
+        $config['server']['swoole']['worker_num'] = 1;
+    }
 
     //替换swoole 常量
     if (isset($config['server']['mode'])) {
