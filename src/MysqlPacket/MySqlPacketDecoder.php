@@ -14,12 +14,12 @@ use SMProxy\SMProxyException;
 class MySqlPacketDecoder
 {
     private $packetHeaderSize = 4;
-    private $maxPacketSize = 16 * 1024 * 1024;
+    private $maxPacketSize = 16777216;
 
     /**
      * MySql外层结构解包.
      *
-     * @throws Exception
+     * @throws SMProxyException
      */
     public function decode(string $data)
     {
