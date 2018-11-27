@@ -134,7 +134,7 @@ class MySQLPool
                 self::$yieldChannel[$connName] = new \Swoole\Coroutine\Channel(1);
             }
             ++self::$pendingFetchCount[$connName];
-            $client = self::coPop(self::$yieldChannel[$connName],self::$connsConfig[$connName]['serverInfo']['timeout']);
+            $client = self::coPop(self::$yieldChannel[$connName], self::$connsConfig[$connName]['serverInfo']['timeout']);
             if (false === $client) {
                 --self::$pendingFetchCount[$connName];
                 $mysql_log = Log::getLogger('mysql');
@@ -200,7 +200,7 @@ class MySQLPool
         }
         $timeout_message = 'Connection ' . $serverInfo['host'] . ':' . $serverInfo['port'] .
             ' waiting timeout, timeout=' . $serverInfo['timeout'];
-        $client = self::coPop($chan,$serverInfo['timeout']);
+        $client = self::coPop($chan, $serverInfo['timeout']);
         if ($client === false) {
             --self::$initConnCount[$connName];
             $mysql_log = Log::getLogger('mysql');
@@ -224,7 +224,7 @@ class MySQLPool
      *
      * @return bool
      */
-    static private function coPop($chan,$timeout = 0)
+    private static function coPop($chan, $timeout = 0)
     {
         if (version_compare(swoole_version(), '4.0.3', '>=')) {
             return $chan->pop($timeout);
