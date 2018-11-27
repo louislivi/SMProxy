@@ -8,3 +8,6 @@
 # Other
 /vendor
 /logs
+
+# Composer lock file
+/composer.lock
