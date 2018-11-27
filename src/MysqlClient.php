@@ -3,6 +3,7 @@
 namespace SMProxy;
 
 use SMProxy\Log\Log;
+use Swoole\Coroutine\Client;
 
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -21,15 +22,8 @@ abstract class MysqlClient extends Base
      */
     public function __construct()
     {
-        $this->client = new \swoole_client(
-            CONFIG['swoole_client_sock_setting']['sock_type'] ?? 1,
-            CONFIG['swoole_client_sock_setting']['sync_type'] ?? 1
-        );
-        $this->client->set(CONFIG['swoole_client_setting'] ?? []);
-        $this->client->on('connect', [$this, 'onClientConnect']);
-        $this->client->on('receive', [$this, 'onClientReceive']);
-        $this->client->on('error', [$this, 'onClientError']);
-        $this->client->on('close', [$this, 'onClientClose']);
+        $this->client = new Client(CONFIG['server']['swoole_client_sock_setting']['sock_type'] ?? 1);
+        $this->client->set(CONFIG['server']['swoole_client_setting'] ?? []);
     }
 
     /**
@@ -40,34 +34,45 @@ abstract class MysqlClient extends Base
      * @param float  $timeout
      * @param int    $flag
      *
-     * @return \swoole_client
+     * @return \Swoole\Coroutine\Client
      *
      * @throws SMProxyException
      */
     public function connect(string $host, int $port, float $timeout = 0.1, int $flag = 0)
     {
         if (!$this->client->connect($host, $port, $timeout = 0.1, $flag = 0)) {
+            $this->onClientError($this ->client);
             $mysql_log = Log::getLogger('mysql');
             $mysql_log->error("connect {$host}:{$port} failed. Error: {$this->client->errCode}\n");
             throw new SMProxyException("connect {$host}:{$port} failed. Error: {$this->client->errCode}\n");
         } else {
+            $this->go(function () {
+                while (true) {
+                    if (version_compare(swoole_version(), '2.1.2', '>=')) {
+                        $data = $this->client->recv(-1);
+                    } else {
+                        $data = $this->client->recv();
+                    }
+                    if (!$data) {
+                        $this ->onClientClose($this ->client);
+                        break;
+                    }
+                    $this ->onClientReceive($this ->client, $data);
+                }
+            });
             return $this->client;
         }
     }
 
-    public function onClientConnect(\swoole_client $cli)
+    public function onClientReceive(\Swoole\Coroutine\Client $cli, string $data)
     {
     }
 
-    public function onClientReceive(\swoole_client $cli, string $data)
+    public function onClientClose(\Swoole\Coroutine\Client $cli)
     {
     }
 
-    public function onClientError(\swoole_client $cli)
-    {
-    }
-
-    public function onClientClose(\swoole_client $cli)
+    public function onClientError(\Swoole\Coroutine\Client $cli)
     {
     }
 }

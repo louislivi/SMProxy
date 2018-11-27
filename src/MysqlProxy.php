@@ -35,17 +35,13 @@ class MysqlProxy extends MysqlClient
         $this->chan = $chan;
     }
 
-    public function onClientConnect(\swoole_client $cli)
-    {
-    }
-
     /**
      * mysql 客户端消息转发.
      *
      * @param $cli
      * @param $data
      */
-    public function onClientReceive(\swoole_client $cli, string $data)
+    public function onClientReceive(\Swoole\Coroutine\Client $cli, string $data)
     {
         $this->go(function () use ($cli, $data) {
             $fd = $this->serverFd;
@@ -96,12 +92,11 @@ class MysqlProxy extends MysqlClient
         });
     }
 
-    public function onClientError(\swoole_client $cli)
+    public function onClientClose(\Swoole\Coroutine\Client $cli)
     {
     }
 
-    public function onClientClose(\swoole_client $cli)
+    public function onClientError(\Swoole\Coroutine\Client $cli)
     {
-//        echo "mysql proxy connection close\n";
     }
 }

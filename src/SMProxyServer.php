@@ -356,7 +356,7 @@ class SMProxyServer extends BaseServer
                         $mysql->query('select sleep(1)');
                         break;
                     case 'write':
-                        $mysql->query('select sleep(1) for update');
+                        $mysql->query('set autocommit=1');
                         break;
                 }
                 $clients[] = $mysql;
