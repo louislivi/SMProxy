@@ -134,7 +134,8 @@ class MySQLPool
                 self::$yieldChannel[$connName] = new \Swoole\Coroutine\Channel(1);
             }
             ++self::$pendingFetchCount[$connName];
-            if (false == self::$yieldChannel[$connName]->pop()) {
+            $client = self::coPop(self::$yieldChannel[$connName],self::$connsConfig[$connName]['serverInfo']['timeout']);
+            if (false === $client) {
                 --self::$pendingFetchCount[$connName];
                 $mysql_log = Log::getLogger('mysql');
                 $mysql_log->warning('Reach max connections! Cann\'t pending fetch!');
@@ -199,32 +200,12 @@ class MySQLPool
         }
         $timeout_message = 'Connection ' . $serverInfo['host'] . ':' . $serverInfo['port'] .
             ' waiting timeout, timeout=' . $serverInfo['timeout'];
-        if (version_compare(swoole_version(), '4.0.3', '>=')) {
-            $client = $chan->pop($serverInfo['timeout']);
-            if ($client === false) {
-                --self::$initConnCount[$connName];
-                $mysql_log = Log::getLogger('mysql');
-                $mysql_log->warning($timeout_message);
-                throw new MySQLException($timeout_message);
-            }
-        } else {
-            if (0 == $serverInfo['timeout']) {
-                $client = $chan->pop();
-            } else {
-                $writes = [];
-                $reads = [$chan];
-                $result = $chan->select($reads, $writes, $serverInfo['timeout']);
-                if (false === $result || empty($reads)) {
-                    --self::$initConnCount[$connName];
-                    $system_log = Log::getLogger('mysql');
-                    $system_log->warning($timeout_message);
-                    throw new MySQLException($timeout_message);
-                }
-
-                $readChannel = $reads[0];
-
-                $client = $readChannel->pop();
-            }
+        $client = self::coPop($chan,$serverInfo['timeout']);
+        if ($client === false) {
+            --self::$initConnCount[$connName];
+            $mysql_log = Log::getLogger('mysql');
+            $mysql_log->warning($timeout_message);
+            throw new MySQLException($timeout_message);
         }
         $id = spl_object_hash($client);
         self::$connsNameMap[$id] = $connName;
@@ -233,6 +214,36 @@ class MySQLPool
         --self::$initConnCount[$connName];
 
         return $client;
+    }
+
+    /**
+     * 协程pop
+     *
+     * @param $chan
+     * @param int $timeout
+     *
+     * @return bool
+     */
+    static private function coPop($chan,$timeout = 0)
+    {
+        if (version_compare(swoole_version(), '4.0.3', '>=')) {
+            return $chan->pop($timeout);
+        } else {
+            if (0 == $timeout) {
+                return $chan->pop();
+            } else {
+                $writes = [];
+                $reads = [$chan];
+                $result = $chan->select($reads, $writes, $timeout);
+                if (false === $result || empty($reads)) {
+                    return false;
+                }
+
+                $readChannel = $reads[0];
+
+                return $readChannel->pop();
+            }
+        }
     }
 
     /**
