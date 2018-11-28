@@ -1,5 +1,5 @@
 #!/bin/sh
 
-EXEC="`dirname $0`/../bin/server"
+EXEC="`dirname $0`/../bin/SMProxy"
 
 $EXEC start && $EXEC stop

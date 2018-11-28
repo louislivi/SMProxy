@@ -1,5 +1,5 @@
 {
-    "main": "bin/server",
+    "main": "bin/SMProxy",
     "output": "SMProxy.phar",
     "alias": "deploy",
     "directories": [
