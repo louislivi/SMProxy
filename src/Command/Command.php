@@ -12,27 +12,48 @@ use SMProxy\Helper\PhpHelper;
 class Command
 {
     /**
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException
+     * @param array $argv
+     *
+     * @throws \SMProxy\SMProxyException
      */
     public function run(array $argv)
     {
+
+        $command = count($argv) >= 2 ? $argv[count($argv) - 1] : false;
+        $configPath = ROOT . '/conf/';
+        foreach ($argv as $key => $value) {
+            switch ($value) {
+                case '-c':
+                case '--config':
+                    // 读取配置文件
+                    $configPath = $argv[$key + 1];
+                    break;
+            }
+        }
+
+        if (file_exists($configPath)) {
+            define('CONFIG_PATH', realpath($configPath) . '/');
+            define('CONFIG', initConfig(realpath(CONFIG_PATH) . '/'));
+        } else {
+            smproxy_error('ERROR: ' . $configPath . ' No such file or directory!');
+        }
+
         $serverCommand = new ServerCommand();
-        if (!isset($argv[1]) || '-h' == $argv[1] || '--help' == $argv[1]) {
+        if (!$command || '-h' == $command || '--help' == $command) {
             echo $serverCommand->desc, PHP_EOL;
 
             return;
         }
-        if ('-v' == $argv[1] || '--version' == $argv[1]) {
+        if ('-v' == $command || '--version' == $command) {
             echo $serverCommand->logo, PHP_EOL;
 
             return;
         }
-        if (!method_exists($serverCommand, $argv[1])) {
-            smproxy_error("ERROR: Unknown option \"{$argv[1]}\"" . PHP_EOL . "Try `server -h' for more information.");
+        if (!method_exists($serverCommand, $command)) {
+            smproxy_error("ERROR: Unknown option \"{$command}\"" . PHP_EOL . "Try `server -h' for more information.");
 
             return;
         }
-        PhpHelper::call([$serverCommand, $argv[1]], ...array_copy($argv, 1, count($argv) - 2));
+        PhpHelper::call([$serverCommand, $command]);
     }
 }

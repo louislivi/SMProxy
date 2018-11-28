@@ -100,6 +100,7 @@ composer install --no-dev # 如果你想贡献你的代码，请不要使用 --n
 - `bin/server reload`  : 平滑重启
 - `bin/server -h`      : 帮助
 - `bin/server -v`      : 查看当前服务版本
+- `bin/server -c`      : 设置配置项目录
 
 ## SMProxy连接测试
 
@@ -182,8 +183,8 @@ QQ群：722124111
 | account..password 密码                                 | serverInfo..host 数据库连接地址\[数组:多读多写\]             | databases..maxSpareConns 最大空闲连接数  |
 |                                                       | serverInfo..prot 数据库端口                                | databases..maxConns 最大连接数          |
 |                                                       | serverInfo..timeout 数据库超时时长(秒)                      | databases..charset 数据库编码格式        |
-|                                                       | serverInfo..flag TCP类型目前支持0阻塞 不支持1.非阻塞          | databases..maxSpareExp 最大空闲时间      |
-|                                                       | serverInfo..account  与 databases.account 对应            |  databases..startConns 服务启动连接数     |
+|                                                       | serverInfo..account  与 databases.account 对应            | databases..maxSpareExp 最大空闲时间      |
+|                                                       |                                                          |  databases..startConns 服务启动连接数     |
 
 ### server.json
 

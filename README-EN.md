@@ -111,8 +111,9 @@ composer install --no-dev # If you want to contribute to this repo, please DO NO
 - `bin/server restart` : Restart service
 - `bin/server status`  : Query service running status
 - `bin/server reload`  : Smooth restart
-- `bin/server -h`      : help
-- `bin/server -v`      : view service version
+- `bin/server -h`      : Help
+- `bin/server -v`      : View service version
+- `bin/server -c`      : Setting configure path
 
 ## Connection Test
 
@@ -196,8 +197,8 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 | Account..password password                                    | serverInfo..host database connection address\[Array:read and write multiple\]         | databases..maxSpareConns maximum idle connections |
 |                                                               | serverInfo..prot database port                                                        | databases..maxConns maximum number of connections |
 |                                                               | serverInfo..timeout database timeout duration (seconds)                               | databases..charset database encoding format       |
-|                                                               | serverInfo..flag TCP type currently supports 0 blocking Not supported 1. Non-blocking | databases..maxSpareExp Maximum idle time          |
-|                                                               | serverInfo..account corresponds to databases.account                                  | databases..startConns service startup connections |
+|                                                               |  serverInfo..account corresponds to databases.account                                 | databases..maxSpareExp Maximum idle time           |                                  
+|                                                               |                                                                                       | databases..startConns service startup connections |
 
 ### server.json
 

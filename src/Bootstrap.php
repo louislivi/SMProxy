@@ -27,13 +27,5 @@ class Bootstrap
         } else {
             exit('ERROR: Swoole not installed!');
         }
-
-        // 读取配置文件
-        $configName = ROOT . '/conf/';
-        if (file_exists($configName)) {
-            define('CONFIG', initConfig($configName));
-        } else {
-            smproxy_error("ERROR: $configName No such file or directory!");
-        }
     }
 }

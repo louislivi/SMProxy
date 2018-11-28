@@ -191,8 +191,7 @@ class MySQLPool
         if (false == $conn->connect(
             $serverInfo['host'],
             $serverInfo['port'],
-            $serverInfo['timeout'] ?? 0.1,
-            $serverInfo['flag'] ?? 0
+            $serverInfo['timeout'] ?? 0.1
         )) {
             $mysql_log = Log::getLogger('mysql');
             $mysql_log->warning('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));

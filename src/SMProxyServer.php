@@ -241,7 +241,7 @@ class SMProxyServer extends BaseServer
         } else {
             ProcessHelper::setProcessTitle('SMProxy worker process');
         }
-        $this->dbConfig = $this->parseDbConfig(initConfig(ROOT . '/conf/'));
+        $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
         //初始化链接
         MySQLPool::init($this->dbConfig);
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
@@ -320,6 +320,7 @@ class SMProxyServer extends BaseServer
      */
     private function setStartConns()
     {
+        $clients = [];
         foreach ($this->dbConfig as $key => $value) {
             if (count(explode('_', $key)) < 2) {
                 continue;
@@ -336,7 +337,6 @@ class SMProxyServer extends BaseServer
             }
             $value['startConns'] = ($value['startConns'] > $value['maxSpareConns']) ?
                 $value['maxSpareConns'] : $value['startConns'];
-            $clients = [];
             while ($value['startConns']) {
                 //初始化startConns
                 $mysql = new \Swoole\Coroutine\MySQL();
@@ -362,14 +362,14 @@ class SMProxyServer extends BaseServer
                 $clients[] = $mysql;
                 $value['startConns']--;
             }
-            foreach ($clients as $client) {
-                $client->recv();
-                if ($client ->errno) {
-                    throw new MySQLException($client ->error);
-                }
-                $client->close();
-            }
-            unset($clients);
         }
+        foreach ($clients as $client) {
+            $client->recv();
+            if ($client ->errno) {
+                throw new MySQLException($client ->error);
+            }
+            $client->close();
+        }
+        unset($clients);
     }
 }
