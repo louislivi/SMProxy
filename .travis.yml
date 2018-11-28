@@ -28,5 +28,6 @@ script:
       vendor/bin/box compile
       ./SMProxy.phar
     else
+      chmod a+x bin/SMProxy
       tests/run
     fi
