@@ -288,3 +288,15 @@ function smproxy_error($message, $exitCode = 0)
         exit($exitCode);
     }
 }
+
+/**
+ * 处理异常
+ *
+ * @param int $errno
+ * @param string $errstr
+ * @param string $errfile
+ * @param int $errline
+ */
+function _error_handler(int $errno, string $errstr, string $errfile, int $errline)
+{
+}

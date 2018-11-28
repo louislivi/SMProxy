@@ -9,39 +9,16 @@ namespace SMProxy\Command;
 
 class ServerCommand
 {
-    public $logo = <<<'LOGO'
-
-  /$$$$$$  /$$      /$$ /$$$$$$$                                        
- /$$__  $$| $$$    /$$$| $$__  $$                                       
-| $$  \__/| $$$$  /$$$$| $$  \ $$ /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
-|  $$$$$$ | $$ $$/$$ $$| $$$$$$$//$$__  $$ /$$__  $$|  $$ /$$/| $$  | $$
- \____  $$| $$  $$$| $$| $$____/| $$  \__/| $$  \ $$ \  $$$$/ | $$  | $$
- /$$  \ $$| $$\  $ | $$| $$     | $$      | $$  | $$  >$$  $$ | $$  | $$
-|  $$$$$$/| $$ \/  | $$| $$     | $$      |  $$$$$$/ /$$/\  $$|  $$$$$$$
- \______/ |__/     |__/|__/     |__/       \______/ |__/  \__/ \____  $$
-                                                               /$$  | $$
-                                                              |  $$$$$$/
-                                                               \______/
-                                                               
-
-LOGO;
-    protected $version = 'SMProxy version: ' . SMPROXY_VERSION . PHP_EOL;
-    public $desc = <<<'DESC'
-Options and arguments (and corresponding environment variables):
-start   : start server
-stop    : stop server
-restart : restart server
-status  : view service status
-reload  : graceful restart
--h      : print this help message and exit (also --help)
--v      : print server version
-DESC;
+    public $logo;
+    public $desc;
+    public $usage;
     public $serverSetting = [];
 
     public function __construct()
     {
-        $this->logo = $this->logo . $this->version;
-        $this->desc = $this->logo . $this->desc;
+        $this->logo  = HelpMessage::$logo . PHP_EOL . HelpMessage::$version;
+        $this->desc  = $this->logo . PHP_EOL . HelpMessage::$usage . PHP_EOL . HelpMessage::$desc;
+        $this->usage = $this->logo . PHP_EOL . HelpMessage::$usage;
     }
 
     /**

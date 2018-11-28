@@ -12,23 +12,37 @@ use SMProxy\Helper\PhpHelper;
 class Command
 {
     /**
+     * 运行
+     *
      * @param array $argv
      *
      * @throws \SMProxy\SMProxyException
      */
     public function run(array $argv)
     {
+        $command = count($argv) >= 2 ? $argv[1] : false;
+        $this ->settingConfig($argv);
+        $this ->commandHandler($command);
+    }
 
-        $command = count($argv) >= 2 ? $argv[count($argv) - 1] : false;
+    /**
+     * 设置配置文件
+     *
+     * @param array $argv
+     *
+     * @throws \SMProxy\SMProxyException
+     */
+    protected function settingConfig(array $argv)
+    {
+        //指定配置文件
         $configPath = ROOT . '/conf/';
-        foreach ($argv as $key => $value) {
-            switch ($value) {
-                case '-c':
-                case '--config':
-                    // 读取配置文件
-                    $configPath = $argv[$key + 1];
-                    break;
+        $configKey  = array_search('-c', $argv) ?: array_search('--config', $argv);
+        if ($configKey) {
+            if (!isset($argv[$configKey + 1])) {
+                echo HelpMessage::$version . PHP_EOL . HelpMessage::$usage;
+                exit(0);
             }
+            $configPath = $argv[$configKey + 1];
         }
 
         if (file_exists($configPath)) {
@@ -37,23 +51,36 @@ class Command
         } else {
             smproxy_error('ERROR: ' . $configPath . ' No such file or directory!');
         }
+    }
 
+    /**
+     * 处理命令
+     *
+     * @param string $command
+     * @param string $command2
+     */
+    protected function commandHandler(string $command)
+    {
         $serverCommand = new ServerCommand();
-        if (!$command || '-h' == $command || '--help' == $command) {
+
+        if ('-h' == $command || '--help' == $command) {
             echo $serverCommand->desc, PHP_EOL;
 
             return;
         }
+
         if ('-v' == $command || '--version' == $command) {
             echo $serverCommand->logo, PHP_EOL;
 
             return;
         }
-        if (!method_exists($serverCommand, $command)) {
-            smproxy_error("ERROR: Unknown option \"{$command}\"" . PHP_EOL . "Try `server -h' for more information.");
+
+        if (!$command || !method_exists($serverCommand, $command)) {
+            echo $serverCommand->usage, PHP_EOL;
 
             return;
         }
+
         PhpHelper::call([$serverCommand, $command]);
     }
 }
