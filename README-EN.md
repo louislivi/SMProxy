@@ -29,7 +29,7 @@ English | [中文](./README.md)
   - [Why This](#why-this)
   - [Environment Requirements](#environment-requirements)
   - [Installation](#installation)
-  - [Run](#run)
+  - [Usage](#usage)
   - [Connection Test](#connection-test)
     - [PHP 7.2.6 Without Framework](#php-726-without-framework)
     - [ThinkPHP 5.0](#thinkphp-50)
@@ -102,18 +102,24 @@ git clone https://github.com/louislivi/smproxy.git
 composer install --no-dev # If you want to contribute to this repo, please DO NOT use --no-dev.
 ```
 
-## Run
+## Usage
 
 `bin/server` needs execute permission.
 
-- `bin/server start`   : Running service
-- `bin/server stop`    : Out of service
-- `bin/server restart` : Restart service
-- `bin/server status`  : Query service running status
-- `bin/server reload`  : Smooth restart
-- `bin/server -h`      : Help
-- `bin/server -v`      : View service version
-- `bin/server -c`      : Setting configure path
+```
+bin/server [ start | stop | restart | reload | status | -v | -h ] [-c <config_path>]
+```
+
+Arguments and Options:
+
+- `start`: Start server
+- `stop`: Shutdown server
+- `restart`: Restart server
+- `reload`: Reload configuration
+- `status`: Show server status
+- `-v`: Display version
+- `-h`: Display help
+- `-c <configuration_path>`: Specify configuration path
 
 ## Connection Test
 
