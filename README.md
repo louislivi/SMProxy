@@ -63,7 +63,7 @@
 - 遵守 MySQL 原生协议，跨语言，跨平台的通用中间件代理
 - 支持 MySQL 事物
 - 支持 HandshakeV10 协议版本
-- 完美兼容 MySQL4.1 - 5.7
+- 完美兼容 MySQL4.1 - 8.0
 - 兼容各大框架，无缝提升性能
 
 ## 设计初衷
@@ -93,14 +93,21 @@ composer install --no-dev # 如果你想贡献你的代码，请不要使用 --n
 
 需要给予 bin/server 执行权限。
 
-- `bin/server start`   : 运行服务
-- `bin/server stop`    : 停止服务
-- `bin/server restart` : 重启服务
-- `bin/server status`  : 查询服务运行状态
-- `bin/server reload`  : 平滑重启
-- `bin/server -h`      : 帮助
-- `bin/server -v`      : 查看当前服务版本
-- `bin/server -c`      : 设置配置项目录
+```
+  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> ]
+  SMProxy -h | --help
+  SMProxy -v | --version
+```
+
+Options:
+- start                            运行服务
+- stop                             停止服务
+- restart                          重启服务
+- status                           查询服务运行状态
+- reload                           平滑重启
+- -h --help                        帮助
+- -v --version                     查看当前服务版本
+- -c --config <configuration_path> 设置配置项目录
 
 ## SMProxy连接测试
 
@@ -199,6 +206,17 @@ QQ群：722124111
 |                 |                   |                  |               |                           |                                                       |                               |                               | reload_async 异步重启              |                                  |                                                         |
 |                 |                   |                  |               |                           |                                                       |                               |                               | log_file 日志目录                  |                                  |                                                         |
 |                 |                   |                  |               |                           |                                                       |                               |                               | pid_file 主进程pid目录             |                                  |                                                         |
+
+## MySQL8.0
+
+`MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件, 如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
+```SQL
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+flush privileges;
+```
+将语句中的 `'root'@'localhost'` 替换成你所使用的用户, `password` 替换成其密码.
+
+如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
 
 ## 其他学习资料
 

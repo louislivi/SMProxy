@@ -72,7 +72,7 @@ If the maximum number of connections is exceeded, the coroutine will be suspende
 - Build with MySQL native protocol, cross-language, cross-platform.
 - Compatible with MySQL Transaction
 - Compatible with HandshakeV10
-- Compatible with MySQL 4.1 - 5.7
+- Compatible with MySQL 4.1 - 8.0
 - Compatible with Various Frameworks
 
 ## Why This
@@ -107,19 +107,21 @@ composer install --no-dev # If you want to contribute to this repo, please DO NO
 `bin/server` needs execute permission.
 
 ```
-bin/server [ start | stop | restart | reload | status | -v | -h ] [-c <config_path>]
+  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> ]
+  SMProxy -h | --help
+  SMProxy -v | --version
 ```
 
-Arguments and Options:
+Options:
+- start                            Start server
+- stop                             Shutdown server
+- restart                          Restart server
+- status                           Show server status
+- reload                           Reload configuration
+- -h --help                        Display help
+- -v --version                     Display version
+- -c --config <configuration_path> Specify configuration path
 
-- `start`: Start server
-- `stop`: Shutdown server
-- `restart`: Restart server
-- `reload`: Reload configuration
-- `status`: Show server status
-- `-v`: Display version
-- `-h`: Display help
-- `-c <configuration_path>`: Specify configuration path
 
 ## Connection Test
 
@@ -219,6 +221,17 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 |                       |                           |                      |                   |                                       |                                                                     |                               |                                           | reload_async Asynchronous restart            |                                            |                                                                        |
 |                       |                           |                      |                   |                                       |                                                                     |                               |                                           | log_file log directory                       |                                            |                                                                        |
 |                       |                           |                      |                   |                                       |                                                                     |                               |                                           | pid_file main process pid directory          |                                            |                                                                        |
+
+## MySQL8.0
+
+`MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件, 如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
+```SQL
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+flush privileges;
+```
+将语句中的 `'root'@'localhost'` 替换成你所使用的用户, `password` 替换成其密码.
+
+如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
 
 ## More Documentation
 
