@@ -5,6 +5,7 @@
  * Date: 2018/10/26
  * Time: 下午6:32
  */
+
 require_once __DIR__.'/bootstrap.php';
 
 (new \SMProxy\Command\Command())->run($argv);
