@@ -39,6 +39,7 @@ English | [中文](./README.md)
   - [Configuration](#configuration)
     - [database.json](#databasejson)
     - [server.json](#serverjson)
+  - [MySQL8.0](#mysql80)
   - [More Documentation](#more-documentation)
 
 ## Swoole MySQL Proxy

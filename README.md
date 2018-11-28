@@ -39,6 +39,7 @@
   - [配置文件](#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
     - [database.json](#databasejson)
     - [server.json](#serverjson)
+  - [MySQL8.0](#mysql80)
   - [其他学习资料](#%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99)
 
 ## Swoole MySQL Proxy
