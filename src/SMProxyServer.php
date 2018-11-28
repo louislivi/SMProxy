@@ -329,7 +329,7 @@ class SMProxyServer extends BaseServer
             $test_client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
             if (!$test_client->connect($value['serverInfo']['host'], $value['serverInfo']['port'], $value['serverInfo']['timeout'])) {
                 throw new MySQLException('connect ' . explode('_smproxy_', $key)[0] .
-                      ' '. explode('_smproxy_', $key)[1] . ' failed. Error: ' . $test_client->errCode . "\n");
+                      ' ' . explode('_smproxy_', $key)[1] . ' failed. Error: ' . $test_client->errCode . "\n");
             }
             $test_client->close();
             //初始化连接
