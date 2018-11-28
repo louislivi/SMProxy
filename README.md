@@ -212,10 +212,10 @@ QQ群：722124111
 
 `MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件, 如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
 ```SQL
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 flush privileges;
 ```
-将语句中的 `'root'@'localhost'` 替换成你所使用的用户, `password` 替换成其密码.
+将语句中的 `'root'@'%'` 替换成你所使用的用户, `password` 替换成其密码.
 
 如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
 
