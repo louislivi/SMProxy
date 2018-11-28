@@ -184,7 +184,7 @@ class MySQLPool
         $chan = new \Swoole\Coroutine\Channel(1);
         $conn = new MysqlProxy($server, $fd, $chan);
         $serverInfo = self::$connsConfig[$connName]['serverInfo'];
-        $database = false == strpos($connName, '_') ? 0 : substr($connName, strpos($connName, '_') + 1);
+        $database = false == strpos($connName, '_smproxy_') ? 0 : substr($connName, strpos($connName, '_smproxy_') + 9);
         $conn->database = $database;
         $conn->account = $serverInfo['account'];
         $conn->charset = self::$connsConfig[$connName]['charset'];

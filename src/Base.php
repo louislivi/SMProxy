@@ -72,10 +72,10 @@ class Base extends Context
                             $config['databases'][$s_key]['serverInfo']['account'] =
                                 $config['account'][$value['account']];
                         }
-                        $config['databases'][$s_key . '_' . $key] = $config['databases'][$key];
-                        $config['databases'][$s_key . '_' . $key]['serverInfo'] =
+                        $config['databases'][$s_key . '_smproxy_' . $key] = $config['databases'][$key];
+                        $config['databases'][$s_key . '_smproxy_' . $key]['serverInfo'] =
                             $config['serverInfo'][$database['serverInfo']][$s_key];
-                        $config['databases'][$s_key . '_' . $key]['serverInfo']['account'] =
+                        $config['databases'][$s_key . '_smproxy_' . $key]['serverInfo']['account'] =
                             $config['account'][$value['account']];
                     } else {
                         $mysql_log = Log::getLogger('system');
