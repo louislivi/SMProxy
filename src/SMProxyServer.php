@@ -367,7 +367,6 @@ class SMProxyServer extends BaseServer
         foreach ($clients as $client) {
             $client->recv();
             if ($client ->errno) {
-                var_dump(123);
                 throw new MySQLException($client ->error);
             }
             $client->close();

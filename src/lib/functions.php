@@ -158,11 +158,6 @@ function initConfig(string $dir)
         $config['server']['swoole_client_sock_setting']['sock_type'] = SWOOLE_SOCK_TCP;
     }
 
-    if (isset($config['server']['swoole_client_sock_setting']['sync_type'])) {
-        replace_constant($config['server']['swoole_client_sock_setting']['sync_type'], SWOOLE_SOCK_ASYNC);
-    } else {
-        $config['server']['swoole_client_sock_setting']['sync_type'] = SWOOLE_SOCK_ASYNC;
-    }
     //生成日志目录
     if (isset($config['server']['logs']['config']['system']['log_path'])) {
         mk_log_dir($config['server']['logs']['config']['system']['log_path']);

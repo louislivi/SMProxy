@@ -37,8 +37,7 @@
       "package_max_length": 16777216
     },
     "swoole_client_sock_setting": {
-      "sock_type": "SWOOLE_SOCK_TCP",
-      "sync_type": "SWOOLE_SOCK_ASYNC"
+      "sock_type": "SWOOLE_SOCK_TCP"
     }
   }
 }
