@@ -92,7 +92,7 @@ composer install --no-dev # 如果你想贡献你的代码，请不要使用 --n
 
 ## 运行
 
-需要给予 bin/server 执行权限。
+需要给予 bin/SMProxy 执行权限。
 
 ```
   SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> ]
