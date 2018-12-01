@@ -49,41 +49,40 @@ class MysqlProxy extends MysqlClient
             $binaryPacket = new BinaryPacket();
             $binaryPacket->data = getBytes($data);
             $binaryPacket->packetLength = $binaryPacket->calcPacketSize();
-            if (!$this->auth) {
-                $handshakePacket = (new HandshakePacket())->read($binaryPacket);
-                $salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
-                $password = SecurityUtil::scramble411($this->account['password'], $salt);
-                $authPacket = new AuthPacket();
-                $authPacket->packetId = 1;
-                $authPacket->clientFlags = BackendAuthenticator::getClientFlags();
-                $authPacket->maxPacketSize =
-                    CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
-                $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf-8');
-                $authPacket->user = $this->account['user'];
-                $authPacket->password = $password;
-                $authPacket->database = $this->database ?? 0;
-                $this->auth = true;
-                if ($cli->isConnected()) {
-                    $cli->send(getString($authPacket->write()));
-                }
-            } else {
+            if (isset($binaryPacket->data[4])) {
                 $send = true;
-                if (isset($binaryPacket->data[4])) {
-                    switch ($binaryPacket->data[4]) {
-                        case OkPacket::$FIELD_COUNT:
-                            if (!array_diff_assoc($binaryPacket->data, OkPacket::$AUTH_OK)) {
-                                $send = false;
-                                $this->chan->push($this);
-                            }
-                            break;
-                        case ErrorPacket::$FIELD_COUNT:
-                            $errorPacket = new ErrorPacket();
-                            $errorPacket->read($binaryPacket);
-                            $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
-                            $mysql_log = Log::getLogger('mysql');
-                            $mysql_log->error($errorPacket->errno . ':' . $errorPacket->message);
-                            $data = getString($errorPacket->write());
-                            break;
+                if ($binaryPacket->data[4] == ErrorPacket::$FIELD_COUNT) {
+                    $errorPacket = new ErrorPacket();
+                    $errorPacket->read($binaryPacket);
+                    $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
+                    $mysql_log = Log::getLogger('mysql');
+                    $mysql_log->error($errorPacket->errno . ':' . $errorPacket->message);
+                    $data = getString($errorPacket->write());
+                } else {
+                    if (!$this->auth) {
+                        $handshakePacket = (new HandshakePacket())->read($binaryPacket);
+                        $salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
+                        $password = SecurityUtil::scramble411($this->account['password'], $salt);
+                        $authPacket = new AuthPacket();
+                        $authPacket->packetId = 1;
+                        $authPacket->clientFlags = BackendAuthenticator::getClientFlags();
+                        $authPacket->maxPacketSize =
+                            CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
+                        $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf-8');
+                        $authPacket->user = $this->account['user'];
+                        $authPacket->password = $password;
+                        $authPacket->database = $this->database ?? 0;
+                        $this->auth = true;
+                        if ($cli->isConnected()) {
+                            $cli->send(getString($authPacket->write()));
+                        }
+                        $send = false;
+                    }
+                    if ($binaryPacket->data[4] == OkPacket::$FIELD_COUNT) {
+                        if (!array_diff_assoc($binaryPacket->data, OkPacket::$AUTH_OK)) {
+                            $send = false;
+                            $this->chan->push($this);
+                        }
                     }
                 }
                 if ($send && $this->server->exist($fd)) {
