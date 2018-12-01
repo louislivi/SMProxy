@@ -105,7 +105,7 @@ composer install --no-dev # If you want to contribute to this repo, please DO NO
 
 ## Usage
 
-`bin/server` needs execute permission.
+`bin/SMProxy` needs execute permission.
 
 ```
   SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> ]
