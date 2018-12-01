@@ -61,42 +61,44 @@ class MySQLPool
      */
     public static function recycle(MysqlProxy $conn, bool $busy = true)
     {
-        if (!self::$init) {
-            $mysql_log = Log::getLogger('mysql');
-            $mysql_log->warning('Should call MySQLPool::init.');
-            throw new MySQLException('Should call MySQLPool::init.');
-        }
-        $id = spl_object_hash($conn);
-        $connName = self::$connsNameMap[$id];
-        if ($busy) {
-            if (isset(self::$busyConns[$connName][$id])) {
-                unset(self::$busyConns[$connName][$id]);
-            } else {
+        go(function () use ($conn, $busy) {
+            if (!self::$init) {
                 $mysql_log = Log::getLogger('mysql');
-                $mysql_log->warning('Unknow MySQL connection.');
-                throw new MySQLException('Unknow MySQL connection.');
+                $mysql_log->warning('Should call MySQLPool::init.');
+                throw new MySQLException('Should call MySQLPool::init.');
             }
-        }
-        $connsPool = &self::$spareConns[$connName];
-        if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
-            ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
-        ) {
-            if ($conn->client->isConnected()) {
-                $conn->client->close();
+            $id = spl_object_hash($conn);
+            $connName = self::$connsNameMap[$id];
+            if ($busy) {
+                if (isset(self::$busyConns[$connName][$id])) {
+                    unset(self::$busyConns[$connName][$id]);
+                } else {
+                    $mysql_log = Log::getLogger('mysql');
+                    $mysql_log->warning('Unknow MySQL connection.');
+                    throw new MySQLException('Unknow MySQL connection.');
+                }
             }
-            unset(self::$connsNameMap[$id]);
-        } else {
-            if (!$conn->client->isConnected()) {
+            $connsPool = &self::$spareConns[$connName];
+            if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
+                ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
+            ) {
+                if ($conn->client->isConnected()) {
+                    $conn->client->close();
+                }
                 unset(self::$connsNameMap[$id]);
-                $conn = self::initConn($conn->server, $conn->serverFd, $connName);
-                $id = spl_object_hash($conn);
+            } else {
+                if (!$conn->client->isConnected()) {
+                    unset(self::$connsNameMap[$id]);
+                    $conn = self::initConn($conn->server, $conn->serverFd, $connName);
+                    $id = spl_object_hash($conn);
+                }
+                $connsPool[] = $conn;
+                if (self::$pendingFetchCount[$connName] > 0) {
+                    ++self::$resumeFetchCount[$connName];
+                    self::$yieldChannel[$connName]->push($id);
+                }
             }
-            $connsPool[] = $conn;
-            if (self::$pendingFetchCount[$connName] > 0) {
-                ++self::$resumeFetchCount[$connName];
-                self::$yieldChannel[$connName]->push($id);
-            }
-        }
+        });
     }
 
     /**
@@ -193,12 +195,12 @@ class MySQLPool
         $chan = new \Swoole\Coroutine\Channel(1);
         $conn = new MysqlProxy($server, $fd, $chan);
         $serverInfo = self::$connsConfig[$connName]['serverInfo'];
-        if (false == strpos($connName, '_smproxy_')) {
+        if (false == strpos($connName, DB_DELIMITER)) {
             $conn->database = 0;
             $conn->model    = $connName;
         } else {
-            $conn->database = substr($connName, strpos($connName, '_smproxy_') + 9);
-            $conn->model    = substr($connName, 0, strpos($connName, '_smproxy_'));
+            $conn->database = substr($connName, strpos($connName, DB_DELIMITER) + strlen(DB_DELIMITER));
+            $conn->model    = substr($connName, 0, strpos($connName, DB_DELIMITER));
         }
 
         $conn->account  = $serverInfo['account'];
@@ -241,20 +243,22 @@ class MySQLPool
      */
     public static function destruct(Client $cli, string $connName)
     {
-        if ($cli->isConnected()) {
-            $cli ->close();
-        }
-        $proxyConn = false;
-        foreach (self::$spareConns[$connName] as $key => $conn) {
-            if (spl_object_hash($conn ->client) == spl_object_hash($cli)) {
-                $proxyConn = $conn;
-                unset(self::$spareConns[$connName][$key]);
-                break;
+        go(function () use ($cli, $connName) {
+            if ($cli->isConnected()) {
+                $cli ->close();
             }
-        }
-        if ($proxyConn) {
-            self::recycle($proxyConn, false);
-        }
+            $proxyConn = false;
+            foreach (self::$spareConns[$connName] as $key => $conn) {
+                if (spl_object_hash($conn ->client) == spl_object_hash($cli)) {
+                    $proxyConn = $conn;
+                    unset(self::$spareConns[$connName][$key]);
+                    break;
+                }
+            }
+            if ($proxyConn) {
+                self::recycle($proxyConn, false);
+            }
+        });
     }
 
     /**

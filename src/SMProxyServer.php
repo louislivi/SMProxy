@@ -14,6 +14,7 @@ use SMProxy\MysqlPacket\Util\ErrorCode;
 use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPool\MySQLPool;
 use SMProxy\Parser\ServerParse;
+use Swoole\Coroutine;
 
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -149,7 +150,7 @@ class SMProxyServer extends BaseServer
                         }
                         if (isset($this->connectReadState[$fd]) && true === $this->connectReadState[$fd]) {
                             $model = 'read';
-                            $key = $this->source[$fd]->database ? $model . '_smproxy_' . $this->source[$fd]->database : $model;
+                            $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
                             //如果没有读库 默认用写库
                             if (!array_key_exists($key, $this->dbConfig)) {
                                 $model = 'write';
@@ -163,7 +164,7 @@ class SMProxyServer extends BaseServer
                                 $client->client->send($data);
                             }
                         } else {
-                            $key = $this->source[$fd]->database ? $model . '_smproxy_' . $this->source[$fd]->database : $model;
+                            $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
                             if (array_key_exists($key, $this->dbConfig)) {
                                 $client = MySQLPool::fetch($key, $server, $fd);
                                 $this->mysqlClient[$fd][$model] = $client;
@@ -222,7 +223,6 @@ class SMProxyServer extends BaseServer
             unset($this->connectReadState[$fd]);
         }
         parent::onClose($server, $fd);
-//        echo "connection close: {$fd}\n";
     }
 
     /**
@@ -246,6 +246,7 @@ class SMProxyServer extends BaseServer
         MySQLPool::init($this->dbConfig);
         if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
             try {
+                Coroutine::sleep(0.1);
                 $this ->setStartConns();
             } catch (MySQLException $exception) {
                 $server ->shutdown();
@@ -322,14 +323,14 @@ class SMProxyServer extends BaseServer
     {
         $clients = [];
         foreach ($this->dbConfig as $key => $value) {
-            if (count(explode('_smproxy_', $key)) < 2) {
+            if (count(explode(DB_DELIMITER, $key)) < 2) {
                 continue;
             }
             //测试数据库host port是否可连接
             $test_client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
             if (!$test_client->connect($value['serverInfo']['host'], $value['serverInfo']['port'], $value['serverInfo']['timeout'])) {
-                throw new MySQLException('connect ' . explode('_smproxy_', $key)[0] .
-                      ' ' . explode('_smproxy_', $key)[1] . ' failed. Error: ' . $test_client->errCode . "\n");
+                throw new MySQLException('connect ' . explode(DB_DELIMITER, $key)[0] .
+                      ' ' . explode(DB_DELIMITER, $key)[1] . ' failed. Error: ' . $test_client->errCode . "\n");
             }
             $test_client->close();
             //初始化连接
@@ -344,13 +345,13 @@ class SMProxyServer extends BaseServer
                     'user'     => CONFIG['server']['user'],
                     'port'     => CONFIG['server']['port'],
                     'password' => CONFIG['server']['password'],
-                    'database' => explode('_smproxy_', $key)[1],
+                    'database' => explode(DB_DELIMITER, $key)[1],
                 ]);
                 if ($mysql ->connect_errno) {
                     throw new MySQLException(CONFIG['server']['host'] . ':' . CONFIG['server']['port'] . $mysql ->connect_error);
                 }
                 $mysql->setDefer();
-                switch (explode('_smproxy_', $key)[0]) {
+                switch (explode(DB_DELIMITER, $key)[0]) {
                     case 'read':
                         $mysql->query('select sleep(1)');
                         break;
