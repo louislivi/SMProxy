@@ -336,8 +336,6 @@ class SMProxyServer extends BaseServer
             if (!isset($value['startConns'])) {
                 $value['startConns'] = 1;
             }
-            $value['startConns'] = ($value['startConns'] > $value['maxSpareConns']) ?
-                $value['maxSpareConns'] : $value['startConns'];
             while ($value['startConns']) {
                 //初始化startConns
                 $mysql = new \Swoole\Coroutine\MySQL();

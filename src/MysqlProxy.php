@@ -12,6 +12,7 @@ use SMProxy\MysqlPacket\OkPacket;
 use SMProxy\MysqlPacket\Util\CharsetUtil;
 use SMProxy\MysqlPacket\Util\ErrorCode;
 use SMProxy\MysqlPacket\Util\SecurityUtil;
+use SMProxy\MysqlPool\MySQLPool;
 
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -20,7 +21,7 @@ use SMProxy\MysqlPacket\Util\SecurityUtil;
  */
 class MysqlProxy extends MysqlClient
 {
-    protected $server;
+    public $server;
     public $serverFd;
     public $charset;
     public $account;
@@ -92,8 +93,17 @@ class MysqlProxy extends MysqlClient
         });
     }
 
+    /**
+     * close.
+     *
+     * @param \Swoole\Coroutine\Client $cli
+     *
+     * @throws \SMProxy\MysqlPool\MySQLException
+     * @throws SMProxyException
+     */
     public function onClientClose(\Swoole\Coroutine\Client $cli)
     {
+        MySQLPool::destruct($cli, $this->model . '_smproxy_' . $this->database);
     }
 
     public function onClientError(\Swoole\Coroutine\Client $cli)

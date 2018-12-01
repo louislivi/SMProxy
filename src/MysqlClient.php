@@ -14,6 +14,7 @@ abstract class MysqlClient extends Base
 {
     public $client;
     public $database;
+    public $model;
 
     /**
      * MysqlClient constructor.

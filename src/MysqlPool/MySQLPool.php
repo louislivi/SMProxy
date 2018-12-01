@@ -4,6 +4,7 @@ namespace SMProxy\MysqlPool;
 
 use SMProxy\Log\Log;
 use SMProxy\MysqlProxy;
+use Swoole\Coroutine\Client;
 
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -14,12 +15,12 @@ class MySQLPool
 {
     protected static $init = false;
     protected static $spareConns = [];
-    protected static $busyConns = [];
+    protected static $busyConns  = [];
     protected static $connsConfig;
     protected static $connsNameMap = [];
     protected static $pendingFetchCount = [];
-    protected static $resumeFetchCount = [];
-    protected static $yieldChannel = [];
+    protected static $resumeFetchCount  = [];
+    protected static $yieldChannel  = [];
     protected static $initConnCount = [];
     protected static $lastConnsTime = [];
 
@@ -38,7 +39,7 @@ class MySQLPool
             self::$spareConns[$name] = [];
             self::$busyConns[$name] = [];
             self::$pendingFetchCount[$name] = 0;
-            self::$resumeFetchCount[$name] = 0;
+            self::$resumeFetchCount[$name]  = 0;
             self::$initConnCount[$name] = 0;
             if ($config['maxSpareConns'] <= 0 || $config['maxConns'] <= 0) {
                 $mysql_log = Log::getLogger('mysql');
@@ -50,11 +51,15 @@ class MySQLPool
     }
 
     /**
-     * @param \Swoole\Coroutine\MySQL $conn
+     * 回收连接。
+     *
+     * @param MysqlProxy $conn
+     * @param bool $busy
      *
      * @throws MySQLException
+     * @throws \SMProxy\SMProxyException
      */
-    public static function recycle(MysqlProxy $conn)
+    public static function recycle(MysqlProxy $conn, bool $busy = true)
     {
         if (!self::$init) {
             $mysql_log = Log::getLogger('mysql');
@@ -63,31 +68,35 @@ class MySQLPool
         }
         $id = spl_object_hash($conn);
         $connName = self::$connsNameMap[$id];
-        if (isset(self::$busyConns[$connName][$id])) {
-            unset(self::$busyConns[$connName][$id]);
-        } else {
-            $mysql_log = Log::getLogger('mysql');
-            $mysql_log->warning('Unknow MySQL connection.');
-            throw new MySQLException('Unknow MySQL connection.');
-        }
-        $connsPool = &self::$spareConns[$connName];
-        if ($conn->client->isConnected()) {
-            if (((count($connsPool) + self::$initConnCount[$connName]) >=
-                    self::$connsConfig[$connName]['maxSpareConns']) &&
-                ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
-            ) {
-                $conn->client->close();
+        if ($busy) {
+            if (isset(self::$busyConns[$connName][$id])) {
+                unset(self::$busyConns[$connName][$id]);
             } else {
-                $connsPool[] = $conn;
-                if (self::$pendingFetchCount[$connName] > 0) {
-                    ++self::$resumeFetchCount[$connName];
-                    self::$yieldChannel[$connName]->push($id);
-                }
-
-                return;
+                $mysql_log = Log::getLogger('mysql');
+                $mysql_log->warning('Unknow MySQL connection.');
+                throw new MySQLException('Unknow MySQL connection.');
             }
         }
-        unset(self::$connsNameMap[$id]);
+        $connsPool = &self::$spareConns[$connName];
+        if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
+            ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
+        ) {
+            if ($conn->client->isConnected()) {
+                $conn->client->close();
+            }
+            unset(self::$connsNameMap[$id]);
+        } else {
+            if (!$conn->client->isConnected()) {
+                unset(self::$connsNameMap[$id]);
+                $conn = self::initConn($conn->server, $conn->serverFd, $connName);
+                $id = spl_object_hash($conn);
+            }
+            $connsPool[] = $conn;
+            if (self::$pendingFetchCount[$connName] > 0) {
+                ++self::$resumeFetchCount[$connName];
+                self::$yieldChannel[$connName]->push($id);
+            }
+        }
     }
 
     /**
@@ -184,10 +193,16 @@ class MySQLPool
         $chan = new \Swoole\Coroutine\Channel(1);
         $conn = new MysqlProxy($server, $fd, $chan);
         $serverInfo = self::$connsConfig[$connName]['serverInfo'];
-        $database = false == strpos($connName, '_smproxy_') ? 0 : substr($connName, strpos($connName, '_smproxy_') + 9);
-        $conn->database = $database;
-        $conn->account = $serverInfo['account'];
-        $conn->charset = self::$connsConfig[$connName]['charset'];
+        if (false == strpos($connName, '_smproxy_')) {
+            $conn->database = 0;
+            $conn->model    = $connName;
+        } else {
+            $conn->database = substr($connName, strpos($connName, '_smproxy_') + 9);
+            $conn->model    = substr($connName, 0, strpos($connName, '_smproxy_'));
+        }
+
+        $conn->account  = $serverInfo['account'];
+        $conn->charset  = self::$connsConfig[$connName]['charset'];
         if (false == $conn->connect(
             $serverInfo['host'],
             $serverInfo['port'],
@@ -213,6 +228,33 @@ class MySQLPool
         --self::$initConnCount[$connName];
 
         return $client;
+    }
+
+    /**
+     * 销毁连接。
+     *
+     * @param Client $cli
+     * @param string $connName
+     *
+     * @throws MySQLException
+     * @throws \SMProxy\SMProxyException
+     */
+    public static function destruct(Client $cli, string $connName)
+    {
+        if ($cli->isConnected()) {
+            $cli ->close();
+        }
+        $proxyConn = false;
+        foreach (self::$spareConns[$connName] as $key => $conn) {
+            if (spl_object_hash($conn ->client) == spl_object_hash($cli)) {
+                $proxyConn = $conn;
+                unset(self::$spareConns[$connName][$key]);
+                break;
+            }
+        }
+        if ($proxyConn) {
+            self::recycle($proxyConn, false);
+        }
     }
 
     /**
@@ -261,15 +303,14 @@ class MySQLPool
      */
     public static function reconnect(\swoole_server $server, int $fd, MysqlProxy $conn, string $connName)
     {
-        if (!$conn->client->isConnected()) {
-            $old_id = spl_object_hash($conn);
-            unset(self::$busyConns[$connName][$old_id]);
-            unset(self::$connsNameMap[$old_id]);
-            self::$lastConnsTime[$old_id] = 0;
-
-            return self::initConn($server, $fd, $connName);
+        if ($conn->client->isConnected()) {
+            $conn->client->close();
         }
+        $old_id = spl_object_hash($conn);
+        unset(self::$busyConns[$connName][$old_id]);
+        unset(self::$connsNameMap[$old_id]);
+        self::$lastConnsTime[$old_id] = 0;
 
-        return $conn;
+        return self::initConn($server, $fd, $connName);
     }
 }

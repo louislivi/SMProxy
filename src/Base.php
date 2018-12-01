@@ -56,7 +56,9 @@ class Base extends Context
                 $config['databases'][$key]['maxConns']      = floor(
                     eval('return ' . $config['databases'][$key]['maxConns'] . ';') / CONFIG['server']['swoole']['worker_num']
                 );
-                $config['databases'][$key]['maxSpareConns'] = eval('return ' . $config['databases'][$key]['maxSpareConns'] . ';');
+                $config['databases'][$key]['maxSpareConns'] = floor(
+                    eval('return ' . $config['databases'][$key]['maxSpareConns'] . ';') / CONFIG['server']['swoole']['worker_num']
+                );
                 $config['databases'][$key]['startConns']    = eval('return ' . $config['databases'][$key]['startConns'] . ';');
                 $config['databases'][$key]['maxSpareExp']   = eval('return ' . $config['databases'][$key]['maxSpareExp'] . ';');
                 foreach ($config['serverInfo'][$database['serverInfo']] as $s_key => $value) {
