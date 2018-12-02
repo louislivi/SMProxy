@@ -62,16 +62,36 @@ class MysqlProxy extends MysqlClient
                     if (!$this->auth) {
                         $handshakePacket = (new HandshakePacket())->read($binaryPacket);
                         $salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
-                        $password = SecurityUtil::scramble411($this->account['password'], $salt);
+                        switch ($handshakePacket ->pluginName) {
+                            case 'mysql_native_password':
+                                $password = SecurityUtil::scramble411($this->account['password'], $salt);
+                                break;
+//                            case 'caching_sha2_password':
+//                                break;
+//                            case 'sha256_password':
+//                                break;
+//                            case 'mysql_old_password':
+//                                break;
+                            case 'mysql_clear_password':
+                                $password = $this->account['password'];
+                                break;
+                            default:
+                                $password = SecurityUtil::scramble411($this->account['password'], $salt);
+                                break;
+                        }
                         $authPacket = new AuthPacket();
                         $authPacket->packetId = 1;
+                        if (isset($this ->database) && $this ->database) {
+                            $authPacket->database = $this->database;
+                        } else {
+                            $authPacket->database = 0;
+                        }
                         $authPacket->clientFlags = BackendAuthenticator::getClientFlags();
                         $authPacket->maxPacketSize =
                             CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
                         $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf-8');
                         $authPacket->user = $this->account['user'];
                         $authPacket->password = $password;
-                        $authPacket->database = $this->database ?? 0;
                         $this->auth = true;
                         if ($cli->isConnected()) {
                             $cli->send(getString($authPacket->write()));

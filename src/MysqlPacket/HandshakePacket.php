@@ -3,6 +3,7 @@
 namespace SMProxy\MysqlPacket;
 
 use SMProxy\MysqlPacket\Util\BufferUtil;
+use SMProxy\MysqlPacket\Util\Capabilities;
 
 /**
  * MySql握手包.
@@ -21,6 +22,7 @@ class HandshakePacket extends MySQLPacket
     public $serverCharsetIndex;
     public $serverStatus;
     public $restOfScrambleBuff;
+    public $pluginName = 'mysql_native_password';
 
     public function read(BinaryPacket $bin)
     {
@@ -37,7 +39,12 @@ class HandshakePacket extends MySQLPacket
         $this->serverCharsetIndex = $mm->read();
         $this->serverStatus = $mm->readUB2();
         $mm->move(13);
-        $this->restOfScrambleBuff = $mm->readBytesWithNull();
+        if ($this ->serverCapabilities & Capabilities::CLIENT_SECURE_CONNECTION) {
+            $this->restOfScrambleBuff = $mm->readBytesWithNull();
+        }
+        if ($this ->serverCapabilities & Capabilities::CLIENT_PLUGIN_AUTH) {
+            $this->pluginName         = $mm->readStringWithNull();
+        }
 
         return $this;
     }
@@ -55,9 +62,19 @@ class HandshakePacket extends MySQLPacket
         BufferUtil::writeUB2($buffer, $this->serverCapabilities);
         $buffer[] = $this->serverCharsetIndex;
         BufferUtil::writeUB2($buffer, $this->serverStatus);
-        $buffer = array_merge($buffer, self::$FILLER_13);
-        BufferUtil::writeWithNull($buffer, $this->restOfScrambleBuff);
-
+        if ($this ->serverCapabilities & Capabilities::CLIENT_PLUGIN_AUTH) {
+            BufferUtil::writeUB2($buffer, $this->serverCapabilities);
+            $buffer[] = max(13, count($this->seed) + count($this->restOfScrambleBuff) + 1);
+            $buffer = array_merge($buffer, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        } else {
+            $buffer = array_merge($buffer, self::$FILLER_13);
+        }
+        if ($this ->serverCapabilities & Capabilities::CLIENT_SECURE_CONNECTION) {
+            BufferUtil::writeWithNull($buffer, $this->restOfScrambleBuff);
+        }
+        if ($this ->serverCapabilities & Capabilities::CLIENT_PLUGIN_AUTH) {
+            BufferUtil::writeWithNull($buffer, getBytes($this->pluginName));
+        }
         return $buffer;
     }
 
@@ -68,8 +85,14 @@ class HandshakePacket extends MySQLPacket
         $size += 5; // 1+4
         $size += count($this->seed); // 8
         $size += 19; // 1+2+1+2+13
-        $size += count($this->restOfScrambleBuff); // 12
-        ++$size; // 1
+        if ($this ->serverCapabilities & Capabilities::CLIENT_SECURE_CONNECTION) {
+            $size += count($this->restOfScrambleBuff); // 12
+            ++$size; // 1
+        }
+        if ($this ->serverCapabilities & Capabilities::CLIENT_PLUGIN_AUTH) {
+            $size += strlen($this->pluginName);
+            ++$size; // 1
+        }
         return $size;
     }
 

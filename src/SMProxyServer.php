@@ -55,7 +55,7 @@ class SMProxyServer extends BaseServer
     {
         $this->go(function () use ($server, $fd, $reactor_id, $data) {
             if (!isset($this->source[$fd]->auth)) {
-                throw new SMProxyException('Cannot connect SMProxy send message!');
+                throw new SMProxyException('Must be connected before sending data!');
             }
             $packages = $this->packageSplit($data, $this->source[$fd]->auth ?: false);
             foreach ($packages as $package) {
@@ -68,8 +68,9 @@ class SMProxyServer extends BaseServer
                         $checkPassword = $this->source[$fd]
                             ->checkPassword($authPacket->password, CONFIG['server']['password']);
                         if (CONFIG['server']['user'] != $authPacket->user || !$checkPassword) {
-                            $message = "Access denied for user '" . $authPacket->user . "'";
-                            $errMessage = $this->writeErrMessage(2, $message, ErrorCode::ER_NO_SUCH_USER);
+                            $message = 'SMProxy access denied for user \'' . $authPacket->user . '\'@\'' .
+                                $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
+                            $errMessage = $this->writeErrMessage(2, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
                             $mysql_log = Log::getLogger('mysql');
                             $mysql_log->error($message);
                             if ($server->exist($fd)) {
@@ -174,7 +175,7 @@ class SMProxyServer extends BaseServer
                             } else {
                                 $message = 'Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
                                     ' is not exists!';
-                                $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR);
+                                $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
                                 $mysql_log = Log::getLogger('mysql');
                                 $mysql_log->error($message);
                                 if ($server->exist($fd)) {

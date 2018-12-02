@@ -111,14 +111,15 @@ abstract class BaseServer extends Base
         }
     }
 
-    protected function writeErrMessage(int $id, string $msg, int $errno = 0)
+    protected function writeErrMessage(int $id, string $msg, int $errno = 0, $sqlState = 'HY000')
     {
         $err = new ErrorPacket();
         $err->packetId = $id;
         if ($errno) {
             $err->errno = $errno;
         }
-        $err->message = array_iconv($msg);
+        $err->sqlState = $sqlState;
+        $err->message  = array_iconv($msg);
 
         return $err->write();
     }

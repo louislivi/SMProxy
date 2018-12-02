@@ -15,17 +15,17 @@ class Bootstrap
     public function bootstrap()
     {
         // 判断php版本
-        if (PHP_VERSION < 7.0) {
+        if (version_compare(PHP_VERSION, '7.0', '<')) {
             smproxy_error('ERROR: PHP version must be greater than 7.0!');
         }
 
         // 判断swoole版本
         if (defined('SWOOLE_VERSION')) {
-            if (SWOOLE_VERSION < 2.1) {
+            if (version_compare(SWOOLE_VERSION, '2.0', '<')) {
                 smproxy_error('ERROR: Swoole version must be greater than 2.1!');
             }
         } else {
-            exit('ERROR: Swoole not installed!');
+            smproxy_error('ERROR: Swoole not installed!');
         }
     }
 }
