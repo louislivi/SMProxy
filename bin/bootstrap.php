@@ -7,12 +7,13 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-
+// Define constants
 define('IN_PHAR', boolval(Phar::running(false)));
 define('ROOT', IN_PHAR ? dirname(Phar::running(false)) : realpath(__DIR__ . '/..'));
 define('DB_DELIMITER', 'SΜ');
 define('SMPROXY_VERSION', IN_PHAR ? '@phar-version@' : absorb_version_from_git());
 
+// Set global error handler
 set_error_handler('_error_handler', E_ALL | E_STRICT);
 
 // Check requirements - PHP
