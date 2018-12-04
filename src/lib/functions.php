@@ -115,23 +115,23 @@ function shr16(int $x, int $bits)
 function initConfig(string $dir)
 {
     $config = [];
-    if (is_dir($dir)) {
-        //打开
-        if ($dh = @opendir($dir)) {
-            //读取
-            while (false !== ($file = readdir($dh))) {
-                if ('.' != $file && '..' != $file && !is_dir($file) &&
-                    '.json' == substr($file, -5, 5)) {
-                    $file_config = json_decode(file_get_contents($dir . $file), true);
-                    if (is_array($file_config)) {
-                        $config = array_merge($config, $file_config);
-                    }
-                }
-            }
-            //关闭
-            closedir($dh);
+
+    $dir = realpath($dir);
+    if (!is_dir($dir)) {
+        throw new RuntimeException('Cannot find config dir.');
+    }
+
+    $paths = glob($dir . '/*.json');
+
+    foreach($paths as $path) {
+        $item = json_decode(file_get_contents($path), true);
+        if (is_array($item)) {
+            $config = array_merge($config, $item);
+        } else {
+            throw new InvalidArgumentException('Invalid config.');
         }
     }
+
     //计算worker_num
     if (isset($config['server']['swoole']['worker_num'])) {
         $config['server']['swoole']['worker_num'] = eval('return ' . $config['server']['swoole']['worker_num'] . ';');
