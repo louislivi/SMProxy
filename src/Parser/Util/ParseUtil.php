@@ -280,8 +280,8 @@ final class ParseUtil
         return $offset;
     }
 
-    private const JSON = 'json';
-    private const EQ = '=';
+    const JSON = 'json';
+    const EQ = '=';
 
     //private static final string WHERE = "where";
     //private static final string SET = "set";
