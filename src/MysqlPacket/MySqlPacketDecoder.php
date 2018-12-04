@@ -20,7 +20,10 @@ class MySqlPacketDecoder
     /**
      * MySql外层结构解包.
      *
-     * @throws SMProxyException
+     * @param string $data
+     *
+     * @return \SMProxy\MysqlPacket\BinaryPacket
+     * @throws \SMProxy\SMProxyException
      */
     public function decode(string $data)
     {

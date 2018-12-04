@@ -294,15 +294,14 @@ class MySQLPool
     /**
      * 断重链.
      *
-     * @param $server
-     * @param $fd
-     * @param $chan
-     * @param $conn
-     * @param $connName
+     * @param \swoole_server      $server
+     * @param int                 $fd
+     * @param \SMProxy\MysqlProxy $conn
+     * @param string              $connName
      *
      * @return mixed
      *
-     * @throws MySQLException
+     * @throws \SMProxy\MysqlPool\MySQLException
      * @throws \SMProxy\SMProxyException
      */
     public static function reconnect(\swoole_server $server, int $fd, MysqlProxy $conn, string $connName)

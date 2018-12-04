@@ -59,7 +59,6 @@ class Command
      * 处理命令
      *
      * @param string $command
-     * @param string $command2
      */
     protected function commandHandler(string $command)
     {

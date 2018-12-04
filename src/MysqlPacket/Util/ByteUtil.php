@@ -55,9 +55,9 @@ class ByteUtil
     /**
      * this is for the String.
      *
-     * @param $data
+     * @param array $data
      *
-     * @return
+     * @return int|mixed
      */
     public static function readLength(array $data)
     {

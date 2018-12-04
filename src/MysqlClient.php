@@ -34,11 +34,10 @@ abstract class MysqlClient extends Base
      * @param string $host
      * @param int    $port
      * @param float  $timeout
-     * @param int    $flag
      *
      * @return \Swoole\Coroutine\Client
      *
-     * @throws SMProxyException
+     * @throws \SMProxy\SMProxyException
      */
     public function connect(string $host, int $port, float $timeout = 0.1)
     {

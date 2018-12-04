@@ -29,7 +29,10 @@ final class ParseUtil
     /**
      * <code>'abc'</code>.
      *
+     * @param string $stmt
      * @param int offset stmt.charAt(offset) == first <code>'</code>
+     *
+     * @return string
      */
     private static function parsestring(string $stmt, int $offset)
     {
@@ -78,7 +81,10 @@ final class ParseUtil
     /**
      * <code>"abc"</code>.
      *
+     * @param string $stmt
      * @param int offset stmt.charAt(offset) == first <code>"</code>
+     *
+     * @return string
      */
     private static function parsestring2(string $stmt, int $offset)
     {
@@ -128,7 +134,10 @@ final class ParseUtil
     /**
      * <code>AS `abc`</code>.
      *
-     * @param offset stmt.charAt(offset) == first <code>`</code>
+     * @param string $stmt
+     * @param int    $offset
+     *
+     * @return string
      */
     private static function parseIdentifierEscape(string $stmt, int $offset)
     {
@@ -153,7 +162,9 @@ final class ParseUtil
     }
 
     /**
-     * @param aliasIndex for <code>AS id</code>, index of 'i'
+     * @param string $stmt
+     * @param int    $aliasIndex
+     * @return bool|null|string
      */
     public static function parseAlias(string $stmt, int $aliasIndex)
     {
@@ -227,6 +238,9 @@ final class ParseUtil
 
     /*****
      * 检查下一个字符是否为分隔符，并把偏移量加1
+     * @param string $stmt
+     * @param int    $offset
+     * @return bool
      */
     public static function nextCharIsSep(string $stmt, int $offset)
     {
@@ -290,8 +304,7 @@ final class ParseUtil
      * 检查下一个字符串是否json= *
      *
      * @param string $stmt 被解析的sql
-     * @param string offset 被解析的sql的当前位置
-     *
+     * @param int    $offset
      * @return int 如果包含指定的字符串，则移动相应的偏移量，否则返回值=offset
      */
     public static function nextstringIsJsonEq(string $stmt, int $offset)

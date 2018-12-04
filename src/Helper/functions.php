@@ -29,7 +29,7 @@ function getBytes(string $data)
 /**
  * 获取 string.
  *
- * @param $data
+ * @param array $bytes
  *
  * @return string
  */
@@ -87,6 +87,8 @@ function getMysqlPackSize(int $size)
  *
  * @param int $x    要进行操作的数字
  * @param int $bits 右移位数
+ *
+ * @return int
  */
 function shr16(int $x, int $bits)
 {
@@ -205,7 +207,9 @@ function mk_log_dir(string &$path)
  * 对数据进行编码转换.
  *
  * @param array/string $data   数组
- * @param string       $output 转换后的编码
+ * @param string $output 转换后的编码
+ *
+ * @return array|null|string|string[]
  */
 function array_iconv($data, string $output = 'utf-8')
 {

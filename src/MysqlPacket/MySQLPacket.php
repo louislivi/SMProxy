@@ -176,9 +176,6 @@ abstract class MySQLPacket
     /**
      * 把数据包写到buffer中，如果buffer满了就把buffer通过前端连接写出。
      *
-     * @param $buffer
-     * @param $c
-     *
      * @throws \Exception
      */
     public function write()

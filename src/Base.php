@@ -42,11 +42,11 @@ class Base extends Context
     /**
      * 格式化配置项.
      *
-     * @param int $server_port
+     * @param array $_config
      *
      * @return array
      *
-     * @throws SMProxyException
+     * @throws \SMProxy\SMProxyException
      */
     public function parseDbConfig(array $_config)
     {
