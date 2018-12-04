@@ -20,7 +20,6 @@ abstract class MysqlClient extends Base
     /**
      * MysqlClient constructor.
      *
-     * @throws SMProxyException
      */
     public function __construct()
     {

@@ -27,7 +27,6 @@ class ServerCommand
      * 启动服务
      *
      * @throws \ErrorException
-     * @throws \SMProxy\SMProxyException
      */
     public function start()
     {

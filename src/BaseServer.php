@@ -24,7 +24,6 @@ abstract class BaseServer extends Base
     /**
      * BaseServer constructor.
      *
-     * @throws \ErrorException
      */
     public function __construct()
     {

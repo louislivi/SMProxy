@@ -194,10 +194,9 @@ class SMProxyServer extends BaseServer
     /**
      * 客户端断开连接.
      *
-     * @param $server
-     * @param $fd
+     * @param \swoole_server $server
+     * @param int            $fd
      *
-     * @throws MySQLException
      */
     public function onClose(\swoole_server $server, int $fd)
     {

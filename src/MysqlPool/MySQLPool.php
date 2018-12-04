@@ -54,10 +54,8 @@ class MySQLPool
      * 回收连接。
      *
      * @param MysqlProxy $conn
-     * @param bool $busy
+     * @param bool       $busy
      *
-     * @throws MySQLException
-     * @throws \SMProxy\SMProxyException
      */
     public static function recycle(MysqlProxy $conn, bool $busy = true)
     {
@@ -238,8 +236,6 @@ class MySQLPool
      * @param Client $cli
      * @param string $connName
      *
-     * @throws MySQLException
-     * @throws \SMProxy\SMProxyException
      */
     public static function destruct(Client $cli, string $connName)
     {
