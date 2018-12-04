@@ -89,9 +89,7 @@ final class ParseUtil
     private static function parsestring2(string $stmt, int $offset)
     {
         $sb = '';
-        for (++$offset;
-             $offset < strlen($stmt);
-             ++$offset) {
+        for (++$offset; $offset < strlen($stmt); ++$offset) {
             $c = $stmt = [$offset];
             if ('\\' == $c) {
                 switch ($c = $stmt[++$offset]) {
@@ -142,9 +140,7 @@ final class ParseUtil
     private static function parseIdentifierEscape(string $stmt, int $offset)
     {
         $sb = '';
-        for (++$offset;
-             $offset < strlen($stmt);
-             ++$offset) {
+        for (++$offset; $offset < strlen($stmt); ++$offset) {
             $c = $stmt[$offset];
             if ('`' == $c) {
                 if ($offset + 1 < strlen($stmt) && '`' == $stmt[$offset + 1]) {
@@ -334,8 +330,7 @@ final class ParseUtil
     public static function move(string $stmt, int $offset, int $length)
     {
         $stmtLen = strlen($stmt);
-        $i = $offset;
-        for (; $i < $stmtLen; ++$i) {
+        for ($i = $offset; $i < $stmtLen; ++$i) {
             switch ($stmt[$i]) {
                 case ' ':
                 case "\t":
@@ -357,8 +352,7 @@ final class ParseUtil
     public static function compare(string $s, int $offset, $keyword)
     {
         if (strlen($s) >= $offset + count($keyword)) {
-            for ($i = 0; $i < count($keyword);
-                 ++$i, ++$offset) {
+            for ($i = 0; $i < count($keyword); ++$i, ++$offset) {
                 if (strtoupper($s[$offset]) != $keyword[$i]) {
                     return false;
                 }
