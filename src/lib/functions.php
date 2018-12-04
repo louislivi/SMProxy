@@ -111,7 +111,7 @@ function initConfig(string $dir)
 
     $paths = glob($dir . '/*.json');
 
-    foreach($paths as $path) {
+    foreach ($paths as $path) {
         $item = json_decode(file_get_contents($path), true);
         if (is_array($item)) {
             $config = array_merge($config, $item);
