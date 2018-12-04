@@ -47,12 +47,7 @@ function getString(array $bytes)
  */
 function array_copy(array $array, int $start, int $len)
 {
-    $newArray = [];
-    for ($i = 0; $i < $len; ++$i) {
-        $newArray[] = $array[$start + $i];
-    }
-
-    return $newArray;
+    return array_slice($array, $start, $len);
 }
 
 /**
