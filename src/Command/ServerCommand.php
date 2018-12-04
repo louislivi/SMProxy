@@ -7,6 +7,8 @@
 
 namespace SMProxy\Command;
 
+use function SMProxy\Helper\smproxy_error;
+
 class ServerCommand
 {
     public $logo;

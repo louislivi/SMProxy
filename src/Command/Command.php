@@ -7,7 +7,9 @@
 
 namespace SMProxy\Command;
 
+use function SMProxy\Helper\initConfig;
 use SMProxy\Helper\PhpHelper;
+use function SMProxy\Helper\smproxy_error;
 
 class Command
 {

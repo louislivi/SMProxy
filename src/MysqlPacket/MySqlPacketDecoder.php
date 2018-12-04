@@ -2,6 +2,7 @@
 
 namespace SMProxy\MysqlPacket;
 
+use function SMProxy\Helper\getBytes;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\Util\ByteUtil;
 use SMProxy\SMProxyException;

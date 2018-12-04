@@ -2,6 +2,9 @@
 
 namespace SMProxy\MysqlPacket\Util;
 
+use function SMProxy\Helper\getBytes;
+use function SMProxy\Helper\getString;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/31

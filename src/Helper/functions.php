@@ -5,6 +5,8 @@
  * Time: 下午5:33.
  */
 
+namespace SMProxy\Helper;
+
 /**
  * 获取bytes 数组.
  *

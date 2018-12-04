@@ -7,6 +7,8 @@
 
 namespace SMProxy\Handler\Frontend;
 
+use function SMProxy\Helper\getBytes;
+use function SMProxy\Helper\getString;
 use SMProxy\MysqlPacket\HandshakePacket;
 use SMProxy\MysqlPacket\Util\Capabilities;
 use SMProxy\MysqlPacket\Util\CharsetUtil;

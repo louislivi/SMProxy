@@ -2,6 +2,9 @@
 
 namespace SMProxy\MysqlPacket;
 
+use function SMProxy\Helper\array_copy;
+use function SMProxy\Helper\getBytes;
+use function SMProxy\Helper\getMysqlPackSize;
 use SMProxy\MysqlPacket\Util\BufferUtil;
 use SMProxy\MysqlPacket\Util\Capabilities;
 

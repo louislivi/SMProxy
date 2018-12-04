@@ -3,6 +3,8 @@
 namespace SMProxy;
 
 use SMProxy\Handler\Backend\BackendAuthenticator;
+use function SMProxy\Helper\getBytes;
+use function SMProxy\Helper\getString;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;
 use SMProxy\MysqlPacket\BinaryPacket;

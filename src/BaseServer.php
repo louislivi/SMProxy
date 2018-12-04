@@ -2,7 +2,9 @@
 
 namespace SMProxy;
 
+use function SMProxy\Helper\array_iconv;
 use SMProxy\Helper\ProcessHelper;
+use function SMProxy\Helper\smproxy_error;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\ErrorPacket;
 use Swoole\Coroutine;

@@ -2,6 +2,7 @@
 
 namespace SMProxy\MysqlPacket;
 
+use function SMProxy\Helper\getBytes;
 use SMProxy\MysqlPacket\Util\BufferUtil;
 use SMProxy\MysqlPacket\Util\Capabilities;
 

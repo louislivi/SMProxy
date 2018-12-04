@@ -5,6 +5,9 @@
  * Time: 下午2:33.
  */
 
+use function SMProxy\Helper\absorb_version_from_git;
+use function SMProxy\Helper\smproxy_error;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Define constants

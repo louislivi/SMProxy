@@ -25,12 +25,12 @@
         "eaglewu/swoole-ide-helper": "dev-master"
     },
     "autoload": {
-        "files": [
-            "src/lib/functions.php"
-        ],
         "psr-4": {
             "SMProxy\\": "src/"
-        }
+        },
+        "files": [
+            "src/Helper/functions.php"
+        ]
     },
     "scripts": {
         "post-autoload-dump": [

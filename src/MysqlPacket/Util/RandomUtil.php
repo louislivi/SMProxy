@@ -7,6 +7,8 @@
 
 namespace SMProxy\MysqlPacket\Util;
 
+use function SMProxy\Helper\shr16;
+
 /**
  * 随机数类.
  *

@@ -4,6 +4,8 @@ namespace SMProxy;
 
 use SMProxy\Handler\Frontend\FrontendAuthenticator;
 use SMProxy\Handler\Frontend\FrontendConnection;
+use function SMProxy\Helper\getString;
+use function SMProxy\Helper\initConfig;
 use SMProxy\Helper\ProcessHelper;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;

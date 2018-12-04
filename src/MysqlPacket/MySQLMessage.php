@@ -2,6 +2,9 @@
 
 namespace SMProxy\MysqlPacket;
 
+use function SMProxy\Helper\array_copy;
+use function SMProxy\Helper\getString;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/25

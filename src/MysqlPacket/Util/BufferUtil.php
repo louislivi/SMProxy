@@ -2,6 +2,8 @@
 
 namespace SMProxy\MysqlPacket\Util;
 
+use function SMProxy\Helper\shr16;
+
 /**
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/10/25
