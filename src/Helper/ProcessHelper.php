@@ -7,8 +7,6 @@
 
 namespace SMProxy\Helper;
 
-use SMProxy\Log\Log;
-
 /**
  * 进程帮助类
  *
