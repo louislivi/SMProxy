@@ -179,7 +179,7 @@ abstract class MySQLPacket
      * @param $buffer
      * @param $c
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function write()
     {
@@ -190,7 +190,7 @@ abstract class MySQLPacket
      * @param $buffer
      * @param $ctx
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function writeBuf($buffer, $ctx)
     {
