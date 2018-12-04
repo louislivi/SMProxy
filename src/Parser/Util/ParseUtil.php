@@ -180,8 +180,9 @@ final class ParseUtil
                 return self::parseIdentifierEscape($stmt, $aliasIndex);
             default:
                 $offset = $aliasIndex;
-                for ($stmtLen = strlen($stmt); $offset < $stmtLen && CharTypes::isIdentifierChar($stmt[$offset]);
-                ++$offset) {
+                $stmtLen = strlen($stmt);
+                while ($offset < $stmtLen && CharTypes::isIdentifierChar($stmt[$offset])) {
+                    $offset++;
                 }
 
                 return substr($stmt, $aliasIndex, $offset);
@@ -195,8 +196,7 @@ final class ParseUtil
         switch ($stmt[$n]) {
             case '/':
                 if ($len > ++$n && '*' == $stmt[$n++] && $len > $n + 1 && '!' != $stmt[$n]) {
-                    for ($i = $n; $i < $len;
-                         ++$i) {
+                    for ($i = $n; $i < $len; ++$i) {
                         if ('*' == $stmt[$i]) {
                             $m = $i + 1;
                             if ($len > $m && '/' == $stmt[$m]) {
@@ -207,8 +207,7 @@ final class ParseUtil
                 }
                 break;
             case '#':
-                for ($i = $n + 1; $i < $len;
-                     ++$i) {
+                for ($i = $n + 1; $i < $len; ++$i) {
                     if ("\n" == $stmt[$i]) {
                         return $i;
                     }
