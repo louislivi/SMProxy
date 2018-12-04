@@ -28,7 +28,7 @@ class PhpHelper
      */
     public static function isMac(): bool
     {
-        return \stripos(PHP_OS, 'Darwin') !== false;
+        return php_uname('s') === 'Darwin';
     }
 
     /**
