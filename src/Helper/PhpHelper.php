@@ -41,18 +41,10 @@ class PhpHelper
      */
     public static function call($cb, array $args = [])
     {
-        $ret = null;
-        if (\is_object($cb) || (\is_string($cb) && \function_exists($cb))) {
-            $ret = $cb(...$args);
-        } elseif (\is_array($cb)) {
-            list($obj, $mhd) = $cb;
-            $ret = \is_object($obj) ? $obj->$mhd(...$args) : $obj::$mhd(...$args);
+        if (version_compare(SWOOLE_VERSION, '4.0', '>=')) {
+            $ret = call_user_func_array($cb, $args);
         } else {
-            if (version_compare(SWOOLE_VERSION, '4.0', '>=')) {
-                $ret = call_user_func_array($cb, $args);
-            } else {
-                $ret = \Swoole\Coroutine::call_user_func_array($cb, $args);
-            }
+            $ret = \Swoole\Coroutine::call_user_func_array($cb, $args);
         }
 
         return $ret;
