@@ -108,7 +108,7 @@ function initConfig(string $dir)
 
     $dir = realpath($dir);
     if (!is_dir($dir)) {
-        throw new RuntimeException('Cannot find config dir.');
+        throw new \RuntimeException('Cannot find config dir.');
     }
 
     $paths = glob($dir . '/*.json');
@@ -118,7 +118,7 @@ function initConfig(string $dir)
         if (is_array($item)) {
             $config = array_merge($config, $item);
         } else {
-            throw new InvalidArgumentException('Invalid config.');
+            throw new \InvalidArgumentException('Invalid config.');
         }
     }
 
