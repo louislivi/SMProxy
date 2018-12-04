@@ -33,14 +33,7 @@ function getBytes(string $data)
  */
 function getString(array $bytes)
 {
-    $string = '';
-    $count = count($bytes);
-    for ($i = 0; $i < $count; ++$i) {
-        $str = chr($bytes[$i]);
-        $string .= $str;
-    }
-
-    return $string;
+    return implode(array_map('chr', $bytes));
 }
 
 /**
