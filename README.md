@@ -115,6 +115,7 @@ Options:
 测试SMProxy与测试MySQL完全一致，MySQL怎么连接，SMProxy就怎么连接。
 
 推荐先采用命令行测试：
+(请勿使用MYSQL8.0客户端链接测试)
 
 ```
 mysql -uroot -p123456 -P3366 -h127.0.0.1
@@ -210,7 +211,9 @@ QQ群：722124111
 
 ## MySQL8.0
 
-`MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件, 如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
+### `SMProxy1.2.4`以上可直接使用
+### `SMProxy1.2.4`以下需要做兼容处理
+`MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件，其他版本如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
 ```SQL
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 flush privileges;

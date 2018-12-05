@@ -15,6 +15,7 @@ use SMProxy\MysqlPacket\Util\Capabilities;
 use SMProxy\MysqlPacket\Util\CharsetUtil;
 use SMProxy\MysqlPacket\Util\ErrorCode;
 use SMProxy\MysqlPacket\Util\SecurityUtil;
+use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPool\MySQLPool;
 use Swoole\Coroutine\Client;
 
@@ -153,12 +154,14 @@ class MysqlProxy extends MysqlClient
                                 case 'caching_sha2_password':
                                     $password = SecurityUtil::scrambleSha256($this->account['password'], $this ->salt);
                                     break;
-    //                            case 'sha256_password':
-    //                                break;
-    //                            case 'mysql_old_password':
-    //                                break;
+                                case 'sha256_password':
+                                    new MySQLException('Sha256_password plugin is not supported yet');
+                                    break;
+                                case 'mysql_old_password':
+                                    new MySQLException('mysql_old_password plugin is not supported yet');
+                                    break;
                                 case 'mysql_clear_password':
-                                    $password = $this->account['password'];
+                                    $password = getString(array_merge(getBytes($this->account['password']),[0]));
                                     break;
                                 default:
                                     $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);

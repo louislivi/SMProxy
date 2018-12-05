@@ -34,17 +34,15 @@ class Base extends Context
                     unset(self::$pool[\Swoole\Coroutine::getuid()]);
                 }
             } catch (SMProxyException $SMProxyException) {
-                if (CONFIG['server']['swoole']['daemonize'] == true) {
-                    $system_log = Log::getLogger('system');
-                    $system_log->warning($SMProxyException->errorMessage());
-                } else {
+                $system_log = Log::getLogger('system');
+                $system_log->warning($SMProxyException->errorMessage());
+                if (CONFIG['server']['swoole']['daemonize'] != true) {
                     echo $SMProxyException->errorMessage(), PHP_EOL;
                 }
             } catch (MySQLException $MySQLException) {
-                if (CONFIG['server']['swoole']['daemonize'] == true) {
-                    $system_log = Log::getLogger('mysql');
-                    $system_log->warning($MySQLException->errorMessage());
-                } else {
+                $system_log = Log::getLogger('mysql');
+                $system_log->warning($MySQLException->errorMessage());
+                if (CONFIG['server']['swoole']['daemonize'] != true) {
                     echo $MySQLException->errorMessage(), PHP_EOL;
                 }
             }

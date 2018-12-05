@@ -129,6 +129,7 @@ Options:
 Testing SMProxy is exactly the same as testing MySQL. How to connect MySQL, how to connect SMProxy.
 
 It is recommended to use the command line test first:
+(Do not use the MYSQL8.0 client link test)
 
 ```
 mysql -uroot -p123456 -P3366 -h127.0.0.1
@@ -225,6 +226,8 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 
 ## MySQL8.0
 
+### `SMProxy1.2.4` can be used directly
+### `SMProxy1.2.4` The following needs to be compatible
 `MySQL-8.0` uses the more secure `caching_sha2_password` plugin by default. If it is upgraded from `5.x`, you can use all the `MySQL` functions directly. For example, if you are creating a new `MySQL`, you need to enter `MySQL. `The command line performs the following operations to be compatible:
 ```SQL
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
