@@ -161,7 +161,7 @@ class MysqlProxy extends MysqlClient
                                     new MySQLException('mysql_old_password plugin is not supported yet');
                                     break;
                                 case 'mysql_clear_password':
-                                    $password = getString(array_merge(getBytes($this->account['password']),[0]));
+                                    $password = getString(array_merge(getBytes($this->account['password']), [0]));
                                     break;
                                 default:
                                     $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);
