@@ -3,6 +3,7 @@
 namespace SMProxy;
 
 use SMProxy\Log\Log;
+use SMProxy\MysqlPool\MySQLException;
 
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -16,7 +17,7 @@ class Base extends Context
      *
      * @param $function
      */
-    protected function go(\Closure $function)
+    protected static function go(\Closure $function)
     {
         if (-1 !== \Swoole\Coroutine::getuid()) {
             $pool = self::$pool[\Swoole\Coroutine::getuid()] ?? false;
@@ -33,8 +34,19 @@ class Base extends Context
                     unset(self::$pool[\Swoole\Coroutine::getuid()]);
                 }
             } catch (SMProxyException $SMProxyException) {
-                $system_log = Log::getLogger('system');
-                $system_log->warning($SMProxyException->errorMessage());
+                if (CONFIG['server']['swoole']['daemonize'] == true) {
+                    $system_log = Log::getLogger('system');
+                    $system_log->warning($SMProxyException->errorMessage());
+                } else {
+                    echo $SMProxyException->errorMessage(), PHP_EOL;
+                }
+            } catch (MySQLException $MySQLException) {
+                if (CONFIG['server']['swoole']['daemonize'] == true) {
+                    $system_log = Log::getLogger('mysql');
+                    $system_log->warning($MySQLException->errorMessage());
+                } else {
+                    echo $MySQLException->errorMessage(), PHP_EOL;
+                }
             }
         });
     }
@@ -80,15 +92,10 @@ class Base extends Context
                         $config['databases'][$s_key . DB_DELIMITER . $key]['serverInfo']['account'] =
                             $config['account'][$value['account']];
                     } else {
-                        $mysql_log = Log::getLogger('system');
-                        $mysql_log->error('config serverInfo->' . $s_key .
-                            '->account is not exists!');
                         throw new SMProxyException('config serverInfo->' . $s_key . '->account is not exists!');
                     }
                 }
             } else {
-                $mysql_log = Log::getLogger('system');
-                $mysql_log->error('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
                 throw new SMProxyException('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
             }
             unset($config['databases'][$key]);

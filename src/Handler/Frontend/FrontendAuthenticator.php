@@ -30,7 +30,7 @@ class FrontendAuthenticator
         $hs = new HandshakePacket();
         $hs->packetId = 0;
         $hs->protocolVersion = Versions::PROTOCOL_VERSION;
-        $hs->serverVersion = getBytes(Versions::SERVER_VERSION);
+        $hs->serverVersion   = Versions::SERVER_VERSION;
         $hs->threadId = $server_id;
         $hs->seed = $rand1;
         $hs->serverCapabilities = $this->getServerCapabilities();

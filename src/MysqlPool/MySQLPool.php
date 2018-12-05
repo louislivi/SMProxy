@@ -2,7 +2,7 @@
 
 namespace SMProxy\MysqlPool;
 
-use SMProxy\Log\Log;
+use SMProxy\Base;
 use SMProxy\MysqlProxy;
 use Swoole\Coroutine\Client;
 
@@ -11,7 +11,7 @@ use Swoole\Coroutine\Client;
  * Date: 2018/11/6
  * Time: 上午10:52.
  */
-class MySQLPool
+class MySQLPool extends Base
 {
     protected static $init = false;
     protected static $spareConns = [];
@@ -42,8 +42,6 @@ class MySQLPool
             self::$resumeFetchCount[$name]  = 0;
             self::$initConnCount[$name] = 0;
             if ($config['maxSpareConns'] <= 0 || $config['maxConns'] <= 0) {
-                $mysql_log = Log::getLogger('mysql');
-                $mysql_log->warning("Invalid maxSpareConns or maxConns in {$name}");
                 throw new MySQLException("Invalid maxSpareConns or maxConns in {$name}");
             }
         }
@@ -59,10 +57,8 @@ class MySQLPool
      */
     public static function recycle(MysqlProxy $conn, bool $busy = true)
     {
-        go(function () use ($conn, $busy) {
+        self::go(function () use ($conn, $busy) {
             if (!self::$init) {
-                $mysql_log = Log::getLogger('mysql');
-                $mysql_log->warning('Should call MySQLPool::init.');
                 throw new MySQLException('Should call MySQLPool::init.');
             }
             $id = spl_object_hash($conn);
@@ -71,8 +67,6 @@ class MySQLPool
                 if (isset(self::$busyConns[$connName][$id])) {
                     unset(self::$busyConns[$connName][$id]);
                 } else {
-                    $mysql_log = Log::getLogger('mysql');
-                    $mysql_log->warning('Unknow MySQL connection.');
                     throw new MySQLException('Unknow MySQL connection.');
                 }
             }
@@ -114,13 +108,9 @@ class MySQLPool
     public static function fetch(string $connName, \swoole_server $server, int $fd)
     {
         if (!self::$init) {
-            $mysql_log = Log::getLogger('mysql');
-            $mysql_log->warning('Should call MySQLPool::init!');
             throw new MySQLException('Should call MySQLPool::init!');
         }
         if (!isset(self::$connsConfig[$connName])) {
-            $mysql_log = Log::getLogger('mysql');
-            $mysql_log->warning("Unvalid connName: {$connName}.");
             throw new MySQLException("Unvalid connName: {$connName}.");
         }
         $connsPool = &self::$spareConns[$connName];
@@ -146,8 +136,6 @@ class MySQLPool
             $client = self::coPop(self::$yieldChannel[$connName], self::$connsConfig[$connName]['serverInfo']['timeout']);
             if (false === $client) {
                 --self::$pendingFetchCount[$connName];
-                $mysql_log = Log::getLogger('mysql');
-                $mysql_log->warning('Reach max connections! Cann\'t pending fetch!');
                 throw new MySQLException('Reach max connections! Cann\'t pending fetch!');
             }
             --self::$resumeFetchCount[$connName];
@@ -187,7 +175,7 @@ class MySQLPool
      * @throws MySQLException
      * @throws \SMProxy\SMProxyException
      */
-    public static function initConn(\swoole_server $server, int $fd, string $connName)
+    public static function initConn(\swoole_server $server, int $fd, string $connName, $tryStep = 0)
     {
         ++self::$initConnCount[$connName];
         $chan = new \Swoole\Coroutine\Channel(1);
@@ -208,25 +196,24 @@ class MySQLPool
             $serverInfo['port'],
             $serverInfo['timeout'] ?? 0.1
         )) {
-            $mysql_log = Log::getLogger('mysql');
-            $mysql_log->warning('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
             throw new MySQLException('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
         }
         $timeout_message = 'Connection ' . $serverInfo['host'] . ':' . $serverInfo['port'] .
             ' waiting timeout, timeout=' . $serverInfo['timeout'];
-        $client = self::coPop($chan, $serverInfo['timeout']);
+        $client = self::coPop($chan, $serverInfo['timeout'] * 3);
         if ($client === false) {
             --self::$initConnCount[$connName];
-            $mysql_log = Log::getLogger('mysql');
-            $mysql_log->warning($timeout_message);
-            throw new MySQLException($timeout_message);
+            if ($tryStep < 3) {
+                return self::initConn($server, $fd, $connName, ++$tryStep);
+            } else {
+                throw new MySQLException($timeout_message);
+            }
         }
         $id = spl_object_hash($client);
         self::$connsNameMap[$id] = $connName;
         self::$busyConns[$connName][$id] = $client;
         self::$lastConnsTime[$id] = microtime(true);
         --self::$initConnCount[$connName];
-
         return $client;
     }
 
@@ -239,7 +226,7 @@ class MySQLPool
      */
     public static function destruct(Client $cli, string $connName)
     {
-        go(function () use ($cli, $connName) {
+        self::go(function () use ($cli, $connName) {
             if ($cli->isConnected()) {
                 $cli ->close();
             }

@@ -20,6 +20,8 @@ class OkPacket extends MySQLPacket
     public static $FIELD_COUNT = 0x00;
     public static $OK = [7, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0];
     public static $AUTH_OK = [7, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0];
+    public static $FAST_AUTH_OK = [7, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0];
+    public static $FULL_AUTH_OK = [7, 0, 0, 6, 0, 0, 0, 2, 0, 0, 0];
 
     public $fieldCount = 0x00;
     public $affectedRows;

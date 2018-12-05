@@ -83,11 +83,13 @@ class BufferUtil
         }
     }
 
-    public static function writeWithNull(array &$buffer, $src)
+    public static function writeWithNull(array &$buffer, $src, $null = true)
     {
         $src = is_array($src) ? $src : [$src];
         $buffer = array_merge($buffer, $src);
-        $buffer[] = 0;
+        if ($null) {
+            $buffer[] = 0;
+        }
     }
 
     public static function writeWithLength(array &$buffer, $src, int $nullValue = 0)

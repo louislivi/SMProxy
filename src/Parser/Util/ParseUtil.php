@@ -89,7 +89,8 @@ final class ParseUtil
     private static function parsestring2(string $stmt, int $offset)
     {
         $sb = '';
-        for (++$offset; $offset < strlen($stmt); ++$offset) {
+        $stmtLen = strlen($stmt);
+        for (++$offset; $offset < $stmtLen; ++$offset) {
             $c = $stmt = [$offset];
             if ('\\' == $c) {
                 switch ($c = $stmt[++$offset]) {
@@ -140,7 +141,7 @@ final class ParseUtil
     private static function parseIdentifierEscape(string $stmt, int $offset)
     {
         $sb = '';
-        for (++$offset; $offset < strlen($stmt); ++$offset) {
+        for (++$offset,$stemLen = strlen($stmt); $offset < $stemLen; ++$offset) {
             $c = $stmt[$offset];
             if ('`' == $c) {
                 if ($offset + 1 < strlen($stmt) && '`' == $stmt[$offset + 1]) {

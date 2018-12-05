@@ -34,6 +34,7 @@ class BackendAuthenticator
         $flag |= Capabilities::CLIENT_TRANSACTIONS;
         // flag |= Capabilities::CLIENT_RESERVED;
         $flag |= Capabilities::CLIENT_SECURE_CONNECTION;
+        $flag |= Capabilities::CLIENT_PLUGIN_AUTH;
         // client extension
         // 不允许MULTI协议
         // flag |= Capabilities::CLIENT_MULTI_STATEMENTS;

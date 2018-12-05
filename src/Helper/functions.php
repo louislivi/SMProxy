@@ -61,24 +61,9 @@ function array_copy(array $array, int $start, int $len)
  */
 function getMysqlPackSize(int $size)
 {
-    if ($size <= 255) {
-        $sizeData[] = $size;
-        $sizeData[] = 0;
-        $sizeData[] = 0;
-    } else {
-        $sizeData[] = 255;
-        if ($size - 255 > 0) {
-            $sizeData[] = $size - 255;
-        } else {
-            $sizeData[] = $size;
-        }
-        if ($size - 255 - 255 > 0) {
-            $sizeData[] = $size - 255 - 255;
-        } else {
-            $sizeData[] = $size;
-        }
-    }
-
+    $sizeData[] = $size & 0xff;
+    $sizeData[] = shr16($size & 0xff << 8, 8);
+    $sizeData[] = shr16($size & 0xff << 16, 16);
     return $sizeData;
 }
 
@@ -276,6 +261,66 @@ function smproxy_error($message, $exitCode = 0)
     if (!$prefixExists || 'ERROR' == $parts[0]) {
         exit($exitCode);
     }
+}
+
+/**
+ * 处理粘包问题.
+ *
+ * @param string $data
+ * @param bool $auth
+ * @param int $headerLength 是否认证通过
+ * @param bool $isClient 是否是客户端
+ *
+ * @return array
+ */
+function packageSplit(string $data, bool $auth, $headerLength = 4, $isClient = false)
+{
+    if (strlen($data) == getPackageLength($data, 0, $headerLength)) {
+        return [$data];
+    }
+    $packages = [];
+    $split = function ($data, &$packages, $step = 0) use (&$split, $headerLength, $isClient) {
+        if (isset($data[$step]) && 0 != ord($data[$step])) {
+            $packageLength = getPackageLength($data, $step, $headerLength);
+            if ($isClient) {
+                $packageLength ++;
+            }
+            $packages[] = substr($data, $step, $packageLength);
+            $split($data, $packages, $step + $packageLength);
+        }
+    };
+    if ($auth) {
+        $split($data, $packages);
+    } else {
+        $packageLength = getPackageLength($data, 0, 3) + 1;
+        $packages[] = substr($data, 0, $packageLength);
+        if (isset($data[$packageLength]) && 0 != ord($data[$packageLength])) {
+            $split($data, $packages, $packageLength);
+        }
+    }
+
+    return $packages;
+}
+
+/**
+ * 获取包长
+ *
+ * @param string $data
+ * @param int    $step
+ * @param int    $offset
+ *
+ * @return int
+ */
+function getPackageLength(string $data, int $step, int $offset)
+{
+    $i = ord($data[$step]);
+    $i |= ord($data[$step + 1]) << 8;
+    $i |= ord($data[$step + 2]) << 16;
+    if ($offset >= 4) {
+        $i |= ord($data[$step + 3]) << 24;
+    }
+
+    return $i + $offset;
 }
 
 /**

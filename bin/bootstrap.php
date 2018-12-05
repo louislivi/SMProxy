@@ -17,7 +17,7 @@ define('DB_DELIMITER', 'SΜ');
 define('SMPROXY_VERSION', IN_PHAR ? '@phar-version@' : absorb_version_from_git());
 
 // Set global error handler
-// set_error_handler('_error_handler', E_ALL | E_STRICT);
+set_error_handler('SMProxy\Helper\_error_handler', E_ALL | E_STRICT);
 
 // Check requirements - PHP
 if (version_compare(PHP_VERSION, '7.0', '<')) {
@@ -26,7 +26,7 @@ if (version_compare(PHP_VERSION, '7.0', '<')) {
 
 // Check requirements - Swoole
 if (extension_loaded('swoole') && defined('SWOOLE_VERSION')) {
-    if (version_compare(SWOOLE_VERSION, '2.0', '<')) {
+    if (version_compare(SWOOLE_VERSION, '2.1', '<')) {
         smproxy_error('ERROR: Swoole version must be greater than 2.1!');
     }
 } else {

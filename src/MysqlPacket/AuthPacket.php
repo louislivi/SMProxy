@@ -24,6 +24,8 @@ class AuthPacket extends MySQLPacket
     public $user;
     public $password;
     public $database = 0;
+    public $pluginName = 'mysql_native_password';
+    public $serverCapabilities;
 
     public function read(BinaryPacket $bin)
     {
@@ -51,31 +53,43 @@ class AuthPacket extends MySQLPacket
 
     public function write()
     {
-        $data = getMysqlPackSize($this->calcPacketSize());
+        $data = getMysqlPackSize($this ->calcPacketSize());
         $data[] = $this->packetId;
         BufferUtil::writeUB4($data, $this->clientFlags);
         BufferUtil::writeUB4($data, $this->maxPacketSize);
         $data[] = $this->charsetIndex;
+
         $data = array_merge($data, self::$FILLER);
+
         if (null == $this->user) {
             $data[] = 0;
         } else {
-            $userData = getBytes($this->user);
-            BufferUtil::writeWithNull($data, $userData);
+            BufferUtil::writeWithNull($data, getBytes($this->user));
         }
         if (null == $this->password) {
-            $data[] = 0;
+            $authResponseLength  = 0;
+            $authResponse = 0;
         } else {
-            BufferUtil::writeWithLength($data, $this->password);
+            $authResponseLength  = count($this->password);
+            $authResponse = $this->password;
         }
-        if (null == $this->database) {
-            $data[] = 0;
+        if ($this ->clientFlags & Capabilities::CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA) {
+                BufferUtil::writeLength($data, $authResponseLength);
+                BufferUtil::writeWithNull($data, $authResponse, false);
+        } else if ($this ->clientFlags & Capabilities::CLIENT_SECURE_CONNECTION) {
+                $data[] = $authResponseLength;
+                BufferUtil::writeWithNull($data, $authResponse, false);
         } else {
+            BufferUtil::writeWithNull($data, $authResponse);
+        }
+
+        if ($this ->clientFlags & Capabilities::CLIENT_CONNECT_WITH_DB) {
             $database = getBytes($this->database);
             BufferUtil::writeWithNull($data, $database);
         }
-        BufferUtil::writeWithNull($data, getBytes('mysql_native_password'));
-
+        if ($this ->clientFlags & Capabilities::CLIENT_PLUGIN_AUTH) {
+            BufferUtil::writeWithNull($data, getBytes($this->pluginName));
+        }
         return $data;
     }
 
@@ -83,9 +97,16 @@ class AuthPacket extends MySQLPacket
     {
         $size = 32; // 4+4+1+23;
         $size += (null == $this->user) ? 1 : strlen($this->user) + 1;
+        if ($this ->clientFlags & Capabilities::CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA) {
+            $size += BufferUtil::getLength(count($this->password)) - 1;
+        }
         $size += (null == $this->password) ? 1 : BufferUtil::getLength($this->password);
-        $size += (null == $this->database) ? 1 : strlen($this->database) + 1;
-        $size += strlen('mysql_native_password') + 1;
+        if ($this ->clientFlags & Capabilities::CLIENT_CONNECT_WITH_DB) {
+            $size += (null == $this->database) ? 1 : strlen($this->database) + 1;
+        }
+        if ($this ->clientFlags & Capabilities::CLIENT_PLUGIN_AUTH) {
+            $size += strlen($this ->pluginName) + 1;
+        }
 
         return $size;
     }

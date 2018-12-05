@@ -6,6 +6,7 @@ use SMProxy\Handler\Frontend\FrontendAuthenticator;
 use SMProxy\Handler\Frontend\FrontendConnection;
 use function SMProxy\Helper\getString;
 use function SMProxy\Helper\initConfig;
+use function SMProxy\Helper\packageSplit;
 use SMProxy\Helper\ProcessHelper;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;
@@ -55,14 +56,14 @@ class SMProxyServer extends BaseServer
      */
     public function onReceive(\swoole_server $server, int $fd, int $reactor_id, string $data)
     {
-        $this->go(function () use ($server, $fd, $reactor_id, $data) {
+        self::go(function () use ($server, $fd, $reactor_id, $data) {
             if (!isset($this->source[$fd]->auth)) {
                 throw new SMProxyException('Must be connected before sending data!');
             }
-            $packages = $this->packageSplit($data, $this->source[$fd]->auth ?: false);
+            $packages = packageSplit($data, $this->source[$fd]->auth ?: false);
             foreach ($packages as $package) {
                 $data = $package;
-                $this->go(function () use ($server, $fd, $reactor_id, $data) {
+                self::go(function () use ($server, $fd, $reactor_id, $data) {
                     $bin = (new MySqlPacketDecoder())->decode($data);
                     if (!$this->source[$fd]->auth) {
                         $authPacket = new AuthPacket();
@@ -73,12 +74,10 @@ class SMProxyServer extends BaseServer
                             $message = 'SMProxy access denied for user \'' . $authPacket->user . '\'@\'' .
                                 $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
                             $errMessage = $this->writeErrMessage(2, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
-                            $mysql_log = Log::getLogger('mysql');
-                            $mysql_log->error($message);
                             if ($server->exist($fd)) {
                                 $server->send($fd, getString($errMessage));
                             }
-                            return null;
+                            throw new MySQLException($message);
                         } else {
                             if ($server->exist($fd)) {
                                 $server->send($fd, getString(OkPacket::$AUTH_OK));
@@ -178,11 +177,10 @@ class SMProxyServer extends BaseServer
                                 $message = 'Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
                                     ' is not exists!';
                                 $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
-                                $mysql_log = Log::getLogger('mysql');
-                                $mysql_log->error($message);
                                 if ($server->exist($fd)) {
                                     $server->send($fd, getString($errMessage));
                                 }
+                                throw new MySQLException($message);
                             }
                         }
                     }
@@ -230,90 +228,34 @@ class SMProxyServer extends BaseServer
     /**
      * WorkerStart.
      *
-     * @param $server
-     * @param $worker_id
-     *
-     * @throws MySQLException
-     * @throws SMProxyException
+     * @param \swoole_server $server
+     * @param int $worker_id
      */
     public function onWorkerStart(\swoole_server $server, int $worker_id)
     {
-        if ($worker_id >= CONFIG['server']['swoole']['worker_num']) {
-            ProcessHelper::setProcessTitle('SMProxy task process');
-        } else {
-            ProcessHelper::setProcessTitle('SMProxy worker process');
-        }
-        $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
-        //初始化链接
-        MySQLPool::init($this->dbConfig);
-        if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
-            try {
-                Coroutine::sleep(0.1);
-                $this ->setStartConns();
-            } catch (MySQLException $exception) {
-                $server ->shutdown();
-                echo 'ERROR:' . $exception ->getMessage(), PHP_EOL;
-                return;
+        self::go(function () use ($server, $worker_id) {
+            if ($worker_id >= CONFIG['server']['swoole']['worker_num']) {
+                ProcessHelper::setProcessTitle('SMProxy task process');
+            } else {
+                ProcessHelper::setProcessTitle('SMProxy worker process');
             }
-            $system_log = Log::getLogger('system');
-            $system_log->info('Worker started!');
-            echo 'Worker started!', PHP_EOL;
-        }
-    }
-
-    /**
-     * 处理粘包问题.
-     *
-     * @param string $data
-     * @param bool   $auth 是否通过认证
-     *
-     * @return array
-     */
-    protected function packageSplit(string $data, bool $auth)
-    {
-        if (strlen($data) == $this->getPackageLength($data, 0, 4)) {
-            return [$data];
-        }
-        $packages = [];
-        $split = function ($data, &$packages, $step = 0) use (&$split) {
-            if (isset($data[$step]) && 0 != ord($data[$step])) {
-                $packageLength = $this->getPackageLength($data, $step, 4);
-                $packages[] = substr($data, $step, $packageLength);
-                $split($data, $packages, $step + $packageLength);
+            $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
+            //初始化链接
+            MySQLPool::init($this->dbConfig);
+            if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
+                try {
+                    Coroutine::sleep(0.1);
+                    $this ->setStartConns();
+                } catch (MySQLException $exception) {
+                    $server ->shutdown();
+                    echo 'ERROR:' . $exception ->getMessage(), PHP_EOL;
+                    return;
+                }
+                $system_log = Log::getLogger('system');
+                $system_log->info('Worker started!');
+                echo 'Worker started!', PHP_EOL;
             }
-        };
-        if ($auth) {
-            $split($data, $packages);
-        } else {
-            $packageLength = $this->getPackageLength($data, 0, 3) + 1;
-            $packages[] = substr($data, 0, $packageLength);
-            if (isset($data[$packageLength]) && 0 != ord($data[$packageLength])) {
-                $split($data, $packages, $packageLength);
-            }
-        }
-
-        return $packages;
-    }
-
-    /**
-     * 获取包长
-     *
-     * @param string $data
-     * @param int    $step
-     * @param int    $offset
-     *
-     * @return int
-     */
-    private function getPackageLength(string $data, int $step, int $offset)
-    {
-        $i = ord($data[$step]);
-        $i |= ord($data[$step + 1]) << 8;
-        $i |= ord($data[$step + 2]) << 16;
-        if ($offset >= 4) {
-            $i |= ord($data[$step + 3]) << 24;
-        }
-
-        return $i + $offset;
+        });
     }
 
     /**
@@ -332,7 +274,7 @@ class SMProxyServer extends BaseServer
             $test_client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
             if (!$test_client->connect($value['serverInfo']['host'], $value['serverInfo']['port'], $value['serverInfo']['timeout'])) {
                 throw new MySQLException('connect ' . explode(DB_DELIMITER, $key)[0] .
-                      ' ' . explode(DB_DELIMITER, $key)[1] . ' failed. Error: ' . $test_client->errCode . "\n");
+                      ' ' . explode(DB_DELIMITER, $key)[1] . ' failed, ErrorCode: ' . $test_client->errCode . "\n");
             }
             $test_client->close();
             //初始化连接

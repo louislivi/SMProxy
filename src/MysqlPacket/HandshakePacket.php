@@ -24,6 +24,7 @@ class HandshakePacket extends MySQLPacket
     public $serverStatus;
     public $restOfScrambleBuff;
     public $pluginName = 'mysql_native_password';
+    public $authDataLength;
 
     public function read(BinaryPacket $bin)
     {
@@ -33,20 +34,19 @@ class HandshakePacket extends MySQLPacket
         $mm->length = $this->packetLength;
         $mm->move(4);
         $this->protocolVersion = $mm->read();
-        $this->serverVersion = $mm->readBytesWithNull();
+        $this->serverVersion = $mm->readStringWithNull();
         $this->threadId = $mm->readUB4();
         $this->seed = $mm->readBytesWithNull();
         $this->serverCapabilities = $mm->readUB2();
         $this->serverCharsetIndex = $mm->read();
         $this->serverStatus = $mm->readUB2();
-        $mm->move(13);
+        $this->serverCapabilities |= $mm->readUB2();
+        $this->authDataLength = $mm->read();
+        $mm->move(10);
         if ($this ->serverCapabilities & Capabilities::CLIENT_SECURE_CONNECTION) {
             $this->restOfScrambleBuff = $mm->readBytesWithNull();
         }
-        if ($this ->serverCapabilities & Capabilities::CLIENT_PLUGIN_AUTH) {
-            $this->pluginName         = $mm->readStringWithNull();
-        }
-
+        $this->pluginName             = $mm->readStringWithNull();
         return $this;
     }
 
@@ -57,7 +57,7 @@ class HandshakePacket extends MySQLPacket
         BufferUtil::writeUB3($buffer, $this->calcPacketSize());
         $buffer[] = $this->packetId;
         $buffer[] = $this->protocolVersion;
-        BufferUtil::writeWithNull($buffer, $this->serverVersion);
+        BufferUtil::writeWithNull($buffer, getBytes($this->serverVersion));
         BufferUtil::writeUB4($buffer, $this->threadId);
         BufferUtil::writeWithNull($buffer, $this->seed);
         BufferUtil::writeUB2($buffer, $this->serverCapabilities);
@@ -82,7 +82,7 @@ class HandshakePacket extends MySQLPacket
     public function calcPacketSize()
     {
         $size = 1;
-        $size += count($this->serverVersion); // n
+        $size += strlen($this->serverVersion); // n
         $size += 5; // 1+4
         $size += count($this->seed); // 8
         $size += 19; // 1+2+1+2+13
