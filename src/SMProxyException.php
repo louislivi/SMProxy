@@ -11,8 +11,6 @@ class SMProxyException extends \Exception
 {
     public function errorMessage()
     {
-        $errorMsg = 'Error  on line ' . $this->getLine() . ',in' . $this->getFile() . ' ' . $this->getMessage();
-
-        return $errorMsg;
+        return sprintf('ERROR: %s (%s:%s)', $this->getMessage(), $this->getFile(), $this->getLine());
     }
 }
