@@ -199,30 +199,105 @@ QQ group: 722124111
 The configuration files are located in the `smproxy/conf` directory, the uppercase `ROOT` represents the SMProxy root directory.
 
 ### database.json
-
-| account information                                           | serverInfo service information                                                        | databases database connection pool information    |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| account.root user ID Corresponds to serverInfo...account.root | serverInfo.server1 Service ID Corresponds to databases..serverInfo                    | databases.dbname database name                    |
-| Account..user username                                        | serverInfo..write read-write separation write write library read read library         | databases..serverInfo service information         |
-| Account..password password                                    | serverInfo..host database connection address\[Array:read and write multiple\]         | databases..maxSpareConns maximum idle connections |
-|                                                               | serverInfo..prot database port                                                        | databases..maxConns maximum number of connections |
-|                                                               | serverInfo..timeout database timeout duration (seconds)                               | databases..charset database encoding format       |
-|                                                               |  serverInfo..account corresponds to databases.account                                 | databases..maxSpareExp Maximum idle time           |                                  
-|                                                               |                                                                                       | databases..startConns service startup connections |
+```json
+{
+  "database": {
+    "account": {
+      "<REQUIRED> Account name": {
+        "user": "<REQUIRED> Database user.",
+        "password": "<REQUIRED> Database password."
+      },
+      "...": "At least one. Account name will be used in serverInfo below."
+    },
+    "serverInfo": {
+      "<REQUIRED> Connection name": {
+        "write": {
+          "host": "<REQUIRED> Master database server hosts (write-only). Use [] if more than one.",
+          "port": "<REQUIRED> Master database server port.",
+          "timeout": "<REQUIRED> Connect timeout.",
+          "account": "<REQUIRED> Account name, should be one in accounts above."
+        },
+        "read": {
+          "host": "<OPTIONAL> Slave database server hosts (read-only). Use [] if more than one.",
+          "port": "<OPTIONAL> Slave database server port.",
+          "timeout": "<OPTIONAL> Connect timeout.",
+          "account": "<OPTIONAL> Account name, should be one in accounts above."
+        }
+      },
+      "...": "<REQUIRED> At least one. Connection name will be used in databases below."
+    },
+    "databases": {
+      "<REQUIRED> Database name": {
+        "serverInfo": "<REQUIRED> Connection name, should be one in serverInfo above.",
+        "maxConns": "<REQUIRED> Max connections. Support expressions evaluating.",
+        "maxSpareConns": "<REQUIRED> Max spare connections. Support expressions evaluating.",
+        "startConns": "<OPTIONAL> Number of connections at starting. Support expressions evaluating.",
+        "maxSpareExp": "<OPTIONAL> Max spare time of idle connections in seconds with default value 0. Support expressions evaluating.",
+        "charset": "<OPTIONAL> Charset of this database."
+      },
+      "...": "At least one. Append more if you need."
+    }
+  }
+}
+```
+- `maxConns`,`maxSpareConns`,`startConns`
+    - It is recommended to set to multiple of `worker_num` configured in `server.json`. (`swoole_cpu_num()*N`)
+- With multiple readable / writable databases
+    - We are now only support random algorithm for retrieving connections. So it is recommended to set `maxConns`, `startConns`, `startConns` at least more than 1 times of `max(master, slave) * worker_num`.
 
 ### server.json
-
-| user service username | password service password | charset service code | host link address | port service port multiple, separated | mode run mode                                                       | sock_type SWOOLE_SOCK_TCP tcp | logs log configuration                    | swoole swoole configuration                  | swoole_client_setting client configuration | swoole_client_sock_setting Client sock configuration                   |
-| --------------------- | ------------------------- | -------------------- | ----------------- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------- | ----------------------------------------- | -------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- |
-|                       |                           |                      |                   |                                       | SWOOLE_PROCESS multi-process mode (default), SWOOLE_BASE basic mode |                               | logs.open log switch                      | worker_num work process number               | package_max_length maximum packet length   | sock_type SWOOLE_SOCK_TCP tcp                                          |
-|                       |                           |                      |                   |                                       |                                                                     |                               | logs.config log configuration item        | max_coro_num maximum number of Ctrips        |                                            | sync_type SWOOLE_SOCK_ASYNC Asynchronous ,SWOOLE_SOCK_SYNC synchronous |
-|                       |                           |                      |                   |                                       |                                                                     |                               | logs.system or MySQL configuration module | open_tcp_nodelay Close Nagle merge algorithm |                                            |                                                                        |
-|                       |                           |                      |                   |                                       |                                                                     |                               | logs..log_path log directory              | daemonize daemonization                      |
-|                       |                           |                      |                   |                                       |                                                                     |                               | logs..log_file log file name              | heartbeat_check_interval heartbeat detection |
-|                       |                           |                      |                   |                                       |                                                                     |                               | logs..format log date format              | heartbeat_idle_time maximum idle time        |                                            |                                                                        |
-|                       |                           |                      |                   |                                       |                                                                     |                               |                                           | reload_async Asynchronous restart            |                                            |                                                                        |
-|                       |                           |                      |                   |                                       |                                                                     |                               |                                           | log_file log directory                       |                                            |                                                                        |
-|                       |                           |                      |                   |                                       |                                                                     |                               |                                           | pid_file main process pid directory          |                                            |                                                                        |
+```json
+{
+  "server": {
+    "user": "必选，SMProxy服务用户",
+    "password": "必选，SMProxy服务密码",
+    "charset": "可选，SMProxy编码，默认utf8mb4",
+    "host": "可选，SMProxy地址，默认0.0.0.0",
+    "port": "可选，SMProxy端口，默认3366 如需多个以`,`隔开",
+    "mode": "可选，SMProxy运行模式，SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式",
+    "sock_type": "可选，sock类型，SWOOLE_SOCK_TCP tcp",
+    "logs": {
+      "open":"必选，日志开关，true 开 false 关",
+      "config": {
+        "system": {
+          "log_path": "必选，SMProxy系统日志目录",
+          "log_file": "必选，SMProxy系统日志文件名",
+          "format": "必选，SMProxy系统日志目录日期格式"
+        },
+        "mysql": {
+          "log_path": "必选，SMProxyMySQL日志目录",
+          "log_file": "必选，SMProxyMySQL日志文件名",
+          "format": "必选，SMProxyMySQL日志目录日期格式"
+        }
+      }
+    },
+    "swoole": {
+      "worker_num": "必选，SWOOLE worker进程数，支持计算",
+      "max_coro_num": "必选，SWOOLE 协程数，推荐不低于3000",
+      "pid_file": "必选，worker进程和manager进程pid目录	",
+      "open_tcp_nodelay": "可选，关闭Nagle合并算法",
+      "daemonize": "可选，守护进程化，true 为守护进程 false 关闭守护进程",
+      "heartbeat_check_interval": "可选，心跳检测",
+      "heartbeat_idle_time": "可选，心跳检测最大空闲时间",
+      "reload_async": "可选，异步重启，true 开启异步重启 false 关闭异步重启",
+      "log_file": "可选，SWOOLE日志目录"
+    },
+    "swoole_client_setting": {
+      "package_max_length": "可选，SWOOLE Client 最大包长，默认16777216MySQL最大支持包长"
+    },
+    "swoole_client_sock_setting": {
+      "sock_type": "可选，SWOOLE Client sock 类型，默认tcp 仅支持tcp"
+    }
+  }
+}
+```
+- `user`,`password`,`port,host`
+    - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
+    - 可随意设置用于`SMProxy`登录验证
+    - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
+    - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
+- `worker_num`
+    - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
 ## MySQL8.0
 
