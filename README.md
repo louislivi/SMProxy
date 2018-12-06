@@ -238,7 +238,7 @@ QQ群：722124111
     "password": "必选，SMProxy服务密码",
     "charset": "可选，SMProxy编码，默认utf8mb4",
     "host": "可选，SMProxy地址，默认0.0.0.0",
-    "port": "可选，SMProxy端口，默认3366",
+    "port": "可选，SMProxy端口，默认3366 如需多个以`,`隔开",
     "mode": "可选，SMProxy运行模式，SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式",
     "sock_type": "可选，sock类型，SWOOLE_SOCK_TCP tcp",
     "logs": {

@@ -109,6 +109,14 @@ function initConfig(string $dir)
         }
     }
 
+    if (!isset($config['server']['host'])) {
+        $config['server']['host'] = '0.0.0.0';
+    }
+
+    if (!isset($config['server']['port'])) {
+        $config['server']['port'] = 3366;
+    }
+
     //计算worker_num
     if (isset($config['server']['swoole']['worker_num'])) {
         $config['server']['swoole']['worker_num'] = eval('return ' . $config['server']['swoole']['worker_num'] . ';');

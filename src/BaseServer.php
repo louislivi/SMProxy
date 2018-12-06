@@ -39,7 +39,7 @@ abstract class BaseServer extends Base
                 $ports = [3366];
             }
             $this->server = new \swoole_server(
-                CONFIG['server']['host'] ?? '0.0.0.0',
+                CONFIG['server']['host'],
                 $ports[0],
                 CONFIG['server']['mode'],
                 CONFIG['server']['sock_type']
@@ -47,7 +47,7 @@ abstract class BaseServer extends Base
             if (count($ports) > 1) {
                 for ($i = 1; $i < count($ports); ++$i) {
                     $this->server->addListener(
-                        CONFIG['server']['host'] ?? '0.0.0.0',
+                        CONFIG['server']['host'],
                         $ports[$i],
                         CONFIG['server']['sock_type']
                     );
