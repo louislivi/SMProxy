@@ -181,38 +181,112 @@ QQ群：722124111
 
 ## 配置文件
 
-配置文件位于 `smproxy/conf` 目录中，其中大写 `ROOT` 代表当前 SMProxy 根目录。
+- 配置文件位于 `smproxy/conf` 目录中，其中大写 `ROOT` 代表当前 SMProxy 根目录。
 
 ### database.json
-
-| account 账号信息                                        | serverInfo 服务信息                                        | databases 数据库连接池信息              |
-| ------------------------------------------------------ | ---------------------------------------------------------- | --------------------------------------- |
-| account.root 用户标识 与 serverInfo...account.root 对应  | serverInfo.server1 服务标识 与  databases..serverInfo 对应 | databases.dbname 数据库名称             |
-| account..user 用户名                                    | serverInfo..write 读写分离 write 写库 read 读库            | databases..serverInfo 服务信息          |
-| account..password 密码                                 | serverInfo..host 数据库连接地址\[数组:多读多写\]             | databases..maxSpareConns 最大空闲连接数  |
-|                                                       | serverInfo..prot 数据库端口                                | databases..maxConns 最大连接数          |
-|                                                       | serverInfo..timeout 数据库超时时长(秒)                      | databases..charset 数据库编码格式        |
-|                                                       | serverInfo..account  与 databases.account 对应            | databases..maxSpareExp 最大空闲时间      |
-|                                                       |                                                          |  databases..startConns 服务启动连接数     |
+```json
+{
+  "database": {
+    "account": {
+      "自定义用户名": {
+        "user": "必选，数据库账户",
+        "password": "必选，数据库密码"
+      },
+      "...":"必选1个，自定义用户名 与serverInfo中的account相对应"
+    },
+    "serverInfo": {
+      "自定义数据库连接信息": {
+        "write": {
+          "host": "必选，写库地址 多个用[]表示",
+          "port": "必选，写库端口",
+          "timeout": "必选，写库连接超时时间（秒）",
+          "account": "必选，自定义用户名 与 account中的自定义用户名相对应"
+        },
+        "read": {
+          "host": "可选，读库地址 多个用[]表示",
+          "port": "可选，读库端口",
+          "timeout": "可选，读库连接超时时间（秒）",
+          "account": "可选，自定义用户名 与 account中的自定义用户名相对应"
+        }
+      },
+      "...":"必选1个，自定义数据库连接信息 与databases中的serverInfo相对应,read读库可不配置"
+    },
+    "databases": {
+      "数据库名称": {
+        "serverInfo": "必选，自定义数据库连接信息 与serverInfo中的自定义数据库连接信息相对应",
+        "maxConns": "必选，该库服务最大连接数，支持计算",
+        "maxSpareConns": "必选，该库服务最大空闲连接数，支持计算",
+        "startConns": "可选，该库服务默认启动连接数，支持计算",
+        "maxSpareExp": "可选，该库服务空闲连接数最大空闲时间（秒），默认为0，支持计算",
+        "charset": "可选，该库编码格式"
+      }
+    }
+  }
+}
+```
+- `maxConns`,`maxSpareConns`,`startConns`
+    - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
+- 多个读库，写库
+    - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
 
 ### server.json
-
-| user 服务用户名 | password 服务密码 | charset 服务编码 | host 链接地址 | port 服务端口 多个以,隔开 | mode 运行模式                                         | sock_type SWOOLE_SOCK_TCP tcp | logs 日志配置                 | swoole swoole配置                  | swoole_client_setting 客户端配置 | swoole_client_sock_setting 客户端sock配置               |
-| --------------- | ----------------- | ---------------- | ------------- | ------------------------- | ----------------------------------------------------- | ----------------------------- | ----------------------------- | ---------------------------------- | -------------------------------- | ------------------------------------------------------- |
-|                 |                   |                  |               |                           | SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式 |                               | logs.open 日志开关            | worker_num work进程数量            | package_max_length 最大包长      | sock_type SWOOLE_SOCK_TCP tcp                           |
-|                 |                   |                  |               |                           |                                                       |                               | logs.config 日志配置项        | max_coro_num 最大携程数            |                                  | sync_type SWOOLE_SOCK_SYNC 同步，SWOOLE_SOCK_ASYNC 异步 |
-|                 |                   |                  |               |                           |                                                       |                               | logs.system or MySQL 配置模块 | open_tcp_nodelay 关闭Nagle合并算法 |                                  |                                                         |
-|                 |                   |                  |               |                           |                                                       |                               | logs..log_path 日志目录       | daemonize 守护进程化               |                                  |                                                         |
-|                 |                   |                  |               |                           |                                                       |                               | logs..log_file 日志文件名     | heartbeat_check_interval 心跳检测  |                                  |                                                         |
-|                 |                   |                  |               |                           |                                                       |                               | logs..format 日志日期格式     | heartbeat_idle_time 最大空闲时间   |                                  |                                                         |
-|                 |                   |                  |               |                           |                                                       |                               |                               | reload_async 异步重启              |                                  |                                                         |
-|                 |                   |                  |               |                           |                                                       |                               |                               | log_file 日志目录                  |                                  |                                                         |
-|                 |                   |                  |               |                           |                                                       |                               |                               | pid_file 主进程pid目录             |                                  |                                                         |
+```json
+{
+  "server": {
+    "user": "必选，SMProxy服务用户",
+    "password": "必选，SMProxy服务密码",
+    "charset": "可选，SMProxy编码，默认utf8mb4",
+    "host": "可选，SMProxy地址，默认0.0.0.0",
+    "port": "可选，SMProxy端口，默认3366",
+    "mode": "可选，SMProxy运行模式，SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式",
+    "sock_type": "可选，sock类型，SWOOLE_SOCK_TCP tcp",
+    "logs": {
+      "open":"必选，日志开关，true 开 false 关",
+      "config": {
+        "system": {
+          "log_path": "必选，SMProxy系统日志目录",
+          "log_file": "必选，SMProxy系统日志文件名",
+          "format": "必选，SMProxy系统日志目录日期格式"
+        },
+        "mysql": {
+          "log_path": "必选，SMProxyMySQL日志目录",
+          "log_file": "必选，SMProxyMySQL日志文件名",
+          "format": "必选，SMProxyMySQL日志目录日期格式"
+        }
+      }
+    },
+    "swoole": {
+      "worker_num": "必选，SWOOLE worker进程数，支持计算",
+      "max_coro_num": "必选，SWOOLE 协程数，推荐不低于3000",
+      "pid_file": "必选，worker进程和manager进程pid目录	",
+      "open_tcp_nodelay": "可选，关闭Nagle合并算法",
+      "daemonize": "可选，守护进程化，true 为守护进程 false 关闭守护进程",
+      "heartbeat_check_interval": "可选，心跳检测",
+      "heartbeat_idle_time": "可选，心跳检测最大空闲时间",
+      "reload_async": "可选，异步重启，true 开启异步重启 false 关闭异步重启",
+      "log_file": "可选，SWOOLE日志目录"
+    },
+    "swoole_client_setting": {
+      "package_max_length": "可选，SWOOLE Client 最大包长，默认16777216MySQL最大支持包长"
+    },
+    "swoole_client_sock_setting": {
+      "sock_type": "可选，SWOOLE Client sock 类型，默认tcp 仅支持tcp"
+    }
+  }
+}
+```
+- `user`,`password`,`port,host`
+    - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
+    - 可随意设置用于`SMProxy`登录验证
+    - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
+    - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
+- `worker_num`
+    - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
 ## MySQL8.0
 
-### `SMProxy1.2.4`以上可直接使用
-### `SMProxy1.2.4`以下需要做兼容处理
+- `SMProxy1.2.4`及以上可直接使用
+- `SMProxy1.2.4`以下需要做兼容处理
 `MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件，其他版本如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
 ```SQL
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
