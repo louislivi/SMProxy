@@ -259,7 +259,7 @@ QQ群：722124111
     "swoole": {
       "worker_num": "必选，SWOOLE worker进程数，支持计算",
       "max_coro_num": "必选，SWOOLE 协程数，推荐不低于3000",
-      "pid_file": "必选，worker进程和manager进程pid目录	",
+      "pid_file": "必选，worker进程和manager进程pid目录",
       "open_tcp_nodelay": "可选，关闭Nagle合并算法",
       "daemonize": "可选，守护进程化，true 为守护进程 false 关闭守护进程",
       "heartbeat_check_interval": "可选，心跳检测",
