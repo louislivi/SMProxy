@@ -249,55 +249,55 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 ```json
 {
   "server": {
-    "user": "必选，SMProxy服务用户",
-    "password": "必选，SMProxy服务密码",
-    "charset": "可选，SMProxy编码，默认utf8mb4",
-    "host": "可选，SMProxy地址，默认0.0.0.0",
-    "port": "可选，SMProxy端口，默认3366 如需多个以`,`隔开",
-    "mode": "可选，SMProxy运行模式，SWOOLE_PROCESS多进程模式（默认），SWOOLE_BASE基本模式",
-    "sock_type": "可选，sock类型，SWOOLE_SOCK_TCP tcp",
+    "user": "<REQUIRED> Username of SMProxy",
+    "password": "<REQUIRED> Password of SMProxy",
+    "charset": "<OPTIONAL> Charset of SMProxy",
+    "host": "<OPTIONAL> Listening address of SMProxy, default 0.0.0.0",
+    "port": "<OPTIONAL> Listensing port of SMProxy, default 3366. Use `,` to separate multiple.",
+    "mode": "<OPTIONAL> Runtime mode, SWOOLE_PROCESS (default, multiple process) or SWOOLE_BASE.",
+    "sock_type": "<OPTIONAL> Socket type, default SWOOLE_SOCK_TCP",
     "logs": {
-      "open":"必选，日志开关，true 开 false 关",
+      "open":"<REQUIRED> True or false to enable / disable logging",
       "config": {
         "system": {
-          "log_path": "必选，SMProxy系统日志目录",
-          "log_file": "必选，SMProxy系统日志文件名",
-          "format": "必选，SMProxy系统日志目录日期格式"
+          "log_path": "<REQUIRED> The directory to put SMProxy logs to",
+          "log_file": "<REQUIRED> The filename of SMProxy logs",
+          "format": "<REQUIRED> Datetime format for the path of SMProxy logs"
         },
         "mysql": {
-          "log_path": "必选，SMProxyMySQL日志目录",
-          "log_file": "必选，SMProxyMySQL日志文件名",
-          "format": "必选，SMProxyMySQL日志目录日期格式"
+          "log_path": "<REQUIRED> The directory to put MySQL logs to",
+          "log_file": "<REQUIRED> The filename of MySQL logs",
+          "format": "<REQUIRED> Datetime format for the path of MySQL logs"
         }
       }
     },
     "swoole": {
-      "worker_num": "必选，SWOOLE worker进程数，支持计算",
-      "max_coro_num": "必选，SWOOLE 协程数，推荐不低于3000",
-      "pid_file": "必选，worker进程和manager进程pid目录	",
-      "open_tcp_nodelay": "可选，关闭Nagle合并算法",
-      "daemonize": "可选，守护进程化，true 为守护进程 false 关闭守护进程",
-      "heartbeat_check_interval": "可选，心跳检测",
-      "heartbeat_idle_time": "可选，心跳检测最大空闲时间",
-      "reload_async": "可选，异步重启，true 开启异步重启 false 关闭异步重启",
-      "log_file": "可选，SWOOLE日志目录"
+      "worker_num": "<REQUIRED> Number of Swoole workers",
+      "max_coro_num": "<REQUIRED> Max number of Swoole coroutines, recommended 3000+",
+      "pid_file": "<REQUIRED> The directory where put PID files to",
+      "open_tcp_nodelay": "<OPTIONAL> True to disable Nagle's algorithms",
+      "daemonize": "<OPTIONAL> True to enable daemonize running",
+      "heartbeat_check_interval": "<OPTIONAL> Interval of health checking for the TCP connections",
+      "heartbeat_idle_time": "<OPTIONAL> Max idle time before the idle connection been closed",
+      "reload_async": "<OPTIONAL> True to enable Asynchronous reloading",
+      "log_file": "<OPTIONAL> The directory where put Swoole logs to"
     },
     "swoole_client_setting": {
-      "package_max_length": "可选，SWOOLE Client 最大包长，默认16777216MySQL最大支持包长"
+      "package_max_length": "<OPTIONAL> Max single package length of Swoole client，default 16777216 (Max length MySQL supported)"
     },
     "swoole_client_sock_setting": {
-      "sock_type": "可选，SWOOLE Client sock 类型，默认tcp 仅支持tcp"
+      "sock_type": "<OPTIONAL> Socket type of Swoole client, only support TCP for now."
     }
   }
 }
 ```
 - `user`,`password`,`port,host`
-    - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
-    - 可随意设置用于`SMProxy`登录验证
-    - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
-    - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
+    - These parameters are for SMProxy server, not MySQL.
+    - Feel free to set to anything you like for authenticating of SMProxy.
+    - E.g. The login command using MySQL cli with default config: `mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
+    - MySQL cli will output `Server version: 5.6.0-SMProxy` when you logged in to SMProxy.
 - `worker_num`
-    - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
+    - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
 
 ## MySQL8.0
 
