@@ -253,7 +253,7 @@ class SMProxyServer extends BaseServer
                 }
                 $system_log = Log::getLogger('system');
                 $system_log->info('Worker started!');
-                fwrite(STDERR, 'Worker started!' . PHP_EOL);
+                echo 'Worker started!', PHP_EOL;
             }
         });
     }

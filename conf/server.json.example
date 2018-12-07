@@ -26,7 +26,7 @@
       "worker_num": "swoole_cpu_num()",
       "max_coro_num": 6000,
       "open_tcp_nodelay": true,
-      "daemonize": 1,
+      "daemonize": true,
       "heartbeat_check_interval": 60,
       "heartbeat_idle_time": 600,
       "reload_async": true,
