@@ -27,19 +27,15 @@
   - [原理](#%E5%8E%9F%E7%90%86)
   - [特性](#%E7%89%B9%E6%80%A7)
   - [设计初衷](#%E8%AE%BE%E8%AE%A1%E5%88%9D%E8%A1%B7)
+  - [性能测试](#%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95)
   - [环境](#%E7%8E%AF%E5%A2%83)
   - [安装](#%E5%AE%89%E8%A3%85)
   - [运行](#%E8%BF%90%E8%A1%8C)
-  - [SMProxy连接测试](#smproxy%E8%BF%9E%E6%8E%A5%E6%B5%8B%E8%AF%95)
-    - [没用框架的 PHP 7.2.6](#%E6%B2%A1%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84-php-726)
-    - [ThinkPHP 5.0](#thinkphp-50)
-    - [Laravel 5.7](#laravel-57)
-    - [MySQL 连接数](#mysql-%E8%BF%9E%E6%8E%A5%E6%95%B0)
-  - [交流](#%E4%BA%A4%E6%B5%81)
-  - [配置文件](#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+  - [配置](#%E9%85%8D%E7%BD%AE)
     - [database.json](#databasejson)
     - [server.json](#serverjson)
   - [MySQL8.0](#mysql80)
+  - [交流](#%E4%BA%A4%E6%B5%81)
   - [其他学习资料](#%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99)
 
 ## Swoole MySQL Proxy
@@ -71,6 +67,10 @@
 
 PHP 没有连接池，所以高并发时数据库会出现连接打满的情况，Mycat 等数据库中间件会出现部分 SQL 无法使用，例如不支持批量添加等，而且过于臃肿。
 所以就自己编写了这个仅支持连接池和读写分离的轻量级中间件，使用 Swoole 协程调度 HandshakeV10 协议转发使程序更加稳定，不用像 Mycat 一样解析所有 SQL 包体，增加复杂度。
+
+## 性能测试
+
+请查阅 [docs/BENCHMARK.md](docs/BENCHMARK.md)。
 
 ## 环境
 
@@ -110,76 +110,7 @@ Options:
 - -v --version                     查看当前服务版本
 - -c --config <configuration_path> 设置配置项目录
 
-## SMProxy连接测试
-
-测试SMProxy与测试MySQL完全一致，MySQL怎么连接，SMProxy就怎么连接。
-
-推荐先采用命令行测试：
-(请勿使用MYSQL8.0客户端链接测试)
-
-```
-mysql -uroot -p123456 -P3366 -h127.0.0.1
-```
-
-也可采用工具连接。
-
-### 没用框架的 PHP 7.2.6
-
-![PHP7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
-
-没用：0.15148401260376,用了：0.040808916091919
-
-未使用连接池: 0.15148401260376
-
-![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
-
-使用连接池: 0.040808916091919
-
-![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
-
-### ThinkPHP 5.0
-
-![ThinkPHP5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
-
-未使用连接池:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542685140126.jpg)
-
-使用连接池:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542685109798.jpg)
-
-### Laravel 5.7
-
-![Laravel5.7](https://file.gesmen.com.cn/smproxy/3FE76B55-9422-40DB-B8CE-7024F36BB5A9.png)
-
-未使用连接池:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542686575874.jpg)
-
-使用连接池:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542686580551.jpg)
-
-### MySQL 连接数
-
-未使用连接池:
-
-![MySQL](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
-
-使用连接池:
-
-![MySQL](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
-
-请以实际压测为准，根数据量，网络环境，数据库配置有关。
-测试中因超出最大连接数会采用协程挂起 等到有连接关闭再恢复协程继续操作，
-所有并发量与配置文件maxConns设置的不合适，会导致比原链接慢，主要是为了控制连接数。
-
-## 交流
-
-QQ群：722124111
-
-## 配置文件
+## 配置
 
 - 配置文件位于 `smproxy/conf` 目录中，其中大写 `ROOT` 代表当前 SMProxy 根目录。
 
@@ -296,6 +227,10 @@ flush privileges;
 将语句中的 `'root'@'%'` 替换成你所使用的用户, `password` 替换成其密码.
 
 如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
+
+## 交流
+
+QQ群：722124111
 
 ## 其他学习资料
 

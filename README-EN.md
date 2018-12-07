@@ -27,19 +27,15 @@ English | [中文](./README.md)
   - [Principle](#principle)
   - [Features](#features)
   - [Why This](#why-this)
-  - [Environment Requirements](#environment-requirements)
+  - [Benchmark](#benchmark)
+  - [Requirements](#requirements)
   - [Installation](#installation)
   - [Usage](#usage)
-  - [Connection Test](#connection-test)
-    - [PHP 7.2.6 Without Framework](#php-726-without-framework)
-    - [ThinkPHP 5.0](#thinkphp-50)
-    - [Laravel 5.7](#laravel-57)
-    - [Number of MySQL Connections](#number-of-mysql-connections)
-  - [Communities & Groups](#communities--groups)
   - [Configuration](#configuration)
     - [database.json](#databasejson)
     - [server.json](#serverjson)
   - [MySQL8.0](#mysql80)
+  - [Community](#community)
   - [More Documentation](#more-documentation)
 
 ## Swoole MySQL Proxy
@@ -85,7 +81,11 @@ So I wrote this lightweight middleware that only supports connection pooling and
 Use the swoole coroutine to schedule HandshakeV10 protocol forwarding to make the program more stable. 
 Do not parse all sql packages like mycat, increasing the complexity.
 
-## Environment Requirements
+## Benchmark
+
+See [docs/BENCHMARK-EN.md](docs/BENCHMARK-EN.md).
+
+## Requirements
 
 - Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
 - PHP 7.0+     ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
@@ -122,77 +122,6 @@ Options:
 - -h --help                        Display help
 - -v --version                     Display version
 - -c --config <configuration_path> Specify configuration path
-
-
-## Connection Test
-
-Testing SMProxy is exactly the same as testing MySQL. How to connect MySQL, how to connect SMProxy.
-
-It is recommended to use the command line test first:
-(Do not use the MYSQL8.0 client link test)
-
-```
-mysql -uroot -p123456 -P3366 -h127.0.0.1
-```
-
-Tool connections are also available.
-
-### PHP 7.2.6 Without Framework
-
-![php7.2.6](https://file.gesmen.com.cn/smproxy/1542782011408.jpg)
-
-Native:0.15148401260376,With SMProxy:0.040808916091919
-
-
-Native: 0.15148401260376
- 
-![ab](https://file.gesmen.com.cn/smproxy/1542782075073.jpg)
-
-With SMProxy: 0.040808916091919
-
-![ab](https://file.gesmen.com.cn/smproxy/1542782043730.jpg)
-
-### ThinkPHP 5.0
-
-![Thinkphp5](https://file.gesmen.com.cn/smproxy/8604B3D4-0AB0-4772-83E0-EEDA6B86F065.png)
-
-Native:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542685140126.jpg)
-
-With SMProxy:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542685109798.jpg)
-
-### Laravel 5.7
-
-![Laravel5.7](https://file.gesmen.com.cn/smproxy/3FE76B55-9422-40DB-B8CE-7024F36BB5A9.png)
-
-Native:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542686575874.jpg)
-
-With SMProxy:
-
-![ab](https://file.gesmen.com.cn/smproxy/1542686580551.jpg)
-
-### Number of MySQL Connections
-
-Native:
-
-![MySQL](https://file.gesmen.com.cn/smproxy/1542625044913.jpg)
-
-With SMProxy:
-
-![MySQL](https://file.gesmen.com.cn/smproxy/1542625037536.jpg)
-
-Please take the actual pressure measurement as the standard, the root data volume, network environment, database configuration.
-In the test, the maximum number of connections will be exceeded, and the coroutine will be suspended. Wait until the connection is closed and the coroutine is resumed.
-All concurrency and the configuration file maxConns are not suitable, which will result in slower than the original link, mainly to control the number of connections.
-
-## Communities & Groups
-
-QQ group: 722124111
 
 ## Configuration
 
@@ -311,6 +240,10 @@ Flush privileges;
 Replace `'root'@'%'` in the statement with the user you are using, and replace `password` with its password.
 
 If it is still not available, set `default_authentication_plugin = mysql_native_password` in my.cnf.
+
+## Community
+
+[![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 
 ## More Documentation
 
