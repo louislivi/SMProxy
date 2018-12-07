@@ -7,6 +7,8 @@
 
 namespace SMProxy\Helper;
 
+use SMProxy\Command\ServerCommand;
+
 /**
  * 获取bytes 数组.
  *
@@ -232,14 +234,17 @@ function array_iconv($data, string $output = 'utf-8')
  */
 function absorb_version_from_git()
 {
-    $tagInfo = \SMProxy\Helper\ProcessHelper::run('git describe --tags HEAD', ROOT)[1];
-    if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $tagInfo, $matches)) {
-        return sprintf('%s@%s', $matches['tag'], $matches['hash']);
-    } elseif ($tagInfo) {
-        return $tagInfo;
-    } else {
-        throw new \RuntimeException('Could not absorb version from git.');
+    $defaultVersion = ServerCommand::SMPROXY_VERSION;
+    $hasGit = \SMProxy\Helper\ProcessHelper::run('type git >/dev/null 2>&1 || { echo >&2 "false" ;}', ROOT)[2];
+    if ($hasGit !== "false") {
+        $tagInfo = \SMProxy\Helper\ProcessHelper::run('git describe --tags HEAD', ROOT)[1];
+        if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $tagInfo, $matches)) {
+            return sprintf('%s@%s', $matches['tag'], $matches['hash']);
+        } elseif ($tagInfo) {
+            return $tagInfo;
+        }
     }
+    return $defaultVersion;
 }
 
 /**

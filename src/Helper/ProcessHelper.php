@@ -70,6 +70,6 @@ class ProcessHelper
         // Close all pipes before proc_close! $code === 0 is success.
         $code = proc_close($process);
 
-        return [$code, $output, $error];
+        return [trim($code), trim($output), trim($error)];
     }
 }

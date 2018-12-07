@@ -113,12 +113,12 @@ class SMProxyServer extends BaseServer
                                     }
                                 } elseif (ServerParse::START == $queryType || ServerParse::BEGIN == $queryType
                                 ) {
-                                    //处理事物
+                                    //处理事务
                                     $this->connectHasTransaction[$fd] = true;
                                     $this->connectReadState[$fd] = false;
                                 } elseif (ServerParse::SET == $queryType && false !== strpos($data, 'autocommit', 4) &&
                                     0 == $trim_data[-1]) {
-                                    //处理autocommit事物
+                                    //处理autocommit事务
                                     $this->connectHasAutoCommit[$fd] = true;
                                     $this->connectHasTransaction[$fd] = true;
                                     $this->connectReadState[$fd] = false;
@@ -127,7 +127,7 @@ class SMProxyServer extends BaseServer
                                     $this->connectHasAutoCommit[$fd] = false;
                                     $this->connectReadState[$fd] = false;
                                 } elseif (ServerParse::COMMIT == $queryType || ServerParse::ROLLBACK == $queryType) {
-                                    //事物提交
+                                    //事务提交
                                     $this->connectHasTransaction[$fd] = false;
                                 } else {
                                     $this->connectReadState[$fd] = false;
@@ -202,7 +202,7 @@ class SMProxyServer extends BaseServer
             unset($this->source[$fd]);
         }
         if (isset($this->connectHasTransaction[$fd]) && true === $this->connectHasTransaction[$fd]) {
-            //回滚未关闭事物
+            //回滚未关闭事务
             $this->mysqlClient[$fd]['write']->client->send(getString([9, 0, 0, 0, 3, 82, 79, 76, 76, 66, 65, 67, 75]));
             unset($this->connectHasTransaction[$fd]);
         }
@@ -253,7 +253,7 @@ class SMProxyServer extends BaseServer
                 }
                 $system_log = Log::getLogger('system');
                 $system_log->info('Worker started!');
-                echo 'Worker started!', PHP_EOL;
+                fwrite(STDERR, 'Worker started!' . PHP_EOL);
             }
         });
     }
@@ -297,10 +297,10 @@ class SMProxyServer extends BaseServer
                 $mysql->setDefer();
                 switch (explode(DB_DELIMITER, $key)[0]) {
                     case 'read':
-                        $mysql->query('select sleep(1)');
+                        $mysql->query('/*SMProxy test sql*/select sleep(0.1)');
                         break;
                     case 'write':
-                        $mysql->query('set autocommit=1');
+                        $mysql->query('/*SMProxy test sql*/set autocommit=1');
                         break;
                 }
                 $clients[] = $mysql;

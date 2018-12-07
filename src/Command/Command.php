@@ -41,8 +41,7 @@ class Command
         $configKey  = array_search('-c', $argv) ?: array_search('--config', $argv);
         if ($configKey) {
             if (!isset($argv[$configKey + 1])) {
-                echo HelpMessage::$version . PHP_EOL . HelpMessage::$usage;
-                exit(0);
+                smproxy_error(HelpMessage::$version . PHP_EOL . HelpMessage::$usage);
             }
             $configPath = $argv[$configKey + 1];
         }
