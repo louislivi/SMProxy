@@ -201,19 +201,29 @@ class SMProxyServer extends BaseServer
         if (isset($this->source[$fd])) {
             unset($this->source[$fd]);
         }
+        $connectHasTransaction = false;
+        $connectHasAutoCommit  = false;
         if (isset($this->connectHasTransaction[$fd]) && true === $this->connectHasTransaction[$fd]) {
             //回滚未关闭事务
-            $this->mysqlClient[$fd]['write']->client->send(getString([9, 0, 0, 0, 3, 82, 79, 76, 76, 66, 65, 67, 75]));
+            $connectHasTransaction = true;
             unset($this->connectHasTransaction[$fd]);
         }
         if (isset($this->connectHasAutoCommit[$fd]) && true === $this->connectHasAutoCommit[$fd]) {
             //开启autocommit=0未关闭
-            $this->mysqlClient[$fd]['write']->client->send(getString([
-                17, 0, 0, 0, 3, 115, 101, 116, 32, 97, 117, 116, 111, 99, 111, 109, 109, 105, 116, 61, 49,
-            ]));
+            $connectHasAutoCommit = true;
             unset($this->connectHasAutoCommit[$fd]);
         }
         if (isset($this->mysqlClient[$fd])) {
+            if ($this->mysqlClient[$fd]['write'] ->client && $this->mysqlClient[$fd]['write'] ->client->isConnected()) {
+                if ($connectHasTransaction) {
+                    $this->mysqlClient[$fd]['write']->client->send(getString([9, 0, 0, 0, 3, 82, 79, 76, 76, 66, 65, 67, 75]));
+                }
+                if ($connectHasAutoCommit) {
+                    $this->mysqlClient[$fd]['write']->client->send(getString([
+                        17, 0, 0, 0, 3, 115, 101, 116, 32, 97, 117, 116, 111, 99, 111, 109, 109, 105, 116, 61, 49,
+                    ]));
+                }
+            }
             foreach ($this->mysqlClient[$fd] as $mysqlClient) {
                 MySQLPool::recycle($mysqlClient);
             }
