@@ -74,12 +74,11 @@ If the maximum number of connections is exceeded, the coroutine will be suspende
 
 ## Why This
 
-PHP does not have a connection pool, so the database will be full when the concurrency is high.
-Database middleware such as mycat will appear some sql can not be used, 
-for example, does not support batch addition, etc., and is too bloated.
-So I wrote this lightweight middleware that only supports connection pooling and read-write separation.
-Use the swoole coroutine to schedule HandshakeV10 protocol forwarding to make the program more stable. 
-Do not parse all sql packages like mycat, increasing the complexity.
+For early design reasons, PHP does not have a native connection pool. So the number of database connections will be easily increasing and reaching the maximum when we got lots of requests. 
+Using one of many database middlewares like Mycat will cause some limitations, e.g. batch inserts. And it's also too heavy in most cases. 
+So we created SMProxy using 100% PHP + Swoole, which only supports connection pool and read/write separation, but much more lightweight. 
+Not like Mycat, we're trying to build SMProxy with Swoole Coroutine to schedule HandshakeV10 packet forwarding, so we don't have to parse all SQL packets. 
+That really makes SMProxy more stable and reliable.
 
 ## Benchmark
 
