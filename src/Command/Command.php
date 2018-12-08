@@ -46,9 +46,18 @@ class Command
             $configPath = $argv[$configKey + 1];
         }
 
+
+        //前台运行
+        $consoleKey  = array_search('--console', $argv);
+        if ($consoleKey) {
+            define('CONSOLE', true);
+        } else {
+            define('CONSOLE', false);
+        }
+
         if (file_exists($configPath)) {
             define('CONFIG_PATH', realpath($configPath) . '/');
-            define('CONFIG', initConfig(realpath(CONFIG_PATH) . '/'));
+            define('CONFIG', initConfig(CONFIG_PATH));
         } else {
             smproxy_error('ERROR: ' . $configPath . ' No such file or directory!');
         }

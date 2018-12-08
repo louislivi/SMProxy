@@ -30,7 +30,7 @@ LOGO;
 
     public static $usage      = <<<'USAGE'
 Usage:
-  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> ]
+  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console ]
   SMProxy -h | --help
   SMProxy -v | --version
 
@@ -46,6 +46,7 @@ Options:
   -h --help                        Display help
   -v --version                     Display version
   -c --config <configuration_path> Specify configuration path
+  --console                        Front desk operation
 
 DESC;
 }

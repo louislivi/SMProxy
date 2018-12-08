@@ -119,6 +119,11 @@ function initConfig(string $dir)
         $config['server']['port'] = 3366;
     }
 
+    //是否为前端运行
+    if (CONSOLE) {
+        $config['server']['swoole']['daemonize'] = false;
+    }
+
     //计算worker_num
     if (isset($config['server']['swoole']['worker_num'])) {
         $config['server']['swoole']['worker_num'] = eval('return ' . $config['server']['swoole']['worker_num'] . ';');
