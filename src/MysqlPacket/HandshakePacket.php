@@ -46,7 +46,7 @@ class HandshakePacket extends MySQLPacket
         if ($this ->serverCapabilities & Capabilities::CLIENT_SECURE_CONNECTION) {
             $this->restOfScrambleBuff = $mm->readBytesWithNull();
         }
-        $this->pluginName             = $mm->readStringWithNull();
+        $this->pluginName             = $mm->readStringWithNull() ?: $this->pluginName;
         return $this;
     }
 

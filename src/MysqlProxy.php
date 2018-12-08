@@ -151,7 +151,7 @@ class MysqlProxy extends MysqlClient
                             $mm->move(5);
                             $pluginName = $mm->readStringWithNull();
                             $this->salt = $mm->readBytesWithNull();
-                            $password = $this->processAuth($pluginName);
+                            $password = $this->processAuth($pluginName ?: 'mysql_native_password');
                             if ($cli->isConnected()) {
                                 $cli->send(getString(array_merge(getMysqlPackSize(count($password)), [3], $password)));
                             }
