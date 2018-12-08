@@ -109,7 +109,7 @@ Options:
 - -h --help                        帮助
 - -v --version                     查看当前服务版本
 - -c --config <configuration_path> 设置配置项目录
-- --console                        前台运行(SMProxy1.2.5+)
+- --console                        前台运行(SMProxy>=1.2.5)
 
 ## 配置
 

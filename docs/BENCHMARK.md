@@ -3,7 +3,7 @@
 测试SMProxy与测试MySQL完全一致，MySQL怎么连接，SMProxy就怎么连接。
 
 推荐先采用命令行测试：
-(请勿使用MYSQL8.0客户端链接测试)
+(SMProxy<1.2.5 请勿使用MYSQL8.0客户端链接测试)
 
 ```
 mysql -uroot -p123456 -P3366 -h127.0.0.1

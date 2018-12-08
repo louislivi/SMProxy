@@ -121,7 +121,7 @@ Options:
 - -h --help                        Display help
 - -v --version                     Display version
 - -c --config <configuration_path> Specify configuration path
-- --console                        Front desk operation(SMProxy1.2.5+)
+- --console                        Front desk operation(SMProxy>=1.2.5)
 
 ## Configuration
 

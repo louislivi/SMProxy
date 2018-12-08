@@ -2,7 +2,7 @@
 
 Benchmark for SMProxy is easily to execute. Connect and test it just like MySQL.
 
-It is recommended to test with the command line first (Do not use MySQL 8.0):
+It is recommended to test with the command line first (SMProxy<1.2.5 Do not use MySQL 8.0):
 
 ```
 mysql -uroot -p123456 -P3366 -h127.0.0.1
