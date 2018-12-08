@@ -21,6 +21,7 @@ class FrontendAuthenticator
     public $seed = [];
     public $auth = false;
     public $database;
+    public $user;
 
     public function getHandshakePacket(int $server_id)
     {
@@ -95,6 +96,7 @@ class FrontendAuthenticator
         $flag |= Capabilities::CLIENT_TRANSACTIONS;
         // flag |= ServerDefs.CLIENT_RESERVED;
         $flag |= Capabilities::CLIENT_SECURE_CONNECTION;
+        $flag |= Capabilities::CLIENT_PLUGIN_AUTH;
 
         return $flag;
     }

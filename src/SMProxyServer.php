@@ -4,6 +4,9 @@ namespace SMProxy;
 
 use SMProxy\Handler\Frontend\FrontendAuthenticator;
 use SMProxy\Handler\Frontend\FrontendConnection;
+use function SMProxy\Helper\array_copy;
+use function SMProxy\Helper\getBytes;
+use function SMProxy\Helper\getMysqlPackSize;
 use function SMProxy\Helper\getString;
 use function SMProxy\Helper\initConfig;
 use function SMProxy\Helper\packageSplit;
@@ -14,6 +17,7 @@ use SMProxy\MysqlPacket\MySqlPacketDecoder;
 use SMProxy\MysqlPacket\MySQLPacket;
 use SMProxy\MysqlPacket\OkPacket;
 use SMProxy\MysqlPacket\Util\ErrorCode;
+use SMProxy\MysqlPacket\Util\RandomUtil;
 use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPool\MySQLPool;
 use SMProxy\Parser\ServerParse;
@@ -66,24 +70,45 @@ class SMProxyServer extends BaseServer
                 self::go(function () use ($server, $fd, $reactor_id, $data) {
                     $bin = (new MySqlPacketDecoder())->decode($data);
                     if (!$this->source[$fd]->auth) {
-                        $authPacket = new AuthPacket();
-                        $authPacket->read($bin);
-                        $checkPassword = $this->source[$fd]
-                            ->checkPassword($authPacket->password, CONFIG['server']['password']);
-                        if (CONFIG['server']['user'] != $authPacket->user || !$checkPassword) {
-                            $message = 'SMProxy access denied for user \'' . $authPacket->user . '\'@\'' .
-                                $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
-                            $errMessage = $this->writeErrMessage(2, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
-                            if ($server->exist($fd)) {
-                                $server->send($fd, getString($errMessage));
+                        if ($bin->data[0] == 20) {
+                            $checkAccount = $this->checkAccount($server, $fd, $this->source[$fd]->user, array_copy($bin->data, 4, 20));
+                            if (!$checkAccount) {
+                                $this ->accessDenied($server, $fd, 4);
+                            } else {
+                                if ($server->exist($fd)) {
+                                    $server->send($fd, getString(OkPacket::$SWITCH_AUTH_OK));
+                                }
+                                $this->source[$fd]->auth = true;
                             }
-                            throw new MySQLException($message);
                         } else {
-                            if ($server->exist($fd)) {
-                                $server->send($fd, getString(OkPacket::$AUTH_OK));
+                            $authPacket = new AuthPacket();
+                            $authPacket->read($bin);
+                            $checkAccount = $this->checkAccount($server, $fd, $authPacket->user, $authPacket->password);
+                            if (!$checkAccount) {
+                                if ($authPacket->pluginName == 'mysql_native_password') {
+                                    $this ->accessDenied($server, $fd, 2);
+                                } else {
+                                    $this->source[$fd]->user = $authPacket ->user;
+                                    $this->source[$fd]->database = $authPacket->database;
+                                    $this->source[$fd]->seed = RandomUtil::randomBytes(20);
+                                    $authSwitchRequest = array_merge(
+                                        [254],
+                                        getBytes('mysql_native_password'),
+                                        [0],
+                                        $this->source[$fd]->seed,
+                                        [0]
+                                    );
+                                    if ($server->exist($fd)) {
+                                        $server->send($fd, getString(array_merge(getMysqlPackSize(count($authSwitchRequest)), [2], $authSwitchRequest)));
+                                    }
+                                }
+                            } else {
+                                if ($server->exist($fd)) {
+                                    $server->send($fd, getString(OkPacket::$AUTH_OK));
+                                }
+                                $this->source[$fd]->auth = true;
+                                $this->source[$fd]->database = $authPacket->database;
                             }
-                            $this->source[$fd]->auth = true;
-                            $this->source[$fd]->database = $authPacket->database;
                         }
                     } else {
                         $trim_data = rtrim($data);
@@ -325,5 +350,42 @@ class SMProxyServer extends BaseServer
             $client->close();
         }
         unset($clients);
+    }
+
+    /**
+     * 验证账号
+     *
+     * @param \swoole_server $server
+     * @param int $fd
+     * @param string $user
+     * @param string $password
+     *
+     * @return bool
+     */
+    private function checkAccount(\swoole_server $server, int $fd, string $user, array $password)
+    {
+        $checkPassword = $this->source[$fd]
+            ->checkPassword($password, CONFIG['server']['password']);
+        return CONFIG['server']['user'] == $user && $checkPassword;
+    }
+
+    /**
+     * 验证账号失败
+     *
+     * @param \swoole_server $server
+     * @param int $fd
+     * @param $serverId
+     *
+     * @throws MySQLException
+     */
+    private function accessDenied(\swoole_server $server, int $fd, $serverId)
+    {
+        $message = 'SMProxy access denied for user \'' . $this->source[$fd]->user . '\'@\'' .
+            $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
+        $errMessage = $this->writeErrMessage($serverId, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
+        if ($server->exist($fd)) {
+            $server->send($fd, getString($errMessage));
+        }
+        throw new MySQLException($message);
     }
 }

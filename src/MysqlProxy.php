@@ -10,6 +10,7 @@ use SMProxy\MysqlPacket\AuthPacket;
 use SMProxy\MysqlPacket\BinaryPacket;
 use SMProxy\MysqlPacket\ErrorPacket;
 use SMProxy\MysqlPacket\HandshakePacket;
+use SMProxy\MysqlPacket\MySQLMessage;
 use SMProxy\MysqlPacket\OkPacket;
 use SMProxy\MysqlPacket\Util\Capabilities;
 use SMProxy\MysqlPacket\Util\CharsetUtil;
@@ -120,6 +121,7 @@ class MysqlProxy extends MysqlClient
                         if ($binaryPacket->data[4] == OkPacket::$FIELD_COUNT) {
                             if (!array_diff_assoc($binaryPacket->data, OkPacket::$AUTH_OK) ||
                                 !array_diff_assoc($binaryPacket->data, OkPacket::$FAST_AUTH_OK) ||
+                                !array_diff_assoc($binaryPacket->data, OkPacket::$SWITCH_AUTH_OK) ||
                                 !array_diff_assoc($binaryPacket->data, OkPacket::$FULL_AUTH_OK)) {
                                 $send = false;
                                 $this->connected = true;
@@ -144,29 +146,20 @@ class MysqlProxy extends MysqlClient
                                 }
                             }
                             $send = false;
+                        } elseif ($binaryPacket ->data[4] == 0xfe) {
+                            $mm = new MySQLMessage($binaryPacket->data);
+                            $mm->move(5);
+                            $pluginName = $mm->readStringWithNull();
+                            $this->salt = $mm->readBytesWithNull();
+                            $password = $this->processAuth($pluginName);
+                            if ($cli->isConnected()) {
+                                $cli->send(getString(array_merge(getMysqlPackSize(count($password)), [3], $password)));
+                            }
+                            $send = false;
                         } elseif (!$this->auth) {
                             $handshakePacket = (new HandshakePacket())->read($binaryPacket);
                             $this ->salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
-                            switch ($handshakePacket ->pluginName) {
-                                case 'mysql_native_password':
-                                    $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);
-                                    break;
-                                case 'caching_sha2_password':
-                                    $password = SecurityUtil::scrambleSha256($this->account['password'], $this ->salt);
-                                    break;
-                                case 'sha256_password':
-                                    new MySQLException('Sha256_password plugin is not supported yet');
-                                    break;
-                                case 'mysql_old_password':
-                                    new MySQLException('mysql_old_password plugin is not supported yet');
-                                    break;
-                                case 'mysql_clear_password':
-                                    $password = getString(array_merge(getBytes($this->account['password']), [0]));
-                                    break;
-                                default:
-                                    $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);
-                                    break;
-                            }
+                            $password = $this->processAuth($handshakePacket ->pluginName);
                             $clientFlag = Capabilities::CLIENT_CAPABILITIES;
                             $authPacket = new AuthPacket();
                             $authPacket->pluginName = $handshakePacket ->pluginName;
@@ -202,6 +195,38 @@ class MysqlProxy extends MysqlClient
                 }
             });
         }
+    }
+
+    /**
+     * 认证
+     *
+     * @param string $pluginName
+     *
+     * @return array
+     */
+    public function processAuth(string $pluginName)
+    {
+        switch ($pluginName) {
+            case 'mysql_native_password':
+                $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);
+                break;
+            case 'caching_sha2_password':
+                $password = SecurityUtil::scrambleSha256($this->account['password'], $this ->salt);
+                break;
+            case 'sha256_password':
+                new MySQLException('Sha256_password plugin is not supported yet');
+                break;
+            case 'mysql_old_password':
+                new MySQLException('mysql_old_password plugin is not supported yet');
+                break;
+            case 'mysql_clear_password':
+                $password = array_merge(getBytes($this->account['password']), [0]);
+                break;
+            default:
+                $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);
+                break;
+        }
+        return $password;
     }
 
     /**

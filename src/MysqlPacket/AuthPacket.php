@@ -47,6 +47,7 @@ class AuthPacket extends MySQLPacket
         if ((0 != ($this->clientFlags & Capabilities::CLIENT_CONNECT_WITH_DB)) && $mm->hasRemaining()) {
             $this->database = $mm->readStringWithNull();
         }
+        $this->pluginName = $mm->readStringWithNull();
 
         return $this;
     }
