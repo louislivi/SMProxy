@@ -96,7 +96,7 @@ class FrontendAuthenticator
         $flag |= Capabilities::CLIENT_TRANSACTIONS;
         // flag |= ServerDefs.CLIENT_RESERVED;
         $flag |= Capabilities::CLIENT_SECURE_CONNECTION;
-        $flag |= Capabilities::CLIENT_PLUGIN_AUTH;
+//        $flag |= Capabilities::CLIENT_PLUGIN_AUTH;
 
         return $flag;
     }
