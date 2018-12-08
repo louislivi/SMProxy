@@ -12,17 +12,17 @@ English | [中文](./README.md)
                                                               |  $$$$$$/
                                                                \______/
 ```
-# [SMProxy](https://github.com/louislivi/smproxy)
+# [SMProxy](https://github.com/louislivi/SMProxy)
 
-[![release](https://img.shields.io/github/release/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/releases)
-[![forks](https://img.shields.io/github/forks/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/network/members)
-[![stars](https://img.shields.io/github/stars/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/stargazers)
-[![Build Status](https://img.shields.io/travis/com/louislivi/smproxy.svg?style=popout-square)](https://travis-ci.com/louislivi/smproxy)
+[![release](https://img.shields.io/github/release/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/releases)
+[![forks](https://img.shields.io/github/forks/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/network/members)
+[![stars](https://img.shields.io/github/stars/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/stargazers)
+[![Build Status](https://img.shields.io/travis/com/louislivi/SMProxy.svg?style=popout-square)](https://travis-ci.com/louislivi/SMProxy)
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
-[![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
-[![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
+[![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
+[![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
 
-- [SMProxy](#smproxy)
+- [SMProxy](#SMProxy)
   - [Swoole MySQL Proxy](#swoole-mysql-proxy)
   - [Principle](#principle)
   - [Features](#features)
@@ -93,12 +93,12 @@ See [docs/BENCHMARK-EN.md](docs/BENCHMARK-EN.md).
 
 (Recommended) Directly download PHAR in latest release:
 
-<https://github.com/louislivi/smproxy/releases/latest>
+<https://github.com/louislivi/SMProxy/releases/latest>
 
 Or use git to checkout any version:
 
 ```bash
-git clone https://github.com/louislivi/smproxy.git
+git clone https://github.com/louislivi/SMProxy.git
 composer install --no-dev # If you want to contribute to this repo, please DO NOT use --no-dev.
 ```
 

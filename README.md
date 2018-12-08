@@ -12,17 +12,17 @@
                                                               |  $$$$$$/
                                                                \______/
 ```
-# [SMProxy](https://github.com/louislivi/smproxy)
+# [SMProxy](https://github.com/louislivi/SMProxy)
 
-[![release](https://img.shields.io/github/release/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/releases)
-[![forks](https://img.shields.io/github/forks/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/network/members)
-[![stars](https://img.shields.io/github/stars/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/stargazers)
-[![Build Status](https://img.shields.io/travis/com/louislivi/smproxy.svg?style=popout-square)](https://travis-ci.com/louislivi/smproxy)
+[![release](https://img.shields.io/github/release/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/releases)
+[![forks](https://img.shields.io/github/forks/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/network/members)
+[![stars](https://img.shields.io/github/stars/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/stargazers)
+[![Build Status](https://img.shields.io/travis/com/louislivi/SMProxy.svg?style=popout-square)](https://travis-ci.com/louislivi/SMProxy)
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
-[![license](https://img.shields.io/github/license/louislivi/smproxy.svg?style=popout-square)](https://github.com/louislivi/smproxy/blob/master/LICENSE)
-[![smproxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/smproxy)
+[![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
+[![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
 
-- [SMProxy](#smproxy)
+- [SMProxy](#SMProxy)
   - [Swoole MySQL Proxy](#swoole-mysql-proxy)
   - [原理](#%E5%8E%9F%E7%90%86)
   - [特性](#%E7%89%B9%E6%80%A7)
@@ -81,12 +81,12 @@ PHP 没有连接池，所以高并发时数据库会出现连接打满的情况�
 
 （推荐）直接下载最新发行版的 PHAR 文件，解压即用：
 
-<https://github.com/louislivi/smproxy/releases/latest>
+<https://github.com/louislivi/SMProxy/releases/latest>
 
 或者使用 Git 切换任意版本：
 
 ```bash
-git clone https://github.com/louislivi/smproxy.git
+git clone https://github.com/louislivi/SMProxy.git
 composer install --no-dev # 如果你想贡献你的代码，请不要使用 --no-dev 参数。
 ```
 
