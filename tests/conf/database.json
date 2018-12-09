@@ -1,0 +1,36 @@
+{
+  "database": {
+    "account": {
+      "root": {
+        "user": "root",
+        "password": "123456"
+      }
+    },
+    "serverInfo": {
+      "server1": {
+        "write": {
+          "host": ["127.0.0.1"],
+          "port": 3306,
+          "timeout": 0.5,
+          "account": "root"
+        },
+        "read": {
+          "host": ["127.0.0.1"],
+          "port": 3306,
+          "timeout": 0.5,
+          "account": "root"
+        }
+      }
+    },
+    "databases": {
+      "mysql": {
+        "serverInfo": "server1",
+        "startConns": "swoole_cpu_num()*10",
+        "maxSpareConns": "swoole_cpu_num()*10",
+        "maxSpareExp": 3600,
+        "maxConns": "swoole_cpu_num()*20",
+        "charset": "utf-8"
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 #!/bin/sh
 
 EXEC="`dirname $0`/../bin/SMProxy"
+CONFIG="`dirname $0`/../tests/conf"
 
-$EXEC start
+$EXEC start -c $CONFIG

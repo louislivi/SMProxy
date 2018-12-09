@@ -37,7 +37,7 @@ script:
     elif [[ $PHAR != "" ]]; then
       composer install --dev
       vendor/bin/box compile
-      ./SMProxy.phar start
+      ./SMProxy.phar start -c tests/conf
       php tests/test.php
     else
       tests/run
