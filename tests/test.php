@@ -8,7 +8,7 @@
 $servername = "127.0.0.1";
 $username = "root";
 $password = "123456";
-$dbname = "mysql";
+$dbname = "";
 $port   = 3366;
 
 // 创建连接
@@ -18,7 +18,7 @@ if ($conn->connect_error) {
     die("连接失败: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM `user`";
+$sql = "SELECT * FROM `mysql`.`user`";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
