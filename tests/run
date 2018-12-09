@@ -2,4 +2,4 @@
 
 EXEC="`dirname $0`/../bin/SMProxy"
 
-$EXEC start && $EXEC stop
+$EXEC start
