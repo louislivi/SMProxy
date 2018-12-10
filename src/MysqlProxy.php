@@ -179,7 +179,7 @@ class MysqlProxy extends MysqlClient
                             $authPacket->serverCapabilities = $handshakePacket ->serverCapabilities;
                             $authPacket->maxPacketSize =
                                 CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
-                            $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf-8');
+                            $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf8mb4');
                             $authPacket->user = $this->account['user'];
                             $authPacket->password = $password;
                             $this->auth = true;

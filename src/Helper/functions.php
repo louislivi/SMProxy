@@ -8,6 +8,7 @@
 namespace SMProxy\Helper;
 
 use SMProxy\Command\ServerCommand;
+use SMProxy\MysqlPacket\Util\CharsetUtil;
 
 /**
  * 获取bytes 数组.
@@ -213,6 +214,7 @@ function mk_log_dir(string &$path)
  */
 function array_iconv($data, string $output = 'utf-8')
 {
+    $output = CharsetUtil::charsetToEncoding($output);
     $encode_arr = ['UTF-8', 'ASCII', 'GBK', 'GB2312', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP'];
     $encoded = mb_detect_encoding($data, $encode_arr);
 

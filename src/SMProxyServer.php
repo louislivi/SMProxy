@@ -199,7 +199,7 @@ class SMProxyServer extends BaseServer
                                     $client->client->send($data);
                                 }
                             } else {
-                                $message = 'Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
+                                $message = 'SMProxy@Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
                                     ' is not exists!';
                                 $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
                                 if ($server->exist($fd)) {
@@ -380,7 +380,7 @@ class SMProxyServer extends BaseServer
      */
     private function accessDenied(\swoole_server $server, int $fd, $serverId)
     {
-        $message = 'SMProxy access denied for user \'' . $this->source[$fd]->user . '\'@\'' .
+        $message = 'SMProxy@access denied for user \'' . $this->source[$fd]->user . '\'@\'' .
             $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
         $errMessage = $this->writeErrMessage($serverId, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
         if ($server->exist($fd)) {

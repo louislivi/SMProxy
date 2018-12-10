@@ -7,7 +7,6 @@
 
 namespace SMProxy\Handler\Frontend;
 
-use function SMProxy\Helper\getBytes;
 use function SMProxy\Helper\getString;
 use SMProxy\MysqlPacket\HandshakePacket;
 use SMProxy\MysqlPacket\Util\Capabilities;
@@ -35,7 +34,7 @@ class FrontendAuthenticator
         $hs->threadId = $server_id;
         $hs->seed = $rand1;
         $hs->serverCapabilities = $this->getServerCapabilities();
-        $hs->serverCharsetIndex = (CharsetUtil::getIndex('utf8mb4') & 0xff);
+        $hs->serverCharsetIndex = (CharsetUtil::getIndex(CONFIG['server']['charset'] ?? 'utf8mb4') & 0xff);
         $hs->serverStatus = 2;
         $hs->restOfScrambleBuff = $rand2;
 
