@@ -32,3 +32,7 @@ if (extension_loaded('swoole') && defined('SWOOLE_VERSION')) {
 } else {
     smproxy_error('ERROR: Swoole not installed!');
 }
+
+if (extension_loaded('xdebug')) {
+    smproxy_error('ERROR: XDebug extension is not allowed to be enabled, please disable it!');
+}
