@@ -15,19 +15,17 @@ try {
     $conn = new mysqli($servername, $username, $password, $dbname, $port);
     // Check connection
     if ($conn->connect_error) {
-        fwrite(STDERR, "连接失败: " . $conn->connect_error);
+        fwrite(STDERR, "Connect fail!" . $conn->connect_error . PHP_EOL);
     }
+    fwrite(STDOUT, 'Connect success!' . PHP_EOL);
 
-    $sql = "SELECT `Host`,`User`,`Plugin` FROM `mysql`.`user` WHERE Host = '%' limit 1";
+    $sql = "SELECT `Host`,`User`,`Plugin` FROM `mysql`.`user` limit 1";
     $result = $conn->query($sql);
-
+    fwrite(STDOUT, 'Exec query:' . $sql . PHP_EOL);
     if ($result->num_rows > 0) {
-        // 输出数据
-        while($row = $result->fetch_assoc()) {
-            fwrite(STDOUT, "SUCCESS:[Host: " . $row["Host"]. " - User: " . $row["User"]. " - Plugin: " . $row["Plugin"] . ']' . PHP_EOL);
-        }
+        fwrite(STDOUT,  'Result:' . json_encode($result->fetch_assoc()) . PHP_EOL);
     } else {
-        fwrite(STDERR, "0 结果");
+        fwrite(STDERR, "Result is empty!" . PHP_EOL);
     }
     $conn->close();
 } catch (\Exception $exception) {
