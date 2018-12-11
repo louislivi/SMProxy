@@ -34,7 +34,7 @@ class Log extends AbstractLogger
 
     public static $open = true;
 
-    private static $levels = [
+    public static $levels = [
         LogLevel::DEBUG     => 0,
         LogLevel::INFO      => 1,
         LogLevel::NOTICE    => 2,

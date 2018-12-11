@@ -21,6 +21,7 @@ use SMProxy\MysqlPacket\Util\RandomUtil;
 use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPool\MySQLPool;
 use SMProxy\Parser\ServerParse;
+use SMProxy\Route\RouteService;
 use Swoole\Coroutine;
 
 /**
@@ -83,7 +84,7 @@ class SMProxyServer extends BaseServer
                         } else {
                             $authPacket = new AuthPacket();
                             $authPacket->read($bin);
-                            $checkAccount = $this->checkAccount($server, $fd, $authPacket->user, $authPacket->password);
+                            $checkAccount = $this->checkAccount($server, $fd, $authPacket->user ?? '', $authPacket->password ?? []);
                             if (!$checkAccount) {
                                 if ($authPacket->pluginName == 'mysql_native_password') {
                                     $this ->accessDenied($server, $fd, 2);
@@ -120,10 +121,33 @@ class SMProxyServer extends BaseServer
                             case MySQLPacket::$COM_STMT_PREPARE:
                                 $connection = new FrontendConnection();
                                 $queryType = $connection->query($bin);
-                                if (ServerParse::SELECT == $queryType ||
-                                    ServerParse::SHOW == $queryType ||
-                                    (ServerParse::SET == $queryType && false === strpos($data, 'autocommit', 4)) ||
-                                    ServerParse::USE == $queryType
+                                $hintArr   = RouteService::route(substr($data, 5, strlen($data) - 5));
+                                if (isset($hintArr['db_type'])) {
+                                    switch ($hintArr['db_type']) {
+                                        case 'read':
+                                            if ($queryType == ServerParse::DELETE || $queryType == ServerParse::INSERT ||
+                                                $queryType == ServerParse::REPLACE || $queryType == ServerParse::UPDATE ||
+                                                $queryType == ServerParse::DDL) {
+                                                $this->connectReadState[$fd] = false;
+                                                $system_log = Log::getLogger('system');
+                                                $system_log->warning("should not use hint 'db_type' to route 'delete', 'insert', 'replace', 'update', 'ddl' to a slave db.");
+                                            } else {
+                                                $this->connectReadState[$fd] = true;
+                                            }
+                                            break;
+                                        case 'write':
+                                            $this->connectReadState[$fd] = false;
+                                            break;
+                                        default:
+                                            $this->connectReadState[$fd] = false;
+                                            $system_log = Log::getLogger('system');
+                                            $system_log->warning("use hint 'db_type' value is not found.");
+                                            break;
+                                    }
+                                } elseif (ServerParse::SELECT == $queryType ||
+                                        ServerParse::SHOW == $queryType ||
+                                        (ServerParse::SET == $queryType && false === strpos($data, 'autocommit', 4)) ||
+                                        ServerParse::USE == $queryType
                                 ) {
                                     //处理读操作
                                     if (!isset($this->connectHasTransaction[$fd]) ||
