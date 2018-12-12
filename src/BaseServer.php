@@ -90,7 +90,7 @@ abstract class BaseServer extends Base
     public function onStart(\swoole_server $server)
     {
         \file_put_contents(CONFIG['server']['swoole']['pid_file'], $server->master_pid . ',' . $server->manager_pid);
-        ProcessHelper::setProcessTitle('SMProxy master process');
+        ProcessHelper::setProcessTitle('SMProxy master  process');
     }
 
     public function onManagerStart(\swoole_server $server)

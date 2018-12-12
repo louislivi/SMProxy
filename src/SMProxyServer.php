@@ -13,6 +13,7 @@ use function SMProxy\Helper\packageSplit;
 use SMProxy\Helper\ProcessHelper;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;
+use SMProxy\MysqlPacket\BinaryPacket;
 use SMProxy\MysqlPacket\MySqlPacketDecoder;
 use SMProxy\MysqlPacket\MySQLPacket;
 use SMProxy\MysqlPacket\OkPacket;
@@ -71,165 +72,25 @@ class SMProxyServer extends BaseServer
                 self::go(function () use ($server, $fd, $reactor_id, $data) {
                     $bin = (new MySqlPacketDecoder())->decode($data);
                     if (!$this->source[$fd]->auth) {
-                        if ($bin->data[0] == 20) {
-                            $checkAccount = $this->checkAccount($server, $fd, $this->source[$fd]->user, array_copy($bin->data, 4, 20));
-                            if (!$checkAccount) {
-                                $this ->accessDenied($server, $fd, 4);
-                            } else {
-                                if ($server->exist($fd)) {
-                                    $server->send($fd, getString(OkPacket::$SWITCH_AUTH_OK));
-                                }
-                                $this->source[$fd]->auth = true;
-                            }
-                        } else {
-                            $authPacket = new AuthPacket();
-                            $authPacket->read($bin);
-                            $checkAccount = $this->checkAccount($server, $fd, $authPacket->user ?? '', $authPacket->password ?? []);
-                            if (!$checkAccount) {
-                                if ($authPacket->pluginName == 'mysql_native_password') {
-                                    $this ->accessDenied($server, $fd, 2);
-                                } else {
-                                    $this->source[$fd]->user = $authPacket ->user;
-                                    $this->source[$fd]->database = $authPacket->database;
-                                    $this->source[$fd]->seed = RandomUtil::randomBytes(20);
-                                    $authSwitchRequest = array_merge(
-                                        [254],
-                                        getBytes('mysql_native_password'),
-                                        [0],
-                                        $this->source[$fd]->seed,
-                                        [0]
-                                    );
-                                    if ($server->exist($fd)) {
-                                        $server->send($fd, getString(array_merge(getMysqlPackSize(count($authSwitchRequest)), [2], $authSwitchRequest)));
-                                    }
-                                }
-                            } else {
-                                if ($server->exist($fd)) {
-                                    $server->send($fd, getString(OkPacket::$AUTH_OK));
-                                }
-                                $this->source[$fd]->auth = true;
-                                $this->source[$fd]->database = $authPacket->database;
-                            }
-                        }
+                        $this->auth($bin, $server, $fd);
                     } else {
-                        $trim_data = rtrim($data);
-                        switch ($bin->data[4]) {
-                            case MySQLPacket::$COM_INIT_DB:
-                                // just init the frontend
-                                break;
-                            case MySQLPacket::$COM_QUERY:
-                            case MySQLPacket::$COM_STMT_PREPARE:
-                                $connection = new FrontendConnection();
-                                $queryType = $connection->query($bin);
-                                $hintArr   = RouteService::route(substr($data, 5, strlen($data) - 5));
-                                if (isset($hintArr['db_type'])) {
-                                    switch ($hintArr['db_type']) {
-                                        case 'read':
-                                            if ($queryType == ServerParse::DELETE || $queryType == ServerParse::INSERT ||
-                                                $queryType == ServerParse::REPLACE || $queryType == ServerParse::UPDATE ||
-                                                $queryType == ServerParse::DDL) {
-                                                $this->connectReadState[$fd] = false;
-                                                $system_log = Log::getLogger('system');
-                                                $system_log->warning("should not use hint 'db_type' to route 'delete', 'insert', 'replace', 'update', 'ddl' to a slave db.");
-                                            } else {
-                                                $this->connectReadState[$fd] = true;
-                                            }
-                                            break;
-                                        case 'write':
-                                            $this->connectReadState[$fd] = false;
-                                            break;
-                                        default:
-                                            $this->connectReadState[$fd] = false;
-                                            $system_log = Log::getLogger('system');
-                                            $system_log->warning("use hint 'db_type' value is not found.");
-                                            break;
-                                    }
-                                } elseif (ServerParse::SELECT == $queryType ||
-                                        ServerParse::SHOW == $queryType ||
-                                        (ServerParse::SET == $queryType && false === strpos($data, 'autocommit', 4)) ||
-                                        ServerParse::USE == $queryType
-                                ) {
-                                    //处理读操作
-                                    if (!isset($this->connectHasTransaction[$fd]) ||
-                                        !$this->connectHasTransaction[$fd]) {
-                                        if ((('u' == $trim_data[-6] || 'U' == $trim_data[-6]) &&
-                                            ServerParse::UPDATE == ServerParse::uCheck($trim_data, -6, false))) {
-                                            //判断悲观锁
-                                            $this->connectReadState[$fd] = false;
-                                        } else {
-                                            $this->connectReadState[$fd] = true;
-                                        }
-                                    }
-                                } elseif (ServerParse::START == $queryType || ServerParse::BEGIN == $queryType
-                                ) {
-                                    //处理事务
-                                    $this->connectHasTransaction[$fd] = true;
-                                    $this->connectReadState[$fd] = false;
-                                } elseif (ServerParse::SET == $queryType && false !== strpos($data, 'autocommit', 4) &&
-                                    0 == $trim_data[-1]) {
-                                    //处理autocommit事务
-                                    $this->connectHasAutoCommit[$fd] = true;
-                                    $this->connectHasTransaction[$fd] = true;
-                                    $this->connectReadState[$fd] = false;
-                                } elseif (ServerParse::SET == $queryType && false !== strpos($data, 'autocommit', 4) &&
-                                    1 == $trim_data[-1]) {
-                                    $this->connectHasAutoCommit[$fd] = false;
-                                    $this->connectReadState[$fd] = false;
-                                } elseif (ServerParse::COMMIT == $queryType || ServerParse::ROLLBACK == $queryType) {
-                                    //事务提交
-                                    $this->connectHasTransaction[$fd] = false;
-                                } else {
-                                    $this->connectReadState[$fd] = false;
-                                }
-                                break;
-                            case MySQLPacket::$COM_PING:
-                                break;
-                            case MySQLPacket::$COM_QUIT:
-                                //禁用客户端退出
-                                $data = '';
-                                break;
-                            case MySQLPacket::$COM_PROCESS_KILL:
-                                break;
-                            case MySQLPacket::$COM_STMT_EXECUTE:
-                                break;
-                            case MySQLPacket::$COM_STMT_CLOSE:
-                                break;
-                            case MySQLPacket::$COM_HEARTBEAT:
-                                break;
-                            default:
-                                break;
-                        }
+                        $this->query($bin, $data, $fd);
                         if (isset($this->connectReadState[$fd]) && true === $this->connectReadState[$fd]) {
                             $model = 'read';
-                            $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
-                            //如果没有读库 默认用写库
-                            if (!array_key_exists($key, $this->dbConfig)) {
-                                $model = 'write';
-                            }
                         } else {
                             $model = 'write';
                         }
+                        $key = $this ->compareModel($model, $server, $fd);
                         if (isset($this->mysqlClient[$fd][$model])) {
                             $client = $this->mysqlClient[$fd][$model];
                             if ($data && $client->client->isConnected()) {
                                 $client->client->send($data);
                             }
                         } else {
-                            $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
-                            if (array_key_exists($key, $this->dbConfig)) {
-                                $client = MySQLPool::fetch($key, $server, $fd);
-                                $this->mysqlClient[$fd][$model] = $client;
-                                if ($data && $client->client->isConnected()) {
-                                    $client->client->send($data);
-                                }
-                            } else {
-                                $message = 'SMProxy@Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
-                                    ' is not exists!';
-                                $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
-                                if ($server->exist($fd)) {
-                                    $server->send($fd, getString($errMessage));
-                                }
-                                throw new MySQLException($message);
+                            $client = MySQLPool::fetch($key, $server, $fd);
+                            $this->mysqlClient[$fd][$model] = $client;
+                            if ($data && $client->client->isConnected()) {
+                                $client->client->send($data);
                             }
                         }
                     }
@@ -263,7 +124,7 @@ class SMProxyServer extends BaseServer
             unset($this->connectHasAutoCommit[$fd]);
         }
         if (isset($this->mysqlClient[$fd])) {
-            if ($this->mysqlClient[$fd]['write'] ->client && $this->mysqlClient[$fd]['write'] ->client->isConnected()) {
+            if (isset($this->mysqlClient[$fd]['write'] ->client) && $this->mysqlClient[$fd]['write'] ->client && $this->mysqlClient[$fd]['write'] ->client->isConnected()) {
                 if ($connectHasTransaction) {
                     $this->mysqlClient[$fd]['write']->client->send(getString([9, 0, 0, 0, 3, 82, 79, 76, 76, 66, 65, 67, 75]));
                 }
@@ -294,9 +155,9 @@ class SMProxyServer extends BaseServer
     {
         self::go(function () use ($server, $worker_id) {
             if ($worker_id >= CONFIG['server']['swoole']['worker_num']) {
-                ProcessHelper::setProcessTitle('SMProxy task process');
+                ProcessHelper::setProcessTitle('SMProxy task    process');
             } else {
-                ProcessHelper::setProcessTitle('SMProxy worker process');
+                ProcessHelper::setProcessTitle('SMProxy worker  process');
             }
             $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
             //初始化链接
@@ -398,11 +259,11 @@ class SMProxyServer extends BaseServer
      *
      * @param \swoole_server $server
      * @param int $fd
-     * @param $serverId
+     * @param int $serverId
      *
      * @throws MySQLException
      */
-    private function accessDenied(\swoole_server $server, int $fd, $serverId)
+    private function accessDenied(\swoole_server $server, int $fd, int $serverId)
     {
         $message = 'SMProxy@access denied for user \'' . $this->source[$fd]->user . '\'@\'' .
             $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
@@ -411,5 +272,198 @@ class SMProxyServer extends BaseServer
             $server->send($fd, getString($errMessage));
         }
         throw new MySQLException($message);
+    }
+
+    /**
+     * 判断model
+     *
+     * @param string $model
+     * @param \swoole_server $server
+     * @param int $fd
+     *
+     * @return string
+     * @throws MySQLException
+     */
+    private function compareModel(string &$model, \swoole_server $server, int $fd)
+    {
+        switch ($model) {
+            case 'read':
+                $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
+                //如果没有读库 默认用写库
+                if (!array_key_exists($key, $this->dbConfig)) {
+                    $model = 'write';
+                }
+                break;
+            case 'write':
+                $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
+                //如果没有写库
+                if (!array_key_exists($key, $this->dbConfig)) {
+                    $message = 'SMProxy@Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
+                        ' is not exists!';
+                    $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
+                    if ($server->exist($fd)) {
+                        $server->send($fd, getString($errMessage));
+                    }
+                    throw new MySQLException($message);
+                }
+                break;
+            default:
+                $key = 'write' . DB_DELIMITER . $this->source[$fd]->database;
+                break;
+        }
+        return $key;
+    }
+
+    /**
+     * 验证
+     *
+     * @param BinaryPacket $bin
+     * @param \swoole_server $server
+     * @param int $fd
+     *
+     * @throws MySQLException
+     */
+    private function auth(BinaryPacket $bin, \swoole_server $server, int $fd)
+    {
+        if ($bin->data[0] == 20) {
+            $checkAccount = $this->checkAccount($server, $fd, $this->source[$fd]->user, array_copy($bin->data, 4, 20));
+            if (!$checkAccount) {
+                $this ->accessDenied($server, $fd, 4);
+            } else {
+                if ($server->exist($fd)) {
+                    $server->send($fd, getString(OkPacket::$SWITCH_AUTH_OK));
+                }
+                $this->source[$fd]->auth = true;
+            }
+        } else {
+            $authPacket = new AuthPacket();
+            $authPacket->read($bin);
+            $checkAccount = $this->checkAccount($server, $fd, $authPacket->user ?? '', $authPacket->password ?? []);
+            if (!$checkAccount) {
+                if ($authPacket->pluginName == 'mysql_native_password') {
+                    $this ->accessDenied($server, $fd, 2);
+                } else {
+                    $this->source[$fd]->user = $authPacket ->user;
+                    $this->source[$fd]->database = $authPacket->database;
+                    $this->source[$fd]->seed = RandomUtil::randomBytes(20);
+                    $authSwitchRequest = array_merge(
+                        [254],
+                        getBytes('mysql_native_password'),
+                        [0],
+                        $this->source[$fd]->seed,
+                        [0]
+                    );
+                    if ($server->exist($fd)) {
+                        $server->send($fd, getString(array_merge(getMysqlPackSize(count($authSwitchRequest)), [2], $authSwitchRequest)));
+                    }
+                }
+            } else {
+                if ($server->exist($fd)) {
+                    $server->send($fd, getString(OkPacket::$AUTH_OK));
+                }
+                $this->source[$fd]->auth = true;
+                $this->source[$fd]->database = $authPacket->database;
+            }
+        }
+    }
+
+    /**
+     * 语句解析处理
+     *
+     * @param BinaryPacket $bin
+     * @param string $data
+     * @param int $fd
+     *
+     * @throws MySQLException
+     */
+    private function query(BinaryPacket $bin, string &$data, int $fd)
+    {
+        $trim_data = rtrim($data);
+        switch ($bin->data[4]) {
+            case MySQLPacket::$COM_INIT_DB:
+                // just init the frontend
+                break;
+            case MySQLPacket::$COM_QUERY:
+            case MySQLPacket::$COM_STMT_PREPARE:
+                $connection = new FrontendConnection();
+                $queryType = $connection->query($bin);
+                $hintArr   = RouteService::route(substr($data, 5, strlen($data) - 5));
+                if (isset($hintArr['db_type'])) {
+                    switch ($hintArr['db_type']) {
+                        case 'read':
+                            if ($queryType == ServerParse::DELETE || $queryType == ServerParse::INSERT ||
+                                $queryType == ServerParse::REPLACE || $queryType == ServerParse::UPDATE ||
+                                $queryType == ServerParse::DDL) {
+                                $this->connectReadState[$fd] = false;
+                                $system_log = Log::getLogger('system');
+                                $system_log->warning("should not use hint 'db_type' to route 'delete', 'insert', 'replace', 'update', 'ddl' to a slave db.");
+                            } else {
+                                $this->connectReadState[$fd] = true;
+                            }
+                            break;
+                        case 'write':
+                            $this->connectReadState[$fd] = false;
+                            break;
+                        default:
+                            $this->connectReadState[$fd] = false;
+                            $system_log = Log::getLogger('system');
+                            $system_log->warning("use hint 'db_type' value is not found.");
+                            break;
+                    }
+                } elseif (ServerParse::SELECT == $queryType ||
+                    ServerParse::SHOW == $queryType ||
+                    (ServerParse::SET == $queryType && false === strpos($data, 'autocommit', 4)) ||
+                    ServerParse::USE == $queryType
+                ) {
+                    //处理读操作
+                    if (!isset($this->connectHasTransaction[$fd]) ||
+                        !$this->connectHasTransaction[$fd]) {
+                        if ((('u' == $trim_data[-6] || 'U' == $trim_data[-6]) &&
+                            ServerParse::UPDATE == ServerParse::uCheck($trim_data, -6, false))) {
+                            //判断悲观锁
+                            $this->connectReadState[$fd] = false;
+                        } else {
+                            $this->connectReadState[$fd] = true;
+                        }
+                    }
+                } elseif (ServerParse::START == $queryType || ServerParse::BEGIN == $queryType
+                ) {
+                    //处理事务
+                    $this->connectHasTransaction[$fd] = true;
+                    $this->connectReadState[$fd] = false;
+                } elseif (ServerParse::SET == $queryType && false !== strpos($data, 'autocommit', 4) &&
+                    0 == $trim_data[-1]) {
+                    //处理autocommit事务
+                    $this->connectHasAutoCommit[$fd] = true;
+                    $this->connectHasTransaction[$fd] = true;
+                    $this->connectReadState[$fd] = false;
+                } elseif (ServerParse::SET == $queryType && false !== strpos($data, 'autocommit', 4) &&
+                    1 == $trim_data[-1]) {
+                    $this->connectHasAutoCommit[$fd] = false;
+                    $this->connectReadState[$fd] = false;
+                } elseif (ServerParse::COMMIT == $queryType || ServerParse::ROLLBACK == $queryType) {
+                    //事务提交
+                    $this->connectHasTransaction[$fd] = false;
+                } else {
+                    $this->connectReadState[$fd] = false;
+                }
+                break;
+            case MySQLPacket::$COM_PING:
+                break;
+            case MySQLPacket::$COM_QUIT:
+                //禁用客户端退出
+                $data = '';
+                break;
+            case MySQLPacket::$COM_PROCESS_KILL:
+                break;
+            case MySQLPacket::$COM_STMT_EXECUTE:
+                break;
+            case MySQLPacket::$COM_STMT_CLOSE:
+                break;
+            case MySQLPacket::$COM_HEARTBEAT:
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -2,7 +2,6 @@
 
 namespace SMProxy;
 
-use Psr\Log\LogLevel;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPool\MySQLException;
 

@@ -12,7 +12,7 @@ class RouteService
     const HINT_SPLIT = '=';
     const SMPROXY_HINT_TYPE = "_smproxyHintType";
 
-    public static function route($stmt)
+    public static function route(string $stmt)
     {
         $hintLength = self::isHintSql($stmt);
         if ($hintLength != -1) {
