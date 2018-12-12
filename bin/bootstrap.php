@@ -21,18 +21,18 @@ set_error_handler('SMProxy\Helper\_error_handler', E_ALL | E_STRICT);
 
 // Check requirements - PHP
 if (version_compare(PHP_VERSION, '7.0', '<')) {
-    smproxy_error('ERROR: PHP version must be greater than 7.0!');
+    smproxy_error('ERROR: SMProxy requires [PHP >= 7.0].');
 }
 
 // Check requirements - Swoole
 if (extension_loaded('swoole') && defined('SWOOLE_VERSION')) {
     if (version_compare(SWOOLE_VERSION, '2.1', '<')) {
-        smproxy_error('ERROR: Swoole version must be greater than 2.1!');
+        smproxy_error('ERROR: SMProxy requires [Swoole >= 2.1].');
     }
 } else {
-    smproxy_error('ERROR: Swoole not installed!');
+    smproxy_error('ERROR: Swoole was not installed.');
 }
 
 if (extension_loaded('xdebug')) {
-    smproxy_error('ERROR: XDebug extension is not allowed to be enabled, please disable it!');
+    smproxy_error('ERROR: XDebug has been enabled, which conflicts with SMProxy.');
 }
