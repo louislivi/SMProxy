@@ -26,6 +26,9 @@
         "humbug/box": "^2.7.5||^3.3",
         "eaglewu/swoole-ide-helper": "dev-master"
     },
+    "conflict": {
+        "ext-xdebug": "*"
+    },
     "autoload": {
         "psr-4": {
             "SMProxy\\": "src/"
