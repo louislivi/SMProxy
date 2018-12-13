@@ -17,6 +17,6 @@
   - [Route](en/README.md#Route)
     - [Annotation](en/README.md#Annotation)
   - [MySQL8.0](en/README.md#mysql80)
-  - [Common Problem](en/README.md#common-problem)
+  - [Troubleshooting](en/README.md#troubleshooting)
   - [Community](en/README.md#community)
   - [More Documentation](en/README.md#more-documentation)

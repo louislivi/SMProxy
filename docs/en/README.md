@@ -14,9 +14,9 @@ A MySQL database connection pool based on MySQL protocol and Swoole.
 
 ## Principle
 
-Store the database connection as an object in memory. When users need to access the database, a connection will be established for the first time. After that, instead of establishing a new connection, free connections will be retrieved from the connection pool when users require. Also, users don't need to close connection but put it back into the connection pool for other requests to use.
+Store the database connection as an object in memory. When users need to access the database, a connection established for the first time. After that, instead of establishing a new connection, free connections will be retrieved from the connection pool when users require. Also, users don't need to close connection but put it back into the connection pool for other requests to use.
 
-All these things, connecting, disconnecting are managed by the connection pool itself. At the same time, you can also configure the parameters of the connection pool, like:
+The connection pool itself manages all these things, connecting, disconnecting. At the same time, you can also configure the parameters of the connection pool, like:
 
 - The initial number of connections
 - Min / Max number of connections
@@ -27,7 +27,7 @@ All these things, connecting, disconnecting are managed by the connection pool i
 
 It's also possible to monitor the number of database connections, usage, etc. through its own management system.
 
-If the maximum number of connections is exceeded, the coroutine will be suspended and wait until a connection is released.
+If the maximum number of connections exceeded, the coroutine will be suspended and wait until a connection is released.
 
 ## Features
 
@@ -44,8 +44,8 @@ If the maximum number of connections is exceeded, the coroutine will be suspende
 
 ## Why This
 
-For early design reasons, PHP does not have a native connection pool. So the number of database connections will be easily increasing and reaching the maximum when we got lots of requests.
-Using one of many database middlewares like Mycat will cause some limitations, e.g. batch inserts. And it's also too heavy in most cases.
+For prior design reasons, PHP does not have a native connection pool. So the number of database connections will be quickly increasing and reaching the maximum when we got lots of requests.
+Using one of many database middlewares like Mycat cause some limitations, e.g., batch inserts. Also, it's too heavy in most cases.
 So we created SMProxy using 100% PHP + Swoole, which only supports connection pool and read/write separation, but much more lightweight.
 Not like Mycat, we're trying to build SMProxy with Swoole Coroutine to schedule HandshakeV10 packet forwarding, so we don't have to parse all SQL packets.
 That really makes SMProxy more stable and reliable.
@@ -95,7 +95,7 @@ Options:
 
 ## Configuration
 
-The configuration files are located in the `smproxy/conf` directory, the uppercase `ROOT` represents the SMProxy root directory.
+The configuration files are located in the `smproxy/conf` directory. The uppercase `ROOT` represents the SMProxy root directory.
 
 ### database.json
 ```json
@@ -201,16 +201,19 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
     - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
 
 ## Route
+
 ### Annotation
    - smproxy:db_type=[read | write]
-        - Forced use of the read library ```/** smproxy:db_type=read */select * from `user` limit 1```
-        - Force the use of the write library ```/** smproxy:db_type=write */select * from `user` limit 1```
+        - Forced use read-only servers ```/** smproxy:db_type=read */select * from `user` limit 1```
+        - Forced use write-only servers ```/** smproxy:db_type=write */select * from `user` limit 1```
 
 ## MySQL8.0
 
 - `SMProxy1.2.4` and above can be used directly
 - `SMProxy1.2.4` The following needs to be compatible
-`MySQL-8.0` uses the more secure `caching_sha2_password` plugin by default. If it is upgraded from `5.x`, you can use all the `MySQL` functions directly. For example, if you are creating a new `MySQL`, you need to enter `MySQL. `The command line performs the following operations to be compatible:
+
+`MySQL-8.0` uses the more secure `caching_sha2_password` plugin by default. If you upgraded from `5.x`, all the thing should still work directly. For example, if you are creating a new `MySQL`, you need to enter `MySQL. `The command line performs the following operations to be compatible:
+
 ```SQL
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 Flush privileges;
@@ -219,14 +222,14 @@ Replace `'root'@'%'` in the statement with the user you are using, and replace `
 
 If it is still not available, set `default_authentication_plugin = mysql_native_password` in my.cnf.
 
-## Common Problem
+## Troubleshooting
 
-- When using `Supervisor` and `docker`, you need to use the foreground mode or it will not start properly.
-- `SMProxy@access denied for user` Please check if the account password in `serve.json` is the same as that configured in the service code.
-- `SMProxy@Database config dbname write is not exists! ` Please change the `dbname` entry in `database.json` to your business database name.
-- Do not configure `localhost` for database `host`.
-- Start the database connection timeout. Please check the database configuration. If it is normal, please lower the `startConns` or increase the `timeout` item in `database.json`.
-- `Reach max connections! Cann't pending fetch!` Appropriately increase `maxSpareConns` or increase the `timeout` entry in `database.json`.
+- When using `Supervisor` and `docker`,  you need to use the foreground mode, or it will not start properly.
+- `SMProxy@access denied for user`: Please check if the account password in `serve.json` is the same as that configured in your code.
+- `SMProxy@Database config dbname write is not exists!`: Please change the `dbname` in `database.json` to your database name.
+- Do not set to `localhost` as database `host`.
+- Database connection timed out at starting. Please check the database configuration. If still connot connect to database, please decrease `startConns` or increase `timeout` in `database.json`.
+- `Reach max connections! Cann't pending fetch!`: Increase `maxSpareConns` or `timeout` in `database.json`.
 
 ## Community
 

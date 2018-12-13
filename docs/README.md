@@ -133,6 +133,7 @@ Options:
     - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
 - `timeout`
     - 设置2-5秒最佳。
+
 ### server.json
 ```json
 {
@@ -188,17 +189,19 @@ Options:
     - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
 ## 路由
+
 ### 注解
    - smproxy:db_type=[read | write]
         - 强制使用读库 ```/** smproxy:db_type=read */select * from `user` limit 1```
         - 强制使用写库 ```/** smproxy:db_type=write */select * from `user` limit 1```
 
-
 ## MySQL8.0
 
 - `SMProxy1.2.4`及以上可直接使用
 - `SMProxy1.2.4`以下需要做兼容处理
+
 `MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件，其他版本如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
+
 ```SQL
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 flush privileges;
