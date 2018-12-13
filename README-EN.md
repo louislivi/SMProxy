@@ -12,7 +12,7 @@ English | [中文](./README.md)
                                                               |  $$$$$$/
                                                                \______/
 ```
-# [SMProxy](http://smproxy.louislivi.com/#/en/)
+# [SMProxy](https://smproxy.louislivi.com/#/en/)
 
 [![release](https://img.shields.io/github/release/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/releases)
 [![forks](https://img.shields.io/github/forks/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/network/members)
@@ -66,6 +66,6 @@ That really makes SMProxy more stable and reliable.
 
 ## Contributing & Discussing
 
-- Documentation: <http://smproxy.louislivi.com/#/en/>
+- Documentation: <https://smproxy.louislivi.com/#/en/>
 - Community: [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 - Issues and Pull requests are always welcome.
