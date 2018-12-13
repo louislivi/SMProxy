@@ -200,35 +200,36 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 - `worker_num`
     - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
 
-### How to configure in the project
+### Integration
+
 - Laravel
     - `.env`
-    ```env
-     DB_CONNECTION=mysql
-     Host configured in DB_HOST=server.json
-     DB_PORT=port configured in server.json
-     Database name configured in DB_DATABASE=databse.json
-     User configured in DB_USERNAME=server.json
-     DB_PASSWORD=password configured in server.json
+    ```
+    DB_CONNECTION=mysql
+    Host configured in DB_HOST=server.json
+    DB_PORT=port configured in server.json
+    Database name configured in DB_DATABASE=databse.json
+    User configured in DB_USERNAME=server.json
+    DB_PASSWORD=password configured in server.json
     ```
 
 - ThinkPHP
     - `database.php`
     ```php
-     'type' => 'mysql',
-     // server address
-     'hostname' => 'host' configured in server.json,
-     // data storage name
-     'database' => 'database name configured in databse.json',
-     // username
-     'username' => 'user' configured in server.json,
-     // password
-     'password' => 'password' configured in server.json,
-     // port
-     'hostport' => 'port' configured in server.json,
+    'type' => 'mysql',
+    // server address
+    'hostname' => 'host' configured in server.json,
+    // data storage name
+    'database' => 'database name configured in databse.json',
+    // username
+    'username' => 'user' configured in server.json,
+    // password
+    'password' => 'password' configured in server.json,
+    // port
+    'hostport' => 'port' configured in server.json,
     ```
-- Other frameworks and so on, only need to configure the code to connect to the database `host`, `port`, `user`, `password` and `SMProxy` in the `server.json`.
 
+- Other frameworks and so on, only need to configure the code to connect to the database `host`, `port`, `user`, `password` and `SMProxy` in the `server.json`.
 
 ## Route
 
