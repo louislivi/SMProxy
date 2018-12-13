@@ -1,6 +1,6 @@
 FROM php:7.2
 
-ADD https://github.com/louislivi/smproxy/releases/download/v1.2.4/smproxy.tar.gz /usr/local
+ADD https://github.com/louislivi/smproxy/releases/download/v1.2.5/smproxy.tar.gz /usr/local
 RUN printf "\n" | pecl install -f swoole && \
     docker-php-ext-enable swoole && \
     cd /usr/local && \
@@ -11,4 +11,4 @@ VOLUME /usr/local/smproxy/logs
 
 EXPOSE 3366
 
-CMD ["/usr/local/smproxy/SMProxy", "start"]
+CMD ["/usr/local/smproxy/SMProxy", "start --console"]
