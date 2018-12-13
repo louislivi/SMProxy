@@ -44,10 +44,10 @@ If the maximum number of connections is exceeded, the coroutine will be suspende
 
 ## Why This
 
-For early design reasons, PHP does not have a native connection pool. So the number of database connections will be easily increasing and reaching the maximum when we got lots of requests. 
-Using one of many database middlewares like Mycat will cause some limitations, e.g. batch inserts. And it's also too heavy in most cases. 
-So we created SMProxy using 100% PHP + Swoole, which only supports connection pool and read/write separation, but much more lightweight. 
-Not like Mycat, we're trying to build SMProxy with Swoole Coroutine to schedule HandshakeV10 packet forwarding, so we don't have to parse all SQL packets. 
+For early design reasons, PHP does not have a native connection pool. So the number of database connections will be easily increasing and reaching the maximum when we got lots of requests.
+Using one of many database middlewares like Mycat will cause some limitations, e.g. batch inserts. And it's also too heavy in most cases.
+So we created SMProxy using 100% PHP + Swoole, which only supports connection pool and read/write separation, but much more lightweight.
+Not like Mycat, we're trying to build SMProxy with Swoole Coroutine to schedule HandshakeV10 packet forwarding, so we don't have to parse all SQL packets.
 That really makes SMProxy more stable and reliable.
 
 ## Benchmark
@@ -140,11 +140,12 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 }
 ```
 - `maxConns`,`maxSpareConns`,`startConns`
-    - It is recommended to set to multiple of `worker_num` configured in `server.json`. (`swoole_cpu_num()*N`)
+    - Recommended set to multiple of `worker_num` configured in `server.json`. (`swoole_cpu_num()*N`)
 - With multiple readable / writable databases
-    - We are now only support random algorithm for retrieving connections. So it is recommended to set `maxConns`, `startConns`, `startConns` at least more than 1 times of `max(master, slave) * worker_num`.
+    - We are now only supporting random algorithm for retrieving connections. So setting `maxConns`, `startConns`, `startConns` at least more than 1 times of `max(master, slave) * worker_num` was recommended.
 - `timeout`
-    - Set the best for 2-5 seconds.
+    - Recommended between 2-5 seconds.
+
 ### server.json
 ```json
 {
