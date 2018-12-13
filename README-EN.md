@@ -64,6 +64,7 @@ So we created SMProxy using 100% PHP + Swoole, which only supports connection po
 Not like Mycat, we're trying to build SMProxy with Swoole Coroutine to schedule HandshakeV10 packet forwarding, so we don't have to parse all SQL packets. 
 That really makes SMProxy more stable and reliable.
 
-## Develop & Discussion
+## Contributing & Discussing
+
 - Documentation: http://smproxy.louislivi.com/#/en/
 - Community: [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
