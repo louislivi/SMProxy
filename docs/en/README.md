@@ -1,17 +1,3 @@
-English | [中文](./README.md)
-```
-  /$$$$$$  /$$      /$$ /$$$$$$$                                        
- /$$__  $$| $$$    /$$$| $$__  $$                                       
-| $$  \__/| $$$$  /$$$$| $$  \ $$ /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
-|  $$$$$$ | $$ $$/$$ $$| $$$$$$$//$$__  $$ /$$__  $$|  $$ /$$/| $$  | $$
- \____  $$| $$  $$$| $$| $$____/| $$  \__/| $$  \ $$ \  $$$$/ | $$  | $$
- /$$  \ $$| $$\  $ | $$| $$     | $$      | $$  | $$  >$$  $$ | $$  | $$
-|  $$$$$$/| $$ \/  | $$| $$     | $$      |  $$$$$$/ /$$/\  $$|  $$$$$$$
- \______/ |__/     |__/|__/     |__/       \______/ |__/  \__/ \____  $$
-                                                               /$$  | $$
-                                                              |  $$$$$$/
-                                                               \______/
-```
 # [SMProxy](https://github.com/louislivi/SMProxy)
 
 [![release](https://img.shields.io/github/release/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/releases)
@@ -21,22 +7,6 @@ English | [中文](./README.md)
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 [![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
 [![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
-
-- [SMProxy](#SMProxy)
-  - [Swoole MySQL Proxy](#swoole-mysql-proxy)
-  - [Principle](#principle)
-  - [Features](#features)
-  - [Why This](#why-this)
-  - [Benchmark](#benchmark)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Configuration](#configuration)
-    - [database.json](#databasejson)
-    - [server.json](#serverjson)
-  - [MySQL8.0](#mysql80)
-  - [Community](#community)
-  - [More Documentation](#more-documentation)
 
 ## Swoole MySQL Proxy
 
@@ -82,7 +52,7 @@ That really makes SMProxy more stable and reliable.
 
 ## Benchmark
 
-See [docs/BENCHMARK.md](docs/en/BENCHMARK.md).
+See [docs/BENCHMARK-EN.md](BENCHMARK.md).
 
 ## Requirements
 
