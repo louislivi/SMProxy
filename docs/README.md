@@ -64,7 +64,7 @@ composer install --no-dev # 如果你想贡献你的代码，请不要使用 --n
 
 需要给予 bin/SMProxy 执行权限。
 
-```
+```bash
   SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console ]
   SMProxy -h | --help
   SMProxy -v | --version
@@ -188,12 +188,47 @@ Options:
 - `worker_num`
     - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
+### 在项目中如何进行配置
+- Laravel
+    - `.env`
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=server.json中配置的host
+    DB_PORT=server.json中配置的port
+    DB_DATABASE=databse.json中配置的数据库名称
+    DB_USERNAME=server.json中配置的user
+    DB_PASSWORD=server.json中配置的password
+    ```
+
+- ThinkPHP
+    - `database.php`
+    ```php
+    'type' => 'mysql',
+    // 服务器地址
+    'hostname' => 'server.json中配置的host',
+    // 数据库名
+    'database' => 'databse.json中配置的数据库名称',
+    // 用户名
+    'username' => 'server.json中配置的user',
+    // 密码
+    'password' => 'server.json中配置的password',
+    // 端口
+    'hostport' => 'server.json中配置的port',
+    ```
+- 其他框架以此类推，只需要配置代码中连接数据库的`host`，`port`，`user`，`password`与 `SMProxy`中`server.json`中一致即可。
+
 ## 路由
 
 ### 注解
    - smproxy:db_type=[read | write]
-        - 强制使用读库 ```/** smproxy:db_type=read */select * from `user` limit 1```
-        - 强制使用写库 ```/** smproxy:db_type=write */select * from `user` limit 1```
+        - 强制使用读库
+        ```sql
+        /** smproxy:db_type=read */select * from `user` limit 1
+        ```
+        - 强制使用写库
+        ```sql
+        /** smproxy:db_type=write */select * from `user` limit 1
+        ```
 
 ## MySQL8.0
 
@@ -202,7 +237,7 @@ Options:
 
 `MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件，其他版本如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
 
-```SQL
+```sql
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 flush privileges;
 ```

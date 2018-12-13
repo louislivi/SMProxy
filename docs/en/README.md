@@ -76,7 +76,7 @@ composer install --no-dev # If you want to contribute to this repo, please DO NO
 
 `bin/SMProxy` needs execute permission.
 
-```
+```bash
   SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console ]
   SMProxy -h | --help
   SMProxy -v | --version
@@ -200,12 +200,52 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 - `worker_num`
     - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
 
+### How to configure in the project
+- Laravel
+    - `.env`
+    ```env
+     DB_CONNECTION=mysql
+     Host configured in DB_HOST=server.json
+     DB_PORT=port configured in server.json
+     Database name configured in DB_DATABASE=databse.json
+     User configured in DB_USERNAME=server.json
+     DB_PASSWORD=password configured in server.json
+    ```
+
+- ThinkPHP
+    - `database.php`
+    ```php
+     'type' => 'mysql',
+     // server address
+     'hostname' => 'host' configured in server.json,
+     // data storage name
+     'database' => 'database name configured in databse.json',
+     // username
+     'username' => 'user' configured in server.json,
+     // password
+     'password' => 'password' configured in server.json,
+     // port
+     'hostport' => 'port' configured in server.json,
+    ```
+- Other frameworks and so on, only need to configure the code to connect to the database `host`, `port`, `user`, `password` and `SMProxy` in the `server.json`.
+
+
 ## Route
 
 ### Annotation
-   - smproxy:db_type=[read | write]
-        - Forced use read-only servers ```/** smproxy:db_type=read */select * from `user` limit 1```
-        - Forced use write-only servers ```/** smproxy:db_type=write */select * from `user` limit 1```
+
+- smproxy:db_type=[read | write]
+
+    - Forced use read-only servers
+    ```sql
+    /** smproxy:db_type=read */select * from `user` limit 1
+    ```
+
+    - Forced use write-only servers
+
+    ```sql
+    /** smproxy:db_type=write */select * from `user` limit 1
+    ```
 
 ## MySQL8.0
 
@@ -214,10 +254,11 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 
 `MySQL-8.0` uses the more secure `caching_sha2_password` plugin by default. If you upgraded from `5.x`, all the thing should still work directly. For example, if you are creating a new `MySQL`, you need to enter `MySQL. `The command line performs the following operations to be compatible:
 
-```SQL
+```sql
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 Flush privileges;
 ```
+
 Replace `'root'@'%'` in the statement with the user you are using, and replace `password` with its password.
 
 If it is still not available, set `default_authentication_plugin = mysql_native_password` in my.cnf.

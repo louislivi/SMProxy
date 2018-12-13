@@ -14,6 +14,7 @@
   - [配置](README.md#%E9%85%8D%E7%BD%AE)
     - [database.json](README.md#databasejson)
     - [server.json](README.md#serverjson)
+    - [在项目中如何进行配置](README.md#%e5%9c%a8%e9%a1%b9%e7%9b%ae%e4%b8%ad%e5%a6%82%e4%bd%95%e8%bf%9b%e8%a1%8c%e9%85%8d%e7%bd%ae)
   - [路由](README.md#%e8%b7%af%e7%94%b1)
     - [注解](README.md#%e6%b3%a8%e8%a7%a3)
   - [MySQL8.0](README.md#mysql80)

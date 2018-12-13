@@ -14,6 +14,7 @@
   - [Configuration](en/README.md#configuration)
     - [database.json](en/README.md#databasejson)
     - [server.json](en/README.md#serverjson)
+    - [How to configure in the project](en/README.md#how-to-configure-in-the-project)
   - [Route](en/README.md#Route)
     - [Annotation](en/README.md#Annotation)
   - [MySQL8.0](en/README.md#mysql80)
