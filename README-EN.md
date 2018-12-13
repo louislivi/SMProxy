@@ -66,5 +66,6 @@ That really makes SMProxy more stable and reliable.
 
 ## Contributing & Discussing
 
-- Documentation: http://smproxy.louislivi.com/#/en/
+- Documentation: <http://smproxy.louislivi.com/#/en/>
 - Community: [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
+- Issues and Pull requests are always welcome.
