@@ -143,7 +143,8 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
     - It is recommended to set to multiple of `worker_num` configured in `server.json`. (`swoole_cpu_num()*N`)
 - With multiple readable / writable databases
     - We are now only support random algorithm for retrieving connections. So it is recommended to set `maxConns`, `startConns`, `startConns` at least more than 1 times of `max(master, slave) * worker_num`.
-
+- `timeout`
+    - Set the best for 2-5 seconds.
 ### server.json
 ```json
 {
@@ -198,6 +199,12 @@ The configuration files are located in the `smproxy/conf` directory, the upperca
 - `worker_num`
     - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
 
+## Route
+### Annotation
+   - smproxy:db_type=[read | write]
+        - Forced use of the read library ```/** smproxy:db_type=read */select * from `user` limit 1```
+        - Force the use of the write library ```/** smproxy:db_type=write */select * from `user` limit 1```
+
 ## MySQL8.0
 
 - `SMProxy1.2.4` and above can be used directly
@@ -210,6 +217,15 @@ Flush privileges;
 Replace `'root'@'%'` in the statement with the user you are using, and replace `password` with its password.
 
 If it is still not available, set `default_authentication_plugin = mysql_native_password` in my.cnf.
+
+## Common Problem
+
+- When using `Supervisor` and `docker`, you need to use the foreground mode or it will not start properly.
+- `SMProxy@access denied for user` Please check if the account password in `serve.json` is the same as that configured in the service code.
+- `SMProxy@Database config dbname write is not exists! ` Please change the `dbname` entry in `database.json` to your business database name.
+- Do not configure `localhost` for database `host`.
+- Start the database connection timeout. Please check the database configuration. If it is normal, please lower the `startConns` or increase the `timeout` item in `database.json`.
+- `Reach max connections! Cann't pending fetch!` Appropriately increase `maxSpareConns` or increase the `timeout` entry in `database.json`.
 
 ## Community
 

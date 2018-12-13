@@ -131,7 +131,8 @@ Options:
     - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
 - 多个读库，写库
     - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
-
+- `timeout`
+    - 设置2-5秒最佳。
 ### server.json
 ```json
 {
@@ -186,6 +187,13 @@ Options:
 - `worker_num`
     - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
+## 路由
+### 注解
+   - smproxy:db_type=[read | write]
+        - 强制使用读库 ```/** smproxy:db_type=read */select * from `user` limit 1```
+        - 强制使用写库 ```/** smproxy:db_type=write */select * from `user` limit 1```
+
+
 ## MySQL8.0
 
 - `SMProxy1.2.4`及以上可直接使用
@@ -198,6 +206,15 @@ flush privileges;
 将语句中的 `'root'@'%'` 替换成你所使用的用户, `password` 替换成其密码.
 
 如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
+
+## 常见问题
+
+- 使用`Supervisor`和`docker`时需要使用前台运行模式否则无法正常启动。
+- `SMProxy@access denied for user` 请检查`serve.json`中的账号密码与业务代码中配置的是否一致。
+- `SMProxy@Database config dbname write is not exists! ` 请将`database.json`中的`dbname`项改为你的业务数据库名。
+- 数据库`host`请勿配置`localhost`。
+- 启动出现数据库连接超时请检查数据库配置，若正常请降低`startConns`或增加`database.json`中的`timeout`项。
+- `Reach max connections! Cann't pending fetch!` 适当增加`maxSpareConns`或增加`database.json`中的`timeout`项。
 
 ## 交流
 
