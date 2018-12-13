@@ -11,6 +11,7 @@
             "notName": "/LICENSE|.*\\.md|.*\\.dist|composer\\.json|composer\\.lock/",
             "exclude": [
                 "doc",
+                "docs",
                 "test",
                 "test_old",
                 "tests",
