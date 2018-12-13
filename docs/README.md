@@ -1,4 +1,4 @@
-# [SMProxy](https://github.com/louislivi/SMProxy)
+# SMProxy
 
 [![release](https://img.shields.io/github/release/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/releases)
 [![forks](https://img.shields.io/github/forks/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/network/members)
