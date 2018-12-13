@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:ror="http://rorweb.com/0.1/" >
+<channel>
+  <title>ROR Sitemap for https://smproxy.louislivi.com/</title>
+  <link>https://smproxy.louislivi.com/</link>
+
+<item>
+     <link>https://smproxy.louislivi.com/</link>
+     <title>SMProxy Document</title>
+     <description>一个基于 MySQL 协议，Swoole 开发的MySQL数据库连接池。A MySQL database connection pool based on MySQL protocol and Swoole.</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>0</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+</channel>
+</rss>
+  
