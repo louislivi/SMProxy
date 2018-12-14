@@ -19,6 +19,6 @@
     - [注解](README.md#%e6%b3%a8%e8%a7%a3)
   - [MySQL8.0](README.md#mysql80)
   - [常见问题](README.md#%e5%b8%b8%e8%a7%81%e9%97%ae%e9%a2%98)
-  - [交流](README.md#%e6%8d%90%e8%b5%a0SMProxy%e9%a1%b9%e7%9b%ae)
-  - [捐赠SMProxy项目](README.md#%E4%BA%A4%E6%B5%81)
+  - [交流](README.md#%E4%BA%A4%E6%B5%81)
+  - [捐赠SMProxy项目](README.md#%e6%8d%90%e8%b5%a0SMProxy%e9%a1%b9%e7%9b%ae)
   - [其他学习资料](README.md#%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99)
