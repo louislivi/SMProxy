@@ -53,6 +53,7 @@ PHP 没有连接池，所以高并发时数据库会出现连接打满的情况�
 所以就自己编写了这个仅支持连接池和读写分离的轻量级中间件，使用 Swoole 协程调度 HandshakeV10 协议转发使程序更加稳定，不用像 Mycat 一样解析所有 SQL 包体，增加复杂度。
 
 ## 开发与讨论
-- 文档：<https://smproxy.louislivi.com> 若被墙请访问 [码云文档](https://gitee.com/louislivi/smproxy/blob/master/docs/README.md)
+- 文档：<https://smproxy.louislivi.com>
+    - 若被墙请访问：<https://smproxy.gitee.louislivi.com>
 - QQ群：722124111
 - 欢迎各类 Issue 和 Pull Request。
