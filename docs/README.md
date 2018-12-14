@@ -258,6 +258,15 @@ flush privileges;
 
 QQ群：722124111
 
+## 捐赠SMProxy项目
+
+您的捐赠是对SMProxy项目开发组最大的鼓励和支持。我们会坚持开发维护下去。 您的捐赠将被用于：
+- 持续和深入地开发
+- 文档和社区的建设和维护
+
+### 捐赠方式
+[开源中国-捐赠SMProxy项目](https://gitee.com/louislivi/smproxy?donate=true)
+
 ## 其他学习资料
 
 - MySQL协议分析 ：<https://www.cnblogs.com/davygeek/p/5647175.html>
