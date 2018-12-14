@@ -1,4 +1,4 @@
-FROM php:7.3.0-cli-alpine
+FROM php:7.2.13-cli-alpine
 
 ENV SMProxy_VERSION 1.2.5
 
