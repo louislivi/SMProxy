@@ -7,7 +7,7 @@
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 [![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
 [![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
-
+> `Github` 项目地址：[https://github.com/louislivi/smproxy](https://github.com/louislivi/smproxy) (支持请点Star)
 ## Swoole MySQL Proxy
 
 一个基于 MySQL 协议，Swoole 开发的MySQL数据库连接池。

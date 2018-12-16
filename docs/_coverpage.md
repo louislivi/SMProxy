@@ -28,4 +28,4 @@
 - 兼容各大框架，无缝提升性能
 
 [GitHub](https://github.com/louislivi/SMProxy/)
-[起步](README.md#%E7%8E%AF%E5%A2%83)
+[起步](README.md)

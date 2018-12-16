@@ -28,4 +28,4 @@
 - Compatible with Various Frameworks
 
 [GitHub](https://github.com/louislivi/SMProxy/)
-[Get Started](en/README.md#requirements)
+[Get Started](en/README.md)

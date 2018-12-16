@@ -7,7 +7,7 @@
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 [![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
 [![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
-
+> `Github` Project address: [https://github.com/louislivi/smproxy](https://github.com/louislivi/smproxy) (support Star)
 ## Swoole MySQL Proxy
 
 A MySQL database connection pool based on MySQL protocol and Swoole.
