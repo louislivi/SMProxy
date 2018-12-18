@@ -265,13 +265,22 @@ Replace `'root'@'%'` in the statement with the user you are using, and replace `
 If it is still not available, set `default_authentication_plugin = mysql_native_password` in my.cnf.
 
 ## Troubleshooting
-
-- When using `Supervisor` and `docker`,  you need to use the foreground mode, or it will not start properly.
-- `SMProxy@access denied for user`: Please check if the account password in `serve.json` is the same as that configured in your code.
-- `SMProxy@Database config dbname write is not exists!`: Please change the `dbname` in `database.json` to your database name.
-- Do not set to `localhost` as database `host`.
-- Database connection timed out at starting. Please check the database configuration. If still connot connect to database, please decrease `startConns` or increase `timeout` in `database.json`.
-- `Reach max connections! Cann't pending fetch!`: Increase `maxSpareConns` or `timeout` in `database.json`.
+- `SMProxy@access denied for user`
+    - Please check if the account password in `serve.json` is the same as that configured in the business code.
+    - Do not configure `localhost` for database `host`.
+- `SMProxy@Database config dbname write is not exists! `
+    - Change the `dbname` entry in `database.json` to your business database name.
+- `Reach max connections! Cann't pending fetch!`
+    - Increase `maxSpareConns` appropriately or increase the `timeout` entry in `database.json`.
+- `Must be connected before sending data!`
+    - Currently does not support `MariaDB`, and check if the `MySQL` validation plugin is `mysql_native_password` or `caching_sha2_password` and check for service conflicts. It is recommended to use `Docker` to run the troubleshooting environment.
+- `Connection * waiting timeout`
+    - Start the database connection timeout. Please check the database configuration. If it is normal, please lower the `startConns` or increase the `timeout` item in `database.json`.
+- `The server is not running`
+    - View the logs `mysql.log` and `system.log` under `SMProxy`.
+    - Prevent `SMProxy` from exiting abnormally. It is recommended to use `Supervisor` or `docker` for service mounting.
+- `Supervisor` || `docker`
+    - Use `Supervisor` and `docker` to use the foreground run mode (v1.2.5+ use `--console`, otherwise use `daemonize` parameter) or it will not start properly.
 
 ## Community
 

@@ -246,13 +246,22 @@ flush privileges;
 如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
 
 ## 常见问题
-
-- 使用`Supervisor`和`docker`时需要使用前台运行模式否则无法正常启动。
-- `SMProxy@access denied for user` 请检查`serve.json`中的账号密码与业务代码中配置的是否一致。
-- `SMProxy@Database config dbname write is not exists! ` 请将`database.json`中的`dbname`项改为你的业务数据库名。
-- 数据库`host`请勿配置`localhost`。
-- 启动出现数据库连接超时请检查数据库配置，若正常请降低`startConns`或增加`database.json`中的`timeout`项。
-- `Reach max connections! Cann't pending fetch!` 适当增加`maxSpareConns`或增加`database.json`中的`timeout`项。
+- `SMProxy@access denied for user` 
+    - 请检查`serve.json`中的账号密码与业务代码中配置的是否一致。
+    - 数据库`host`请勿配置`localhost`。
+- `SMProxy@Database config dbname write is not exists! ` 
+    - 请将`database.json`中的`dbname`项改为你的业务数据库名。
+- `Reach max connections! Cann't pending fetch!` 
+    - 适当增加`maxSpareConns`或增加`database.json`中的`timeout`项。
+- `Must be connected before sending data!` 
+    - 目前不支持`MariaDB`，并检查`MySQL`验证插件是否为`mysql_native_password`或`caching_sha2_password`,并排查是否有服务冲突，推荐使用`Docker`进行运行排查环境问题。
+- `Connection * waiting timeout`
+    - 启动出现数据库连接超时请检查数据库配置，若正常请降低`startConns`或增加`database.json`中的`timeout`项。
+- `The server is not running`
+    - 查看`SMProxy`下的日志`mysql.log`和`system.log`。
+    - 防止`SMProxy`异常退出，建议使用`Supervisor`或`docker`进行服务挂载。
+- `Supervisor` || `docker`
+    - 使用`Supervisor`和`docker`时需要使用前台运行模式(v1.2.5+使用`--console`,否则使用`daemonize`参数)否则无法正常启动。
 
 ## 交流
 
