@@ -273,8 +273,11 @@ If it is still not available, set `default_authentication_plugin = mysql_native_
 - `Reach max connections! Cann't pending fetch!`
     - Increase `maxSpareConns` appropriately or increase the `timeout` entry in `database.json`.
 - `Must be connected before sending data!`
-    - Currently does not support `MariaDB`, and check if the `MySQL` validation plugin is `mysql_native_password` or `caching_sha2_password` and check for service conflicts. It is recommended to use `Docker` to run the troubleshooting environment.
+    - Check if `MySQL` has access to the external network.
+    - Check if `MySQL` verifies that the plugin is `mysql_native_password` or `caching_sha2_password`
+    - Check for service conflicts. It is recommended to use `Docker` to run a troubleshooting environment.
 - `Connection * waiting timeout`
+    - Check if `MySQL` has access to the external network.
     - Start the database connection timeout. Please check the database configuration. If it is normal, please lower the `startConns` or increase the `timeout` item in `database.json`.
 - `The server is not running`
     - View the logs `mysql.log` and `system.log` under `SMProxy`.

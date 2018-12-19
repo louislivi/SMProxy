@@ -254,8 +254,11 @@ flush privileges;
 - `Reach max connections! Cann't pending fetch!` 
     - 适当增加`maxSpareConns`或增加`database.json`中的`timeout`项。
 - `Must be connected before sending data!` 
-    - 目前不支持`MariaDB`，并检查`MySQL`验证插件是否为`mysql_native_password`或`caching_sha2_password`,并排查是否有服务冲突，推荐使用`Docker`进行运行排查环境问题。
+    - 检查`MySQL`是否有外网访问权限。
+    - 检查`MySQL`验证插件是否为`mysql_native_password`或`caching_sha2_password`
+    - 排查是否有服务冲突，推荐使用`Docker`进行运行排查环境问题。
 - `Connection * waiting timeout`
+    - 检查`MySQL`是否有外网访问权限。
     - 启动出现数据库连接超时请检查数据库配置，若正常请降低`startConns`或增加`database.json`中的`timeout`项。
 - `The server is not running`
     - 查看`SMProxy`下的日志`mysql.log`和`system.log`。
