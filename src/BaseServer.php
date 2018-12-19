@@ -2,11 +2,9 @@
 
 namespace SMProxy;
 
-use function SMProxy\Helper\array_iconv;
 use SMProxy\Helper\ProcessHelper;
 use function SMProxy\Helper\smproxy_error;
 use SMProxy\Log\Log;
-use SMProxy\MysqlPacket\ErrorPacket;
 use Swoole\Coroutine;
 
 /**
@@ -110,18 +108,5 @@ abstract class BaseServer extends Base
         if ($cid > 0 && isset(self::$pool[$cid])) {
             unset(self::$pool[$cid]);
         }
-    }
-
-    protected function writeErrMessage(int $id, string $msg, int $errno = 0, $sqlState = 'HY000')
-    {
-        $err = new ErrorPacket();
-        $err->packetId = $id;
-        if ($errno) {
-            $err->errno = $errno;
-        }
-        $err->sqlState = $sqlState;
-        $err->message  = array_iconv($msg);
-
-        return $err->write();
     }
 }

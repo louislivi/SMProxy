@@ -267,7 +267,7 @@ class SMProxyServer extends BaseServer
     {
         $message = 'SMProxy@access denied for user \'' . $this->source[$fd]->user . '\'@\'' .
             $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
-        $errMessage = $this->writeErrMessage($serverId, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
+        $errMessage = self::writeErrMessage($serverId, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
         if ($server->exist($fd)) {
             $server->send($fd, getString($errMessage));
         }
@@ -300,7 +300,7 @@ class SMProxyServer extends BaseServer
                 if (!array_key_exists($key, $this->dbConfig)) {
                     $message = 'SMProxy@Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
                         ' is not exists!';
-                    $errMessage = $this->writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
+                    $errMessage = self::writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
                     if ($server->exist($fd)) {
                         $server->send($fd, getString($errMessage));
                     }

@@ -524,4 +524,5 @@ interface ErrorCode
     const ER_PLUGIN_IS_NOT_LOADED = 1494;
     const ER_MULTI_QUERY_TIMEOUT = 1495;
     const ER_MULTI_EXEC_ERROR = 1496;
+    const ER_HAS_GONE_AWAY = 2006;
 }

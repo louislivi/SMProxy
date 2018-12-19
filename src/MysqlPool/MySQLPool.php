@@ -3,6 +3,8 @@
 namespace SMProxy\MysqlPool;
 
 use SMProxy\Base;
+use function SMProxy\Helper\getString;
+use SMProxy\MysqlPacket\Util\ErrorCode;
 use SMProxy\MysqlProxy;
 use Swoole\Coroutine\Client;
 
@@ -196,7 +198,13 @@ class MySQLPool extends Base
             $serverInfo['port'],
             $serverInfo['timeout'] ?? 0.1
         )) {
-            throw new MySQLException('Cann\'t connect to MySQL server: ' . json_encode($serverInfo));
+            --self::$initConnCount[$connName];
+            $message = 'SMProxy@MySQL server has gone away';
+            $errMessage = self::writeErrMessage(1, $message, ErrorCode::ER_HAS_GONE_AWAY);
+            if ($server->exist($fd)) {
+                $server->send($fd, getString($errMessage));
+            }
+            throw new MySQLException($message);
         }
         $timeout_message = 'Connection ' . $serverInfo['host'] . ':' . $serverInfo['port'] .
             ' waiting timeout, timeout=' . $serverInfo['timeout'];

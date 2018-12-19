@@ -58,8 +58,7 @@ class MysqlProxy extends MysqlClient
      * @param float $timeout
      * @param int $tryStep
      *
-     * @return Client
-     * @throws SMProxyException
+     * @return bool|Client
      */
     public function connect(string $host, int $port, float $timeout = 0.1, int $tryStep = 0)
     {
@@ -69,7 +68,7 @@ class MysqlProxy extends MysqlClient
                 return $this ->connect($host, $port, $timeout, ++$tryStep);
             } else {
                 $this->onClientError($this ->client);
-                throw new SMProxyException("connect {$host}:{$port} failed. Error: {$this->client->errCode}\n");
+                return false;
             }
         } else {
             self::go(function () {
@@ -79,7 +78,7 @@ class MysqlProxy extends MysqlClient
                     } else {
                         $data = $this->client->recv();
                     }
-                    if (!$data) {
+                    if ($data === '') {
                         $this ->onClientClose($this ->client);
                         break;
                     }

@@ -4,6 +4,8 @@ namespace SMProxy;
 
 use SMProxy\Log\Log;
 use SMProxy\MysqlPool\MySQLException;
+use SMProxy\MysqlPacket\ErrorPacket;
+use function SMProxy\Helper\array_iconv;
 
 /**
  * Author: Louis Livi <574747417@qq.com>
@@ -101,5 +103,18 @@ class Base extends Context
             unset($config['databases'][$key]);
         }
         return $config['databases'];
+    }
+
+    protected static function writeErrMessage(int $id, string $msg, int $errno = 0, $sqlState = 'HY000')
+    {
+        $err = new ErrorPacket();
+        $err->packetId = $id;
+        if ($errno) {
+            $err->errno = $errno;
+        }
+        $err->sqlState = $sqlState;
+        $err->message  = array_iconv($msg);
+
+        return $err->write();
     }
 }
