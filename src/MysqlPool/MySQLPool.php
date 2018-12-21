@@ -138,7 +138,12 @@ class MySQLPool extends Base
             $client = self::coPop(self::$yieldChannel[$connName], self::$connsConfig[$connName]['serverInfo']['timeout']);
             if (false === $client) {
                 --self::$pendingFetchCount[$connName];
-                throw new MySQLException('Reach max connections! Cann\'t pending fetch!');
+                $message = 'SMProxy@Reach max connections! Cann\'t pending fetch!';
+                $errMessage = self::writeErrMessage(1, $message, ErrorCode::ER_HAS_GONE_AWAY);
+                if ($server->exist($fd)) {
+                    $server->send($fd, getString($errMessage));
+                }
+                throw new MySQLException($message);
             }
             --self::$resumeFetchCount[$connName];
             if (!empty($connsPool)) {
@@ -193,11 +198,7 @@ class MySQLPool extends Base
 
         $conn->account  = $serverInfo['account'];
         $conn->charset  = self::$connsConfig[$connName]['charset'];
-        if (false == $conn->connect(
-            $serverInfo['host'],
-            $serverInfo['port'],
-            $serverInfo['timeout'] ?? 0.1
-        )) {
+        if (false == $conn->connect($serverInfo['host'], $serverInfo['port'], $serverInfo['timeout'] ?? 0.1)) {
             --self::$initConnCount[$connName];
             $message = 'SMProxy@MySQL server has gone away';
             $errMessage = self::writeErrMessage(1, $message, ErrorCode::ER_HAS_GONE_AWAY);
@@ -206,15 +207,19 @@ class MySQLPool extends Base
             }
             throw new MySQLException($message);
         }
-        $timeout_message = 'Connection ' . $serverInfo['host'] . ':' . $serverInfo['port'] .
-            ' waiting timeout, timeout=' . $serverInfo['timeout'];
         $client = self::coPop($chan, $serverInfo['timeout'] * 3);
         if ($client === false) {
             --self::$initConnCount[$connName];
             if ($tryStep < 3) {
                 return self::initConn($server, $fd, $connName, ++$tryStep);
             } else {
-                throw new MySQLException($timeout_message);
+                $message = 'SMProxy@Connection ' . $serverInfo['host'] . ':' . $serverInfo['port'] .
+                    ' waiting timeout, timeout=' . $serverInfo['timeout'];
+                $errMessage = self::writeErrMessage(1, $message, ErrorCode::ER_HAS_GONE_AWAY);
+                if ($server->exist($fd)) {
+                    $server->send($fd, getString($errMessage));
+                }
+                throw new MySQLException($message);
             }
         }
         $id = spl_object_hash($client);
@@ -250,36 +255,6 @@ class MySQLPool extends Base
                 self::recycle($proxyConn, false);
             }
         });
-    }
-
-    /**
-     * 协程pop
-     *
-     * @param $chan
-     * @param int $timeout
-     *
-     * @return bool
-     */
-    private static function coPop($chan, $timeout = 0)
-    {
-        if (version_compare(swoole_version(), '4.0.3', '>=')) {
-            return $chan->pop($timeout);
-        } else {
-            if (0 == $timeout) {
-                return $chan->pop();
-            } else {
-                $writes = [];
-                $reads = [$chan];
-                $result = $chan->select($reads, $writes, $timeout);
-                if (false === $result || empty($reads)) {
-                    return false;
-                }
-
-                $readChannel = $reads[0];
-
-                return $readChannel->pop();
-            }
-        }
     }
 
     /**

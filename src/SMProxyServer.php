@@ -81,16 +81,20 @@ class SMProxyServer extends BaseServer
                             $model = 'write';
                         }
                         $key = $this ->compareModel($model, $server, $fd);
-                        if (isset($this->mysqlClient[$fd][$model])) {
-                            $client = $this->mysqlClient[$fd][$model];
+                        if (isset($this->mysqlClient[$fd][$key])) {
+                            $client = self::coPop($this->mysqlClient[$fd][$key], $this->dbConfig[$key]['serverInfo']['timeout']);
                             if ($data && $client->client->isConnected()) {
                                 $client->client->send($data);
                             }
+                            $this->mysqlClient[$fd][$key]->push($client);
                         } else {
                             $client = MySQLPool::fetch($key, $server, $fd);
-                            $this->mysqlClient[$fd][$model] = $client;
                             if ($data && $client->client->isConnected()) {
-                                $client->client->send($data);
+                                $result = $client->client->send($data);
+                                if ($result) {
+                                    $this->mysqlClient[$fd][$key] = new Coroutine\Channel(1);
+                                    $this->mysqlClient[$fd][$key]->push($client);
+                                }
                             }
                         }
                     }
@@ -124,18 +128,24 @@ class SMProxyServer extends BaseServer
             unset($this->connectHasAutoCommit[$fd]);
         }
         if (isset($this->mysqlClient[$fd])) {
-            if (isset($this->mysqlClient[$fd]['write'] ->client) && $this->mysqlClient[$fd]['write'] ->client && $this->mysqlClient[$fd]['write'] ->client->isConnected()) {
-                if ($connectHasTransaction) {
-                    $this->mysqlClient[$fd]['write']->client->send(getString([9, 0, 0, 0, 3, 82, 79, 76, 76, 66, 65, 67, 75]));
+            foreach ($this->mysqlClient[$fd] as $key => $mysqlClient) {
+                $model = explode(DB_DELIMITER, $key)[0];
+                $conn = self::coPop($mysqlClient, $this->dbConfig[$key]['serverInfo']['timeout']);
+                if ($conn) {
+                    if ($model == 'write') {
+                        if (isset($conn ->client) && $conn ->client && $conn ->client->isConnected()) {
+                            if ($connectHasTransaction) {
+                                $conn->client->send(getString([9, 0, 0, 0, 3, 82, 79, 76, 76, 66, 65, 67, 75]));
+                            }
+                            if ($connectHasAutoCommit) {
+                                $conn->client->send(getString([
+                                    17, 0, 0, 0, 3, 115, 101, 116, 32, 97, 117, 116, 111, 99, 111, 109, 109, 105, 116, 61, 49,
+                                ]));
+                            }
+                        }
+                    }
+                    MySQLPool::recycle($conn);
                 }
-                if ($connectHasAutoCommit) {
-                    $this->mysqlClient[$fd]['write']->client->send(getString([
-                        17, 0, 0, 0, 3, 115, 101, 116, 32, 97, 117, 116, 111, 99, 111, 109, 109, 105, 116, 61, 49,
-                    ]));
-                }
-            }
-            foreach ($this->mysqlClient[$fd] as $mysqlClient) {
-                MySQLPool::recycle($mysqlClient);
             }
             unset($this->mysqlClient[$fd]);
         }
@@ -194,7 +204,7 @@ class SMProxyServer extends BaseServer
             $test_client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
             if (!$test_client->connect($value['serverInfo']['host'], $value['serverInfo']['port'], $value['serverInfo']['timeout'])) {
                 throw new MySQLException('connect ' . explode(DB_DELIMITER, $key)[0] .
-                      ' ' . explode(DB_DELIMITER, $key)[1] . ' failed, ErrorCode: ' . $test_client->errCode . "\n");
+                    ' ' . explode(DB_DELIMITER, $key)[1] . ' failed, ErrorCode: ' . $test_client->errCode . "\n");
             }
             $test_client->close();
             //初始化连接

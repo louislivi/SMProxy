@@ -105,6 +105,36 @@ class Base extends Context
         return $config['databases'];
     }
 
+    /**
+     * 协程pop
+     *
+     * @param $chan
+     * @param int $timeout
+     *
+     * @return bool
+     */
+    protected static function coPop($chan, $timeout = 0)
+    {
+        if (version_compare(swoole_version(), '4.0.3', '>=')) {
+            return $chan->pop($timeout);
+        } else {
+            if (0 == $timeout) {
+                return $chan->pop();
+            } else {
+                $writes = [];
+                $reads = [$chan];
+                $result = $chan->select($reads, $writes, $timeout);
+                if (false === $result || empty($reads)) {
+                    return false;
+                }
+
+                $readChannel = $reads[0];
+
+                return $readChannel->pop();
+            }
+        }
+    }
+
     protected static function writeErrMessage(int $id, string $msg, int $errno = 0, $sqlState = 'HY000')
     {
         $err = new ErrorPacket();
