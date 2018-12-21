@@ -81,19 +81,21 @@ class SMProxyServer extends BaseServer
                             $model = 'write';
                         }
                         $key = $this ->compareModel($model, $server, $fd);
-                        if (isset($this->mysqlClient[$fd][$key])) {
-                            $client = self::coPop($this->mysqlClient[$fd][$key], $this->dbConfig[$key]['serverInfo']['timeout']);
-                            if ($data && $client->client->isConnected()) {
-                                $client->client->send($data);
-                            }
-                            $this->mysqlClient[$fd][$key]->push($client);
-                        } else {
-                            $client = MySQLPool::fetch($key, $server, $fd);
-                            if ($data && $client->client->isConnected()) {
-                                $result = $client->client->send($data);
-                                if ($result) {
-                                    $this->mysqlClient[$fd][$key] = new Coroutine\Channel(1);
-                                    $this->mysqlClient[$fd][$key]->push($client);
+                        if ($data) {
+                            if (isset($this->mysqlClient[$fd][$key])) {
+                                $client = self::coPop($this->mysqlClient[$fd][$key], $this->dbConfig[$key]['serverInfo']['timeout']);
+                                if ($client->client->isConnected()) {
+                                    $client->client->send($data);
+                                }
+                                $this->mysqlClient[$fd][$key]->push($client);
+                            } else {
+                                $client = MySQLPool::fetch($key, $server, $fd);
+                                if ($client->client->isConnected()) {
+                                    $result = $client->client->send($data);
+                                    if ($result) {
+                                        $this->mysqlClient[$fd][$key] = new Coroutine\Channel(1);
+                                        $this->mysqlClient[$fd][$key]->push($client);
+                                    }
                                 }
                             }
                         }
