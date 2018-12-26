@@ -284,6 +284,8 @@ If it is still not available, set `default_authentication_plugin = mysql_native_
     - Prevent `SMProxy` from exiting abnormally. It is recommended to use `Supervisor` or `docker` for service mounting.
 - `Supervisor` || `docker`
     - Use `Supervisor` and `docker` to use the foreground run mode (v1.2.5+ use `--console`, otherwise use `daemonize` parameter) or it will not start properly.
+- `502 Bad Gateway`
+    - After MySQL crashes abnormally, the connection appears 502 or the connection times out. Please do not enable long connection mode.
 
 ## Community
 

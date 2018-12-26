@@ -265,6 +265,8 @@ flush privileges;
     - 防止`SMProxy`异常退出，建议使用`Supervisor`或`docker`进行服务挂载。
 - `Supervisor` || `docker`
     - 使用`Supervisor`和`docker`时需要使用前台运行模式(v1.2.5+使用`--console`,否则使用`daemonize`参数)否则无法正常启动。
+- `502 Bad Gateway`
+    - MySQL异常崩溃后连接出现502或连接超时，请不要开启长连接模式。
 
 ## 交流
 
