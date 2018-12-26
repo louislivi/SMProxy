@@ -138,7 +138,7 @@ class MySQLMessage
 
     public function readLength()
     {
-        $length = $this->data[$this->position++] & 0xff;
+        $length = ($this->data[$this->position++] ?? 0) & 0xff;
         switch ($length) {
             case 251:
                 return self::$NULL_LENGTH;

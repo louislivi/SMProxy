@@ -266,7 +266,7 @@ class MysqlProxy extends MysqlClient
      */
     public function onClientClose(\Swoole\Coroutine\Client $cli)
     {
-        MySQLPool::destruct($cli, $this->model . DB_DELIMITER . $this->database);
+        MySQLPool::destruct($cli, $this->database ? ($this->model . DB_DELIMITER . $this->database) : $this->model);
     }
 
     public function onClientError(\Swoole\Coroutine\Client $cli)

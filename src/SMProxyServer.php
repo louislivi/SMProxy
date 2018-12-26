@@ -337,6 +337,10 @@ class SMProxyServer extends BaseServer
                 }
                 $this->source[$fd]->auth = true;
             }
+        } elseif ($bin->data[4] == 14) {
+            if ($server->exist($fd)) {
+                $server->send($fd, getString(OkPacket::$OK));
+            }
         } else {
             $authPacket = new AuthPacket();
             $authPacket->read($bin);

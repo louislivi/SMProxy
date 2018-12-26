@@ -327,7 +327,7 @@ final class ServerParse
     // HELP' '
     public static function helpCheck(string $stmt, int $offset)
     {
-        if (strlen($stmt) > strlen($offset . "ELP ")) {
+        if (strlen($stmt) > $offset + 3) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
@@ -342,7 +342,7 @@ final class ServerParse
     // EXPLAIN' '
     public static function explainCheck(string $stmt, int $offset)
     {
-        if (strlen($stmt) > strlen($offset . "XPLAIN ")) {
+        if (strlen($stmt) > $offset + 6) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
@@ -366,7 +366,7 @@ final class ServerParse
     // KILL' '
     public static function killCheck(string $stmt, int $offset)
     {
-        if (strlen($stmt) > strlen($offset . "ILL ")) {
+        if (strlen($stmt) > $offset + 3) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
@@ -397,7 +397,7 @@ final class ServerParse
     // KILL QUERY' '
     public static function killQueryCheck(string $stmt, int $offset)
     {
-        if (strlen($stmt) > strlen($offset . "UERY ")) {
+        if (strlen($stmt) > $offset + 4) {
             $c1 = $stmt[++$offset];
             $c2 = $stmt[++$offset];
             $c3 = $stmt[++$offset];
