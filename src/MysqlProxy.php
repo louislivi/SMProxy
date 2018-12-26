@@ -18,6 +18,7 @@ use SMProxy\MysqlPacket\Util\ErrorCode;
 use SMProxy\MysqlPacket\Util\SecurityUtil;
 use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPool\MySQLPool;
+use Swoole\Coroutine\Channel;
 use Swoole\Coroutine\Client;
 
 /**
@@ -36,6 +37,8 @@ class MysqlProxy extends MysqlClient
     public $serverPublicKey;
     public $salt;
     public $connected = false;
+    public $timeout = 0.1;
+    public $mysqlClient;
 
     /**
      * MysqlClient constructor.
@@ -48,6 +51,7 @@ class MysqlProxy extends MysqlClient
         $this->chan = $chan;
         $this->client = new Client(CONFIG['server']['swoole_client_sock_setting']['sock_type'] ?? SWOOLE_SOCK_TCP);
         $this->client->set(CONFIG['server']['swoole_client_setting'] ?? []);
+        $this->mysqlClient = new Channel(1);
     }
 
     /**
@@ -62,27 +66,23 @@ class MysqlProxy extends MysqlClient
      */
     public function connect(string $host, int $port, float $timeout = 0.1, int $tryStep = 0)
     {
+        $this->timeout = $timeout;
         if (!$this->client->connect($host, $port, $timeout)) {
             if ($tryStep < 3) {
                 $this->client->close();
-                return $this ->connect($host, $port, $timeout, ++$tryStep);
+                return $this->connect($host, $port, $timeout, ++$tryStep);
             } else {
-                $this->onClientError($this ->client);
+                $this->onClientError($this->client);
                 return false;
             }
         } else {
+            $this->mysqlClient->push($this->client);
             self::go(function () {
                 while (true) {
-                    if (version_compare(swoole_version(), '2.1.2', '>=')) {
-                        $data = $this->client->recv(-1);
-                    } else {
-                        $data = $this->client->recv();
-                    }
+                    $data = $this ->recv();
                     if ($data === '') {
-                        $this ->onClientClose($this ->client);
                         break;
                     }
-                    $this ->onClientReceive($this ->client, $data);
                 }
             });
             return $this->client;
@@ -127,43 +127,37 @@ class MysqlProxy extends MysqlClient
                                 $this->chan->push($this);
                             }
                             # 快速认证
-                        } elseif ($binaryPacket ->data[4] == 0x01) {
+                        } elseif ($binaryPacket->data[4] == 0x01) {
                             # 请求公钥
-                            if ($binaryPacket ->packetLength == 6) {
-                                if ($binaryPacket ->data[$binaryPacket->packetLength - 1] == 4) {
+                            if ($binaryPacket->packetLength == 6) {
+                                if ($binaryPacket->data[$binaryPacket->packetLength - 1] == 4) {
                                     $data = getString(array_merge(getMysqlPackSize(1), [3, 2]));
-                                    if ($cli->isConnected()) {
-                                        $cli->send($data);
-                                    }
+                                    $this->send($data);
                                 }
                             } else {
                                 $this->serverPublicKey = substr($data, 5, strlen($data) - 2);
-                                $encryptData = SecurityUtil::sha2RsaEncrypt($this->account['password'], $this ->salt, $this->serverPublicKey);
+                                $encryptData = SecurityUtil::sha2RsaEncrypt($this->account['password'], $this->salt, $this->serverPublicKey);
                                 $data = getString(array_merge(getMysqlPackSize(strlen($encryptData)), [5])) . $encryptData;
-                                if ($cli->isConnected()) {
-                                    $cli->send($data);
-                                }
+                                $this->send($data);
                             }
                             $send = false;
-                        } elseif ($binaryPacket ->data[4] == 0xfe) {
+                        } elseif ($binaryPacket->data[4] == 0xfe) {
                             $mm = new MySQLMessage($binaryPacket->data);
                             $mm->move(5);
                             $pluginName = $mm->readStringWithNull();
                             $this->salt = $mm->readBytesWithNull();
                             $password = $this->processAuth($pluginName ?: 'mysql_native_password');
-                            if ($cli->isConnected()) {
-                                $cli->send(getString(array_merge(getMysqlPackSize(count($password)), [3], $password)));
-                            }
+                            $this->send(getString(array_merge(getMysqlPackSize(count($password)), [3], $password)));
                             $send = false;
                         } elseif (!$this->auth) {
                             $handshakePacket = (new HandshakePacket())->read($binaryPacket);
-                            $this ->salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
-                            $password = $this->processAuth($handshakePacket ->pluginName);
+                            $this->salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
+                            $password = $this->processAuth($handshakePacket->pluginName);
                             $clientFlag = Capabilities::CLIENT_CAPABILITIES;
                             $authPacket = new AuthPacket();
-                            $authPacket->pluginName = $handshakePacket ->pluginName;
+                            $authPacket->pluginName = $handshakePacket->pluginName;
                             $authPacket->packetId = 1;
-                            if (isset($this ->database) && $this ->database) {
+                            if (isset($this->database) && $this->database) {
                                 $authPacket->database = $this->database;
                             } else {
                                 $authPacket->database = 0;
@@ -171,20 +165,18 @@ class MysqlProxy extends MysqlClient
                             if ($authPacket->database) {
                                 $clientFlag |= Capabilities::CLIENT_CONNECT_WITH_DB;
                             }
-                            if (version_compare($handshakePacket ->serverVersion, '5.0', '>=')) {
+                            if (version_compare($handshakePacket->serverVersion, '5.0', '>=')) {
                                 $clientFlag |= Capabilities::CLIENT_MULTI_RESULTS;
                             }
                             $authPacket->clientFlags = $clientFlag;
-                            $authPacket->serverCapabilities = $handshakePacket ->serverCapabilities;
+                            $authPacket->serverCapabilities = $handshakePacket->serverCapabilities;
                             $authPacket->maxPacketSize =
                                 CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777216;
                             $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf8mb4');
                             $authPacket->user = $this->account['user'];
                             $authPacket->password = $password;
                             $this->auth = true;
-                            if ($cli->isConnected()) {
-                                $cli->send(getString($authPacket->write()));
-                            }
+                            $this->send(getString($authPacket->write()));
                             $send = false;
                         }
                     }
@@ -207,10 +199,10 @@ class MysqlProxy extends MysqlClient
     {
         switch ($pluginName) {
             case 'mysql_native_password':
-                $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);
+                $password = SecurityUtil::scramble411($this->account['password'], $this->salt);
                 break;
             case 'caching_sha2_password':
-                $password = SecurityUtil::scrambleSha256($this->account['password'], $this ->salt);
+                $password = SecurityUtil::scrambleSha256($this->account['password'], $this->salt);
                 break;
             case 'sha256_password':
                 new MySQLException('Sha256_password plugin is not supported yet');
@@ -222,10 +214,49 @@ class MysqlProxy extends MysqlClient
                 $password = array_merge(getBytes($this->account['password']), [0]);
                 break;
             default:
-                $password = SecurityUtil::scramble411($this->account['password'], $this ->salt);
+                $password = SecurityUtil::scramble411($this->account['password'], $this->salt);
                 break;
         }
         return $password;
+    }
+
+    /**
+     * send.
+     *
+     * @param mixed ...$data
+     *
+     * @return bool
+     */
+    public function send(...$data)
+    {
+        $client = self::coPop($this->mysqlClient, $this->timeout);
+        if ($client->isConnected()) {
+            $result = $client->send(...$data);
+            $this->mysqlClient->push($client);
+            return $result;
+        }
+        return false;
+    }
+
+    /**
+     * recv.
+     *
+     */
+    public function recv()
+    {
+        $client = self::coPop($this->mysqlClient, $this->timeout);
+        if (version_compare(swoole_version(), '2.1.2', '>=')) {
+            $data = $client->recv(0.00001);
+        } else {
+            $data = $client->recv();
+        }
+        $this->mysqlClient->push($client);
+        if ($data === '') {
+            $this->onClientClose($client);
+        } elseif (is_string($data)) {
+            $this->onClientReceive($client, $data);
+        }
+        return $data;
     }
 
     /**

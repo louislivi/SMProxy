@@ -40,14 +40,14 @@ class Base extends Context
                 $errLevel = $SMProxyException ->getCode() ? array_search($SMProxyException ->getCode(), Log::$levels) : 'error';
                 $system_log->$errLevel($SMProxyException->errorMessage());
                 if (CONFIG['server']['swoole']['daemonize'] != true) {
-                    echo $SMProxyException->errorMessage(), PHP_EOL;
+                    echo '[' . ucfirst($errLevel) . '] ', $SMProxyException->errorMessage(), PHP_EOL;
                 }
             } catch (MySQLException $MySQLException) {
                 $mysql_log = Log::getLogger('mysql');
                 $errLevel = $MySQLException ->getCode() ? array_search($MySQLException ->getCode(), Log::$levels) : 'warning';
                 $mysql_log->$errLevel($MySQLException->errorMessage());
                 if (CONFIG['server']['swoole']['daemonize'] != true) {
-                    echo $MySQLException->errorMessage(), PHP_EOL;
+                    echo  '[' . ucfirst($errLevel) . '] ', $MySQLException->errorMessage(), PHP_EOL;
                 }
             }
         });
