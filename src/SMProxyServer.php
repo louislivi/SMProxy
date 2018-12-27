@@ -36,6 +36,7 @@ class SMProxyServer extends BaseServer
     public $source;
     public $mysqlClient;
     protected $dbConfig;
+    public $halfPack;
 
     /**
      * 连接.
@@ -67,7 +68,15 @@ class SMProxyServer extends BaseServer
             if (!isset($this->source[$fd]->auth)) {
                 throw new SMProxyException('Must be connected before sending data!');
             }
-            $packages = packageSplit($data, $this->source[$fd]->auth ?: false);
+            if (!isset($this->halfPack[$fd])) {
+                $this->halfPack[$fd] = '';
+            }
+            if ($this->source[$fd]->auth) {
+                $headerLength = 4;
+            } else {
+                $headerLength = 3;
+            }
+            $packages = packageSplit($data, $this->source[$fd]->auth ?: false, $headerLength, false, $this->halfPack[$fd]);
             foreach ($packages as $package) {
                 $data = $package;
                 self::go(function () use ($server, $fd, $reactor_id, $data) {
@@ -110,6 +119,9 @@ class SMProxyServer extends BaseServer
     {
         if (isset($this->source[$fd])) {
             unset($this->source[$fd]);
+        }
+        if (isset($this->halfPack[$fd])) {
+            unset($this->halfPack[$fd]);
         }
         $connectHasTransaction = false;
         $connectHasAutoCommit  = false;

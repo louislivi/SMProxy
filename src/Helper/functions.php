@@ -291,17 +291,31 @@ function smproxy_error($message, $exitCode = 0)
  * @param bool $auth
  * @param int $headerLength 是否认证通过
  * @param bool $isClient 是否是客户端
+ * @param string $halfPack 半包体
  *
  * @return array
  */
-function packageSplit(string $data, bool $auth, $headerLength = 4, $isClient = false)
+function packageSplit(string $data, bool $auth, int $headerLength = 4, bool $isClient = false, string &$halfPack = '')
 {
+    if ($halfPack !== '') {
+        $data = $halfPack . $data;
+    }
     $dataLen = strlen($data);
+    if ($headerLength == 3) {
+        $dataLen -= 1;
+    }
     if ($dataLen < 4) {
         return [];
     }
-    if ($dataLen == getPackageLength($data, 0, $headerLength)) {
+    $packageLen = getPackageLength($data, 0, $headerLength);
+    if ($dataLen == $packageLen) {
+        $halfPack = '';
         return [$data];
+    } elseif ($dataLen < $packageLen) {
+        $halfPack = $data;
+        return [];
+    } else {
+        $halfPack = '';
     }
     $packages = [];
     $split = function ($data, &$packages, $step = 0) use (&$split, $headerLength, $isClient) {
