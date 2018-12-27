@@ -226,10 +226,14 @@ class MysqlProxy extends MysqlClient
      * @param mixed ...$data
      *
      * @return bool
+     * @throws MySQLException
      */
     public function send(...$data)
     {
-        $client = self::coPop($this->mysqlClient, $this->timeout);
+        $client = self::coPop($this->mysqlClient, $this->timeout * 3);
+        if ($client === false) {
+            throw new MySQLException('Send data timeout');
+        }
         if ($client->isConnected()) {
             $result = $client->send(...$data);
             $this->mysqlClient->push($client);
@@ -246,7 +250,7 @@ class MysqlProxy extends MysqlClient
     {
         $client = self::coPop($this->mysqlClient, $this->timeout);
         if (version_compare(swoole_version(), '2.1.2', '>=')) {
-            $data = $client->recv(0.001);
+            $data = $client->recv($this->timeout / 500);
         } else {
             $data = $client->recv();
         }

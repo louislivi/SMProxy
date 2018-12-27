@@ -296,7 +296,11 @@ function smproxy_error($message, $exitCode = 0)
  */
 function packageSplit(string $data, bool $auth, $headerLength = 4, $isClient = false)
 {
-    if (strlen($data) == getPackageLength($data, 0, $headerLength)) {
+    $dataLen = strlen($data);
+    if ($dataLen < 4) {
+        return [];
+    }
+    if ($dataLen == getPackageLength($data, 0, $headerLength)) {
         return [$data];
     }
     $packages = [];

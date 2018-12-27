@@ -30,7 +30,7 @@ class MySqlPacketDecoder
         $data = getBytes($data);
         // 4 bytes:3 length + 1 packetId
         if (count($data) < $this->packetHeaderSize) {
-            throw new SMProxyException('Packet is empty ' . $this->maxPacketSize);
+            throw new SMProxyException('Packet is empty');
         }
         $packetLength = ByteUtil::readUB3($data);
 //        // 过载保护
