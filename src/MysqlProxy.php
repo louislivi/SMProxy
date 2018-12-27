@@ -246,7 +246,7 @@ class MysqlProxy extends MysqlClient
     {
         $client = self::coPop($this->mysqlClient, $this->timeout);
         if (version_compare(swoole_version(), '2.1.2', '>=')) {
-            $data = $client->recv(0.00001);
+            $data = $client->recv(0.001);
         } else {
             $data = $client->recv();
         }
