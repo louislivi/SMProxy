@@ -34,7 +34,7 @@
       "pid_file": "ROOT/logs/pid/server.pid"
     },
     "swoole_client_setting": {
-      "package_max_length": 16777216
+      "package_max_length": 16777215
     },
     "swoole_client_sock_setting": {
       "sock_type": "SWOOLE_SOCK_TCP"
