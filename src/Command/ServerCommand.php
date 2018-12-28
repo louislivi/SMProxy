@@ -15,7 +15,7 @@ class ServerCommand
     public $desc;
     public $usage;
     public $serverSetting = [];
-    const  SMPROXY_VERSION = 'v1.2.6-rc.1';
+    const  SMPROXY_VERSION = 'v1.2.6';
 
     public function __construct()
     {
