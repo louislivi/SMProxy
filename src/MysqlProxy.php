@@ -260,6 +260,8 @@ class MysqlProxy extends MysqlClient
             } else {
                 $data = $client->recv();
             }
+        } else {
+            $data = '';
         }
         $this->mysqlClient->push($client);
         if ($data === '') {
