@@ -23,11 +23,6 @@ class RouteService
                 if ($firstSplitPos > 0) {
                     $hintArr = self::parseHint($hint);
                     return $hintArr;
-//                    $hintType = $hintArr[self::SMPROXY_HINT_TYPE];
-//                    $hintSql  = $hintArr[$hintType];
-//                    if(strlen($hintSql) != 0) {
-//                        $realSQL = substr($stmt, trim(strlen($endPos . "*/")));
-//                    }
                 }
             }
         }

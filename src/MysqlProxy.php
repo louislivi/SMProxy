@@ -245,14 +245,21 @@ class MysqlProxy extends MysqlClient
     /**
      * recv.
      *
+     * @return mixed
+     * @throws MySQLException
      */
     public function recv()
     {
         $client = self::coPop($this->mysqlClient, $this->timeout);
-        if (version_compare(swoole_version(), '2.1.2', '>=')) {
-            $data = $client->recv($this->timeout / 500);
-        } else {
-            $data = $client->recv();
+        if ($client === false) {
+            throw new MySQLException('Receive data timeout');
+        }
+        if ($client->isConnected()) {
+            if (version_compare(swoole_version(), '2.1.2', '>=')) {
+                $data = $client->recv($this->timeout / 500);
+            } else {
+                $data = $client->recv();
+            }
         }
         $this->mysqlClient->push($client);
         if ($data === '') {
