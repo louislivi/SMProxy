@@ -7,7 +7,11 @@
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 [![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
 [![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
-> `Github` Project address: [https://github.com/louislivi/smproxy](https://github.com/louislivi/smproxy) (support Star)
+
+> `Github` Project address: [https://github.com/louislivi/smproxy](https://github.com/louislivi/smproxy) (Support Star)
+
+> `Gitlab` Project address: [https://gitlab.com/louislivi/smproxy](https://gitlab.com/louislivi/smproxy) (Support Star)
+
 ## Swoole MySQL Proxy
 
 A MySQL database connection pool based on MySQL protocol and Swoole.
@@ -251,18 +255,17 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 ## MySQL8.0
 
 - `SMProxy1.2.4` and above can be used directly
-- `SMProxy1.2.4` The following needs to be compatible
-
-`MySQL-8.0` uses the more secure `caching_sha2_password` plugin by default. If you upgraded from `5.x`, all the thing should still work directly. For example, if you are creating a new `MySQL`, you need to enter `MySQL. `The command line performs the following operations to be compatible:
-
-```sql
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
-Flush privileges;
-```
-
-Replace `'root'@'%'` in the statement with the user you are using, and replace `password` with its password.
-
-If it is still not available, set `default_authentication_plugin = mysql_native_password` in my.cnf.
+- `SMProxy1.2.4` The following needs to be compatible:
+    - `MySQL-8.0` uses the more secure `caching_sha2_password` plugin by default. If you upgraded from `5.x`, all the thing should still work directly. For example, if you are creating a new `MySQL`, you need to enter `MySQL. `The command line performs the following operations to be compatible:
+    
+    ```sql
+    ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+    Flush privileges;
+    ```
+    
+    Replace `'root'@'%'` in the statement with the user you are using, and replace `password` with its password.
+    
+    If it is still not available, set `default_authentication_plugin = mysql_native_password` in my.cnf.
 
 ## Troubleshooting
 - `SMProxy@access denied for user`

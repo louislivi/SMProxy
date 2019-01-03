@@ -7,7 +7,11 @@
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 [![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
 [![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
+
 > `Github` 项目地址：[https://github.com/louislivi/smproxy](https://github.com/louislivi/smproxy) (支持请点Star)
+
+> `码云` 项目地址：[https://gitee.com/louislivi/smproxy](https://gitee.com/louislivi/smproxy) (支持请点Star)
+
 ## Swoole MySQL Proxy
 
 一个基于 MySQL 协议，Swoole 开发的MySQL数据库连接池。
@@ -233,17 +237,16 @@ Options:
 ## MySQL8.0
 
 - `SMProxy1.2.4`及以上可直接使用
-- `SMProxy1.2.4`以下需要做兼容处理
-
-`MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件，其他版本如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
-
-```sql
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
-flush privileges;
-```
-将语句中的 `'root'@'%'` 替换成你所使用的用户, `password` 替换成其密码.
-
-如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
+- `SMProxy1.2.4`以下需要做如下兼容处理：
+    - `MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件，其他版本如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
+    
+    ```sql
+    ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+    flush privileges;
+    ```
+    将语句中的 `'root'@'%'` 替换成你所使用的用户, `password` 替换成其密码.
+    
+    如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
 
 ## 常见问题
 - `SMProxy@access denied for user` 
