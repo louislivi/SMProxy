@@ -10,8 +10,6 @@
 
 > `Github` 项目地址：[https://github.com/louislivi/smproxy](https://github.com/louislivi/smproxy) (支持请点Star)
 
-> `码云` 项目地址：[https://gitee.com/louislivi/smproxy](https://gitee.com/louislivi/smproxy) (支持请点Star)
-
 ## Swoole MySQL Proxy
 
 一个基于 MySQL 协议，Swoole 开发的MySQL数据库连接池。

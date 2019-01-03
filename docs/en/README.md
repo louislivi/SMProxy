@@ -10,8 +10,6 @@
 
 > `Github` Project address: [https://github.com/louislivi/smproxy](https://github.com/louislivi/smproxy) (Support Star)
 
-> `Gitlab` Project address: [https://gitlab.com/louislivi/smproxy](https://gitlab.com/louislivi/smproxy) (Support Star)
-
 ## Swoole MySQL Proxy
 
 A MySQL database connection pool based on MySQL protocol and Swoole.

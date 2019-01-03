@@ -28,4 +28,5 @@
 - Compatible with Various Frameworks
 
 [GitHub](https://github.com/louislivi/SMProxy/)
+[GitLab](https://gitlab.com/louislivi/SMProxy/)
 [Get Started](en/README.md)
