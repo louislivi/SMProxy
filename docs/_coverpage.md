@@ -27,6 +27,6 @@
 - 完美兼容 MySQL4.1 - 8.0
 - 兼容各大框架，无缝提升性能
 
-[GitHub](https://github.com/louislivi/SMProxy/)
-[开源中国](https://gitee.com/louislivi/SMProxy/)
+[GitHub](https://github.com/louislivi/smproxy/)
+[开源中国](https://gitee.com/louislivi/smproxy/)
 [起步](README.md)

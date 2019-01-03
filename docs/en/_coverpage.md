@@ -27,6 +27,6 @@
 - Compatible with MySQL 4.1 - 8.0
 - Compatible with Various Frameworks
 
-[GitHub](https://github.com/louislivi/SMProxy/)
-[GitLab](https://gitlab.com/louislivi/SMProxy/)
+[GitHub](https://github.com/louislivi/smproxy/)
+[GitLab](https://gitlab.com/louislivi/smproxy/)
 [Get Started](en/README.md)
