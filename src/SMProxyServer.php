@@ -2,7 +2,6 @@
 
 namespace SMProxy;
 
-use Psr\Log\LogLevel;
 use SMProxy\Handler\Frontend\FrontendAuthenticator;
 use SMProxy\Handler\Frontend\FrontendConnection;
 use function SMProxy\Helper\array_copy;
