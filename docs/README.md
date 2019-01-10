@@ -46,8 +46,8 @@ PHP 没有连接池，所以高并发时数据库会出现连接打满的情况�
 
 ## 环境
 
-- Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-- PHP 7.0+     ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+- Swoole >= 2.1.3  ![swoole_version](https://img.shields.io/badge/swoole->=2.1.3-yellow.svg?style=popout-square)
+- PHP >= 7.0     ![php_version](https://img.shields.io/badge/php->=7.0-blue.svg?style=popout-square)
 
 ## 安装
 
@@ -252,6 +252,8 @@ Options:
     - 数据库`host`请勿配置`localhost`。
 - `SMProxy@Database config dbname write is not exists! ` 
     - 请将`database.json`中的`dbname`项改为你的业务数据库名。
+- `Config serverInfo->*->account is not exists! `
+    - 请仔细比对`database.json`中`databse->serverInfo->*->*->account`是否在`database->account`下含有相对于的键值对。
 - `Reach max connections! Cann't pending fetch!` 
     - 适当增加`maxSpareConns`或增加`database.json`中的`timeout`项。
 - `Must be connected before sending data!` 

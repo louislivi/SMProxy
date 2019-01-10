@@ -94,11 +94,11 @@ class Base extends Context
                         $config['databases'][$s_key . DB_DELIMITER . $key]['serverInfo']['account'] =
                             $config['account'][$value['account']];
                     } else {
-                        throw new SMProxyException('config serverInfo->' . $s_key . '->account is not exists!');
+                        throw new SMProxyException('Config serverInfo->' . $s_key . '->account is not exists!');
                     }
                 }
             } else {
-                throw new SMProxyException('config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
+                throw new SMProxyException('Config serverInfo key ' . $database['serverInfo'] . 'is not exists!');
             }
             unset($config['databases'][$key]);
         }

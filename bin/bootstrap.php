@@ -26,8 +26,8 @@ if (version_compare(PHP_VERSION, '7.0', '<')) {
 
 // Check requirements - Swoole
 if (extension_loaded('swoole') && defined('SWOOLE_VERSION')) {
-    if (version_compare(SWOOLE_VERSION, '2.1', '<')) {
-        smproxy_error('ERROR: SMProxy requires [Swoole >= 2.1].');
+    if (version_compare(SWOOLE_VERSION, '2.1.3', '<')) {
+        smproxy_error('ERROR: SMProxy requires [Swoole >= 2.1.3].');
     }
 } else {
     smproxy_error('ERROR: Swoole was not installed.');

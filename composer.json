@@ -14,7 +14,7 @@
     "require": {
         "php": "^7.0",
         "psr/log": "~1.0",
-        "ext-swoole": "^2.1||^4.0",
+        "ext-swoole": "^2.1.3||^4.0",
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-mbstring": "*",

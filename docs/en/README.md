@@ -58,8 +58,8 @@ See [docs/BENCHMARK-EN.md](BENCHMARK.md).
 
 ## Requirements
 
-- Swoole 2.1+  ![swoole_version](https://img.shields.io/badge/swoole-2.1+-yellow.svg?style=popout-square)
-- PHP 7.0+     ![php_version](https://img.shields.io/badge/php-7.0+-blue.svg?style=popout-square)
+- Swoole >= 2.1.3  ![swoole_version](https://img.shields.io/badge/swoole->=2.1.3-yellow.svg?style=popout-square)
+- PHP >= 7.0     ![php_version](https://img.shields.io/badge/php->=7.0-blue.svg?style=popout-square)
 
 ## Installation
 
@@ -271,6 +271,8 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
     - Do not configure `localhost` for database `host`.
 - `SMProxy@Database config dbname write is not exists! `
     - Change the `dbname` entry in `database.json` to your business database name.
+- `Config serverInfo->*->account is not exists! `
+     - Please carefully compare `databse->serverInfo->*->*->account` in `database.json` to contain relative key-value pairs under `database->account`.
 - `Reach max connections! Cann't pending fetch!`
     - Increase `maxSpareConns` appropriately or increase the `timeout` entry in `database.json`.
 - `Must be connected before sending data!`
