@@ -174,16 +174,27 @@ class SMProxyServer extends BaseServer
             } else {
                 ProcessHelper::setProcessTitle('SMProxy worker  process');
             }
-            $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
-            //初始化链接
-            MySQLPool::init($this->dbConfig);
+            try {
+                $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
+                //初始化链接
+                MySQLPool::init($this->dbConfig);
+            } catch (MySQLException $exception) {
+                self::writeErrorMessage($exception, 'mysql');
+                $server ->shutdown();
+                return;
+            } catch (SMProxyException $exception) {
+                self::writeErrorMessage($exception, 'system');
+                $server ->shutdown();
+                return;
+            }
             if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
                 try {
                     Coroutine::sleep(0.1);
                     $this ->setStartConns();
                 } catch (MySQLException $exception) {
+                    self::writeErrorMessage($exception, 'mysql');
                     $server ->shutdown();
-                    throw new MySQLException($exception ->getMessage(), Log::$levels[LogLevel::ERROR]);
+                    return;
                 }
                 $system_log = Log::getLogger('system');
                 $system_log->info('Worker started!');

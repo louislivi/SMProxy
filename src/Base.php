@@ -36,21 +36,27 @@ class Base extends Context
                     unset(self::$pool[\Swoole\Coroutine::getuid()]);
                 }
             } catch (SMProxyException $SMProxyException) {
-                $system_log = Log::getLogger('system');
-                $errLevel = $SMProxyException ->getCode() ? array_search($SMProxyException ->getCode(), Log::$levels) : 'error';
-                $system_log->$errLevel($SMProxyException->errorMessage());
-                if (CONFIG['server']['swoole']['daemonize'] != true) {
-                    echo '[' . ucfirst($errLevel) . '] ', $SMProxyException->errorMessage(), PHP_EOL;
-                }
+                self::writeErrorMessage($SMProxyException, 'system');
             } catch (MySQLException $MySQLException) {
-                $mysql_log = Log::getLogger('mysql');
-                $errLevel = $MySQLException ->getCode() ? array_search($MySQLException ->getCode(), Log::$levels) : 'warning';
-                $mysql_log->$errLevel($MySQLException->errorMessage());
-                if (CONFIG['server']['swoole']['daemonize'] != true) {
-                    echo  '[' . ucfirst($errLevel) . '] ', $MySQLException->errorMessage(), PHP_EOL;
-                }
+                self::writeErrorMessage($MySQLException, 'mysql');
             }
         });
+    }
+
+    /**
+     * 写入日志
+     *
+     * @param $exception
+     * @param string $tag
+     */
+    protected static function writeErrorMessage($exception, string $tag = 'mysql')
+    {
+        $log = Log::getLogger($tag);
+        $errLevel = $exception ->getCode() ? array_search($exception ->getCode(), Log::$levels) : 'warning';
+        $log->$errLevel($exception->errorMessage());
+        if (CONFIG['server']['swoole']['daemonize'] != true) {
+            echo  '[' . ucfirst($errLevel) . '] ', $exception->errorMessage(), PHP_EOL;
+        }
     }
 
     /**
