@@ -337,11 +337,11 @@ final class ParseUtil
                 case "\t":
                 case "\r":
                 case "\n":
-                    continue;
+                    continue 2;
                 case '/':
                 case '#':
                     $i = self::comment($stmt, $i);
-                    continue;
+                    continue 2;
                 default:
                     return $i + $length;
             }

@@ -56,7 +56,7 @@ final class ServerParse
                 case '\t':
                 case '\r':
                 case '\n':
-                    continue;
+                    continue 2;
                 case '/':
                     // such as /*!40101 SET character_set_client = @saved_cs_client
                     // */;
@@ -70,107 +70,107 @@ final class ServerParse
                     if ($i + 1 == $length) {
                         return self::MYSQL_COMMENT;
                     }
-                    continue;
+                    continue 2;
                 case 'A':
                 case 'a':
                     $rt = self::aCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'B':
                 case 'b':
                     $rt = self::beginCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'C':
                 case 'c':
                     $rt = self::commitOrCallCheckOrCreate($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'D':
                 case 'd':
                     $rt = self::deleteOrdCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'E':
                 case 'e':
                     $rt = self::explainCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'I':
                 case 'i':
                     $rt = self::insertCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'M':
                 case 'm':
                     $rt = self::migrateCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'R':
                 case 'r':
                     $rt = self::rCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'S':
                 case 's':
                     $rt = self::sCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'T':
                 case 't':
                     $rt = self::tCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'U':
                 case 'u':
                     $rt = self::uCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'K':
                 case 'k':
                     $rt = self::killCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'H':
                 case 'h':
                     $rt = self::helpCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 case 'L':
                 case 'l':
                     $rt = self::lCheck($stmt, $i);
                     if ($rt != self::OTHER) {
                         return $rt;
                     }
-                    continue;
+                    continue 2;
                 default:
-                    continue;
+                    continue 2;
             }
         }
         return self::OTHER;
@@ -380,7 +380,7 @@ final class ServerParse
                         case '\t':
                         case '\r':
                         case '\n':
-                            continue;
+                            continue 2;
                         case 'Q':
                         case 'q':
                             return self::killQueryCheck($stmt, $offset);
@@ -412,7 +412,7 @@ final class ServerParse
                         case '\t':
                         case '\r':
                         case '\n':
-                            continue;
+                            continue 2;
                         default:
                             return ($offset << 8) | self::KILL_QUERY;
                     }
