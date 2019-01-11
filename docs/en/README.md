@@ -272,7 +272,7 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 - `SMProxy@Database config dbname write is not exists! `
     - Change the `dbname` entry in `database.json` to your business database name.
 - `Config serverInfo->*->account is not exists! `
-     - Please carefully compare `databse->serverInfo->*->*->account` in `database.json` to contain relative key-value pairs under `database->account`.
+    - Please review `database.json`, make sure that `databse->serverInfo->*->*->account` exists in `database->account`.
 - `Reach max connections! Cann't pending fetch!`
     - Increase `maxSpareConns` appropriately or increase the `timeout` entry in `database.json`.
 - `Must be connected before sending data!`
