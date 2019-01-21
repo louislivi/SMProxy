@@ -106,7 +106,7 @@ class SMProxyServer extends BaseServer
                         }
                         //预处理语句id记录
                         if (isset($this->mysqlClient[$fd][$key])) {
-                            $clientId = spl_object_id($this->mysqlClient[$fd][$key]);
+                            $clientId = spl_object_hash($this->mysqlClient[$fd][$key]);
                             switch ($bin ->data[4]) {
                                 case MysqlPacket::$COM_STMT_PREPARE:
                                     if (isset($this->stmtId[$clientId])) {
@@ -172,7 +172,7 @@ class SMProxyServer extends BaseServer
                     }
                 }
                 //处理预处理语句连接断开未关闭
-                $clientId = spl_object_id($mysqlClient);
+                $clientId = spl_object_hash($mysqlClient);
                 if (isset($this->stmtPrepare[$clientId])) {
                     $stmtIdes = $this->stmtPrepare[$clientId] ?? [];
                     if (!empty($stmtIdes)) {
