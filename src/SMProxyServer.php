@@ -181,8 +181,8 @@ class SMProxyServer extends BaseServer
                         }
                     }
                     unset($this->stmtPrepare[$clientId]);
-                    unset($clientId);
                 }
+                unset($clientId);
                 MySQLPool::recycle($mysqlClient);
             }
             unset($this->mysqlClient[$fd]);
