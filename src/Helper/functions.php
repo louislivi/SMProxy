@@ -57,17 +57,21 @@ function array_copy(array $array, int $start, int $len)
 }
 
 /**
- * 计算mysql包的大小.
+ * 转换长度.
  *
- * @param $size
+ * @param int $size
+ * @param int $length
  *
  * @return array
  */
-function getMysqlPackSize(int $size)
+function getMysqlPackSize(int $size, int $length = 3)
 {
     $sizeData[] = $size & 0xff;
     $sizeData[] = shr16($size & 0xff << 8, 8);
     $sizeData[] = shr16($size & 0xff << 16, 16);
+    if ($length > 3) {
+        $sizeData[] = shr16($size & 0xff << 24, 24);
+    }
     return $sizeData;
 }
 

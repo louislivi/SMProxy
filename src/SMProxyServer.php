@@ -7,6 +7,7 @@ use SMProxy\Handler\Frontend\FrontendConnection;
 use function SMProxy\Helper\array_copy;
 use function SMProxy\Helper\getBytes;
 use function SMProxy\Helper\getMysqlPackSize;
+use function SMProxy\Helper\getPackageLength;
 use function SMProxy\Helper\getString;
 use function SMProxy\Helper\initConfig;
 use function SMProxy\Helper\packageSplit;
@@ -36,6 +37,8 @@ class SMProxyServer extends BaseServer
     public $mysqlClient;
     protected $dbConfig;
     public $halfPack;
+    public $stmtId = [];
+    public $stmtPrepare = [];
 
     /**
      * 连接.
@@ -95,11 +98,30 @@ class SMProxyServer extends BaseServer
                                 $this->mysqlClient[$fd][$key]->send($data);
                             } else {
                                 $client = MySQLPool::fetch($key, $server, $fd);
-                                $result = $client ->send($data);
+                                $result = $client->send($data);
                                 if ($result) {
                                     $this->mysqlClient[$fd][$key] = $client;
                                 }
                             }
+                        }
+                        //预处理语句id记录
+                        if (isset($this->mysqlClient[$fd][$key])) {
+                            $clientId = spl_object_id($this->mysqlClient[$fd][$key]);
+                            switch ($bin ->data[4]) {
+                                case MysqlPacket::$COM_STMT_PREPARE:
+                                    if (isset($this->stmtId[$clientId])) {
+                                        $this->stmtId[$clientId]++;
+                                    } else {
+                                        $this->stmtId[$clientId] = 1;
+                                    }
+                                    $this->stmtPrepare[$clientId][$this->stmtId[$clientId]] = $this->stmtId[$clientId];
+                                    break;
+                                case MySQLPacket::$COM_STMT_CLOSE:
+                                    $closeStmtId = getPackageLength($data, 5, 4) - 4;
+                                    unset($this->stmtPrepare[$clientId][$closeStmtId]);
+                                    break;
+                            }
+                            unset($clientId);
                         }
                     }
                 });
@@ -148,6 +170,18 @@ class SMProxyServer extends BaseServer
                             ]));
                         }
                     }
+                }
+                //处理预处理语句连接断开未关闭
+                $clientId = spl_object_id($mysqlClient);
+                if (isset($this->stmtPrepare[$clientId])) {
+                    $stmtIdes = $this->stmtPrepare[$clientId] ?? [];
+                    if (!empty($stmtIdes)) {
+                        foreach ($stmtIdes as $stmtId) {
+                            $mysqlClient->send(getString(array_merge([5, 0, 0, 0, 25], getMysqlPackSize($stmtId, 4))));
+                        }
+                    }
+                    unset($this->stmtPrepare[$clientId]);
+                    unset($clientId);
                 }
                 MySQLPool::recycle($mysqlClient);
             }
@@ -411,8 +445,8 @@ class SMProxyServer extends BaseServer
             case MySQLPacket::$COM_INIT_DB:
                 // just init the frontend
                 break;
-            case MySQLPacket::$COM_QUERY:
             case MySQLPacket::$COM_STMT_PREPARE:
+            case MySQLPacket::$COM_QUERY:
                 $connection = new FrontendConnection();
                 $queryType = $connection->query($bin);
                 $hintArr   = RouteService::route(substr($data, 5, strlen($data) - 5));
