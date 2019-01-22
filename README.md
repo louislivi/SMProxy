@@ -1,7 +1,7 @@
 中文 | [English](./README-EN.md)
 ```
-  /$$$$$$  /$$      /$$ /$$$$$$$                                        
- /$$__  $$| $$$    /$$$| $$__  $$                                       
+  /$$$$$$  /$$      /$$ /$$$$$$$
+ /$$__  $$| $$$    /$$$| $$__  $$
 | $$  \__/| $$$$  /$$$$| $$  \ $$ /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
 |  $$$$$$ | $$ $$/$$ $$| $$$$$$$//$$__  $$ /$$__  $$|  $$ /$$/| $$  | $$
  \____  $$| $$  $$$| $$| $$____/| $$  \__/| $$  \ $$ \  $$$$/ | $$  | $$
@@ -21,6 +21,8 @@
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 [![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
 [![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
+[![Backers on Open Collective](https://opencollective.com/SMProxy/backers/badge.svg?style=popout-square)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/SMProxy/sponsors/badge.svg?style=popout-square)](#sponsors)
 
 ## Swoole MySQL Proxy
 
@@ -57,3 +59,30 @@ PHP 没有连接池，所以高并发时数据库会出现连接打满的情况�
     - 若被墙请访问：<https://smproxy.gitee.louislivi.com>
 - QQ群：722124111
 - 欢迎各类 Issue 和 Pull Request。
+
+## 贡献者列表
+
+因为有你们，SMProxy 才能走到现在。
+
+<a href="https://github.com/louislivi/SMProxy/graphs/contributors"><img src="https://opencollective.com/SMProxy/contributors.svg?width=890&button=false" /></a>
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/SMProxy#backer)]
+
+<a href="https://opencollective.com/SMProxy#backers" target="_blank"><img src="https://opencollective.com/SMProxy/backers.svg?width=890"></a>
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/SMProxy#sponsor)]
+
+<a href="https://opencollective.com/SMProxy/sponsor/0/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/1/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/2/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/3/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/4/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/5/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/6/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/7/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/8/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/9/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/9/avatar.svg"></a>
