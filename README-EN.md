@@ -1,7 +1,7 @@
 English | [中文](./README.md)
 ```
-  /$$$$$$  /$$      /$$ /$$$$$$$                                        
- /$$__  $$| $$$    /$$$| $$__  $$                                       
+  /$$$$$$  /$$      /$$ /$$$$$$$
+ /$$__  $$| $$$    /$$$| $$__  $$
 | $$  \__/| $$$$  /$$$$| $$  \ $$ /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
 |  $$$$$$ | $$ $$/$$ $$| $$$$$$$//$$__  $$ /$$__  $$|  $$ /$$/| $$  | $$
  \____  $$| $$  $$$| $$| $$____/| $$  \__/| $$  \ $$ \  $$$$/ | $$  | $$
@@ -21,6 +21,8 @@ English | [中文](./README.md)
 [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 [![license](https://img.shields.io/github/license/louislivi/SMProxy.svg?style=popout-square)](https://github.com/louislivi/SMProxy/blob/master/LICENSE)
 [![SMProxy](https://img.shields.io/badge/SMProxy-%F0%9F%92%97-pink.svg?style=popout-square)](https://github.com/louislivi/SMProxy)
+[![Backers on Open Collective](https://opencollective.com/SMProxy/backers/badge.svg?style=popout-square)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/SMProxy/sponsors/badge.svg?style=popout-square)](#sponsors)
 
 ## Swoole MySQL Proxy
 
@@ -58,10 +60,10 @@ If the maximum number of connections is exceeded, the coroutine will be suspende
 
 ## Why This
 
-For early design reasons, PHP does not have a native connection pool. So the number of database connections will be easily increasing and reaching the maximum when we got lots of requests. 
-Using one of many database middlewares like Mycat will cause some limitations, e.g. batch inserts. And it's also too heavy in most cases. 
-So we created SMProxy using 100% PHP + Swoole, which only supports connection pool and read/write separation, but much more lightweight. 
-Not like Mycat, we're trying to build SMProxy with Swoole Coroutine to schedule HandshakeV10 packet forwarding, so we don't have to parse all SQL packets. 
+For early design reasons, PHP does not have a native connection pool. So the number of database connections will be easily increasing and reaching the maximum when we got lots of requests.
+Using one of many database middlewares like Mycat will cause some limitations, e.g. batch inserts. And it's also too heavy in most cases.
+So we created SMProxy using 100% PHP + Swoole, which only supports connection pool and read/write separation, but much more lightweight.
+Not like Mycat, we're trying to build SMProxy with Swoole Coroutine to schedule HandshakeV10 packet forwarding, so we don't have to parse all SQL packets.
 That really makes SMProxy more stable and reliable.
 
 ## Contributing & Discussing
@@ -69,3 +71,29 @@ That really makes SMProxy more stable and reliable.
 - Documentation: <https://smproxy.louislivi.com/#/en/>
 - Community: [![Gitter](https://img.shields.io/gitter/room/louislivi/SMproxy.svg?style=popout-square)](https://gitter.im/louislivi/SMproxy)
 - Issues and Pull requests are always welcome.
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/louislivi/SMProxy/graphs/contributors"><img src="https://opencollective.com/SMProxy/contributors.svg?width=890&button=false" /></a>
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/SMProxy#backer)]
+
+<a href="https://opencollective.com/SMProxy#backers" target="_blank"><img src="https://opencollective.com/SMProxy/backers.svg?width=890"></a>
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/SMProxy#sponsor)]
+
+<a href="https://opencollective.com/SMProxy/sponsor/0/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/1/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/2/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/3/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/4/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/5/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/6/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/7/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/8/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/SMProxy/sponsor/9/website" target="_blank"><img src="https://opencollective.com/SMProxy/sponsor/9/avatar.svg"></a>
