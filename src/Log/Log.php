@@ -206,7 +206,7 @@ class Log extends AbstractLogger
     private function createLogPath(string $log_path)
     {
         if (!file_exists($log_path) || !is_dir($log_path)) {
-            return mkdir($log_path, 0644, true);
+            return mkdir($log_path, 0755, true);
         }
 
         return true;
