@@ -194,6 +194,7 @@ class MysqlProxy extends MysqlClient
      * @param string $pluginName
      *
      * @return array
+     * @throws MySQLException
      */
     public function processAuth(string $pluginName)
     {
@@ -205,10 +206,10 @@ class MysqlProxy extends MysqlClient
                 $password = SecurityUtil::scrambleSha256($this->account['password'], $this->salt);
                 break;
             case 'sha256_password':
-                new MySQLException('Sha256_password plugin is not supported yet');
+                throw new MySQLException('Sha256_password plugin is not supported yet');
                 break;
             case 'mysql_old_password':
-                new MySQLException('mysql_old_password plugin is not supported yet');
+                throw new MySQLException('mysql_old_password plugin is not supported yet');
                 break;
             case 'mysql_clear_password':
                 $password = array_merge(getBytes($this->account['password']), [0]);
