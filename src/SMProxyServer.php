@@ -342,34 +342,65 @@ class SMProxyServer extends BaseServer
      * @return string
      * @throws MySQLException
      */
-    private function compareModel(string &$model, \swoole_server $server, int $fd)
+    private function compareModel(string $model, \swoole_server $server, int $fd)
     {
+        /**
+         * 拼接数据库键名
+         *
+         * @param int $fd
+         * @param string $model
+         *
+         * @return string
+         */
+        $spliceKey = function (int $fd, string $model) {
+            return $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
+        };
         switch ($model) {
             case 'read':
-                $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
+                $key = $spliceKey($fd, $model);
                 //如果没有读库 默认用写库
-                if (!array_key_exists($key, $this->dbConfig)) {
+                if (!isset($this->dbConfig[$key])) {
                     $model = 'write';
+                    $key = $spliceKey($fd, $model);
+                    //如果没有写库
+                    $this->existsDBKey($server, $fd, $model, $key);
                 }
                 break;
             case 'write':
-                $key = $this->source[$fd]->database ? $model . DB_DELIMITER . $this->source[$fd]->database : $model;
+                $key = $spliceKey($fd, $model);
                 //如果没有写库
-                if (!array_key_exists($key, $this->dbConfig)) {
-                    $message = 'SMProxy@Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
-                        ' is not exists!';
-                    $errMessage = self::writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
-                    if ($server->exist($fd)) {
-                        $server->send($fd, getString($errMessage));
-                    }
-                    throw new MySQLException($message);
-                }
+                $this->existsDBKey($server, $fd, $model, $key);
                 break;
             default:
                 $key = 'write' . DB_DELIMITER . $this->source[$fd]->database;
                 break;
         }
         return $key;
+    }
+
+
+    /**
+     * 判断配置文件键是否存在
+     *
+     * @param \swoole_server $server
+     * @param int $fd
+     * @param string $model
+     * @param string $key
+     *
+     * @throws MySQLException
+     */
+    private function existsDBKey(\swoole_server $server, int $fd, string $model, string $key)
+    {
+        //如果没有写库则抛出异常
+        if (!isset($this->dbConfig[$key])) {
+            $message = 'SMProxy@Database config ' . ($this->source[$fd]->database ?: '') . ' ' . $model .
+                ' is not exists!';
+            $errMessage = self::writeErrMessage(1, $message, ErrorCode::ER_SYNTAX_ERROR, 42000);
+            if ($server->exist($fd)) {
+                $server->send($fd, getString($errMessage));
+            }
+            throw new MySQLException($message);
+        }
     }
 
     /**
