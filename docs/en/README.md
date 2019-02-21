@@ -290,6 +290,9 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 - `502 Bad Gateway`
     - After MySQL crashes abnormally, the connection appears 502 or the connection times out. Please do not enable long connection mode.
     - If the SQL statement is too large, do not use a succession pool, which will cause the connection to be blocked and the program to be abnormal.
+- `CPU usage is too high after starting SMProxy`
+     - Because Swoole 4.2.12 and below does not open the coroutine Client read and write separation, the CPU ratio will be larger.
+     - Upgrade the Swoole version to 4.2.13 and above and upgrade the SMProxy version to 1.2.8 and above.
 
 ## Community
 
