@@ -3,6 +3,7 @@
 namespace SMProxy;
 
 use SMProxy\Log\Log;
+use Swoole\Coroutine\Channel;
 use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPacket\ErrorPacket;
 use function SMProxy\Helper\array_iconv;
@@ -119,7 +120,7 @@ class Base extends Context
      *
      * @return bool
      */
-    protected static function coPop($chan, $timeout = 0)
+    protected static function coPop(Channel $chan, int $timeout = 0)
     {
         if (version_compare(swoole_version(), '4.0.3', '>=')) {
             return $chan->pop($timeout);
@@ -133,9 +134,7 @@ class Base extends Context
                 if (false === $result || empty($reads)) {
                     return false;
                 }
-
                 $readChannel = $reads[0];
-
                 return $readChannel->pop();
             }
         }

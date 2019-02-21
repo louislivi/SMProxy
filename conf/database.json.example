@@ -11,13 +11,13 @@
         "write": {
           "host": ["127.0.0.1"],
           "port": 3306,
-          "timeout": 0.5,
+          "timeout": 2,
           "account": "root"
         },
         "read": {
           "host": ["127.0.0.1"],
           "port": 3306,
-          "timeout": 0.5,
+          "timeout": 2,
           "account": "root"
         }
       }
