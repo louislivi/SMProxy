@@ -39,8 +39,6 @@ class MysqlProxy extends MysqlClient
     public $salt;
     public $connected = false;
     public $timeout = 0.1;
-    public $sendQueue;
-    public $recvQueue;
     public $mysqlClient;
 
     /**
@@ -55,89 +53,9 @@ class MysqlProxy extends MysqlClient
         $this->client = new Client(CONFIG['server']['swoole_client_sock_setting']['sock_type'] ?? SWOOLE_SOCK_TCP);
         $this->client->set(CONFIG['server']['swoole_client_setting'] ?? []);
         $this->isDuplex = version_compare(SWOOLE_VERSION, '4.2.13', '>=');
-        if ($this->isDuplex) {
-            $this->sendQueue = new Channel(1);
-            $this->recvQueue = new Channel(1);
-        } else {
+        if (!$this->isDuplex) {
             $this->mysqlClient = new Channel(1);
         }
-    }
-
-    /**
-     * 初始化读写队列
-     *
-     * @return bool
-     */
-    public function initQueue(): bool
-    {
-        if (!$this->client->isConnected()) {
-            return false;
-        }
-        self::go(function () {
-            while (true) {
-                if (!$this->readCoroutine()) {
-                    break;
-                }
-            }
-        });
-        self::go(function () {
-            while (true) {
-                if (!$this->writeCoroutine()) {
-                    break;
-                }
-            }
-        });
-        return true;
-    }
-
-    /**
-     * 读协程
-     *
-     * @param int $timeout
-     * @param $chan
-     *
-     * @return bool
-     *
-     */
-    private function readCoroutine(int $timeout = -1)
-    {
-        $data = $this->client->recv($timeout);
-        if (isset($this->recvQueue)) {
-            if ($data === '') {
-                $this->recvQueue->push($data);
-                return false;
-            } elseif ($data) {
-                return $this->recvQueue->push($data);
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * 写协程
-     *
-     * @param int $timeout
-     *
-     * @return bool
-     */
-    private function writeCoroutine(int $timeout = 0)
-    {
-        $data = self::coPop($this->sendQueue, $timeout);
-        if (empty($data)) {
-            //通道已关闭
-            return false;
-        } else {
-            if (!$this->client->isConnected()) {
-                return false;
-            }
-            if ($data) {
-                return $this->client->send(...$data);
-            }
-        }
-        return false;
     }
 
     /**
@@ -162,9 +80,7 @@ class MysqlProxy extends MysqlClient
                 return false;
             }
         } else {
-            if ($this->isDuplex) {
-                $this->initQueue();
-            } else {
+            if (!$this->isDuplex) {
                 $this->mysqlClient->push($this->client);
             }
             self::go(function () {
@@ -321,7 +237,11 @@ class MysqlProxy extends MysqlClient
     public function send(...$data)
     {
         if ($this->isDuplex) {
-            return $this->sendQueue->push($data);
+            if ($this->client->isConnected()) {
+                return $this->client->send(...$data);
+            } else {
+                return false;
+            }
         } else {
             $client = self::coPop($this->mysqlClient);
             if ($client === false) {
@@ -345,10 +265,8 @@ class MysqlProxy extends MysqlClient
     public function recv()
     {
         if ($this->isDuplex) {
-            $data = self::coPop($this->recvQueue);
+            $data = $this->client->recv(-1);
             if ($data === '') {
-                $this->sendQueue->close();
-                $this->recvQueue->close();
                 $this->onClientClose($this->client);
             } elseif (is_string($data)) {
                 $this->onClientReceive($this->client, $data);
