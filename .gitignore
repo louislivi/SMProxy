@@ -11,3 +11,8 @@
 
 # Composer lock file
 /composer.lock
+
+# zend studio
+/.settings/*
+/.buildpath
+/.project

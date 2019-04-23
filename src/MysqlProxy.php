@@ -86,6 +86,7 @@ class MysqlProxy extends MysqlClient
             self::go(function () {
                 while (true) {
                     $data = $this->recv();
+                    //关闭连接后，返回值是false
                     if ($data === '' || $data === false) {
                         break;
                     }
