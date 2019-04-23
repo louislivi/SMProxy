@@ -86,7 +86,7 @@ class MysqlProxy extends MysqlClient
             self::go(function () {
                 while (true) {
                     $data = $this->recv();
-                    if ($data === '') {
+                    if ($data === '' || $data === false) {
                         break;
                     }
                 }
