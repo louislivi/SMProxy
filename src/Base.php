@@ -16,7 +16,7 @@ use function SMProxy\Helper\array_iconv;
 class Base extends Context
 {
     /**
-     * 携程执行处理异常.
+     * 协程执行处理异常.
      *
      * @param $function
      */
@@ -53,7 +53,7 @@ class Base extends Context
     protected static function writeErrorMessage($exception, string $tag = 'mysql')
     {
         $log = Log::getLogger($tag);
-        $errLevel = $exception ->getCode() ? array_search($exception ->getCode(), Log::$levels) : 'warning';
+        $errLevel = $exception->getCode() ? array_search($exception->getCode(), Log::$levels) : 'warning';
         $log->$errLevel($exception->errorMessage());
         if (CONFIG['server']['swoole']['daemonize'] != true) {
             echo  '[' . ucfirst($errLevel) . '] ', $exception->errorMessage(), PHP_EOL;

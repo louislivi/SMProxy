@@ -74,16 +74,13 @@ abstract class BaseServer extends Base
     }
 
     protected function onConnect(\swoole_server $server, int $fd)
-    {
-    }
+    { }
 
     protected function onReceive(\swoole_server $server, int $fd, int $reactor_id, string $data)
-    {
-    }
+    { }
 
     protected function onWorkerStart(\swoole_server $server, int $worker_id)
-    {
-    }
+    { }
 
     public function onStart(\swoole_server $server)
     {
@@ -97,7 +94,7 @@ abstract class BaseServer extends Base
     }
 
     /**
-     * 关闭连接 销毁携程变量.
+     * 关闭连接 销毁协程变量.
      *
      * @param $server
      * @param $fd
