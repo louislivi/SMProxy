@@ -326,7 +326,7 @@ function packageSplit(string $data, bool $auth, int $headerLength = 4, bool $isC
         if (isset($data[$step]) && 0 != ord($data[$step])) {
             $packageLength = getPackageLength($data, $step, $headerLength);
             if ($isClient) {
-                $packageLength ++;
+                $packageLength++;
             }
             $packages[] = substr($data, $step, $packageLength);
             $split($data, $packages, $step + $packageLength);

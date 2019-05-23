@@ -74,13 +74,16 @@ abstract class BaseServer extends Base
     }
 
     protected function onConnect(\swoole_server $server, int $fd)
-    { }
+    {
+    }
 
     protected function onReceive(\swoole_server $server, int $fd, int $reactor_id, string $data)
-    { }
+    {
+    }
 
     protected function onWorkerStart(\swoole_server $server, int $worker_id)
-    { }
+    {
+    }
 
     public function onStart(\swoole_server $server)
     {
