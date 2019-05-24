@@ -86,7 +86,7 @@ class MysqlProxy extends MysqlClient
             self::go(function () {
                 while (true) {
                     $data = $this->recv();
-                    if ($data === '') {
+                    if ($data === '' || $data === false) {
                         break;
                     }
                 }
@@ -265,13 +265,13 @@ class MysqlProxy extends MysqlClient
     public function recv()
     {
         if ($this->isDuplex) {
-            $data = $this->client->recv(-1);
-            if ($data === '') {
-                $this->onClientClose($this->client);
+            $client = $this->client;
+            $data = $client->recv(-1);
+            if ($data === '' || $data === false) {
+                $this->onClientClose($client);
             } elseif (is_string($data)) {
-                $this->onClientReceive($this->client, $data);
+                $this->onClientReceive($client, $data);
             }
-            return $data;
         } else {
             $client = self::coPop($this->mysqlClient, $this->timeout);
             if ($client === false) {
@@ -284,14 +284,18 @@ class MysqlProxy extends MysqlClient
                 $data = '';
             }
             $this->mysqlClient->push($client);
-            if ($data === '') {
+            if ($data === false && $client->errCode == 110) {
+                //如果连接超时则不处理
+                $data = true;
+            }
+            if ($data === '' || $data === false) {
                 $this->mysqlClient->close();
                 $this->onClientClose($client);
             } elseif (is_string($data)) {
                 $this->onClientReceive($client, $data);
             }
-            return $data;
         }
+        return $data;
     }
 
     /**

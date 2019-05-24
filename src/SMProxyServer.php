@@ -511,7 +511,7 @@ class SMProxyServer extends BaseServer
                     //处理读操作
                     if (!isset($this->connectHasTransaction[$fd]) ||
                         !$this->connectHasTransaction[$fd]) {
-                        if ((('u' == $trim_data[-6] || 'U' == $trim_data[-6]) &&
+                        if (strlen($trim_data) > 6 && (('u' == $trim_data[-6] || 'U' == $trim_data[-6]) &&
                             ServerParse::UPDATE == ServerParse::uCheck($trim_data, -6, false))) {
                             //判断悲观锁
                             $this->connectReadState[$fd] = false;
