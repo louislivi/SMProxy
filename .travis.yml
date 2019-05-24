@@ -1,5 +1,7 @@
 language: php
 
+dist: trusty
+
 matrix:
   include:
     - php: 7.0
@@ -23,8 +25,6 @@ install:
 
 before_script:
   - phpenv config-rm xdebug.ini
-  - sudo systemctl unmask mysql.service > null
-  - sudo service mysql restart
   - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('123456') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
   - sudo mysql_upgrade -u root -p123456
   - sudo service mysql restart
