@@ -117,21 +117,18 @@ class MysqlProxy extends MysqlClient
                 $binaryPacket->packetLength = $binaryPacket->calcPacketSize();
                 if (isset($binaryPacket->data[4])) {
                     $send = true;
+                    //ERROR Packet
                     if ($binaryPacket->data[4] == ErrorPacket::$FIELD_COUNT) {
                         $errorPacket = new ErrorPacket();
                         $errorPacket->read($binaryPacket);
                         $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
                         $data = getString($errorPacket->write());
                     } elseif (!$this->connected) {
+                        //OK Packet
                         if ($binaryPacket->data[4] == OkPacket::$FIELD_COUNT) {
-                            if (!array_diff_assoc($binaryPacket->data, OkPacket::$AUTH_OK) ||
-                                !array_diff_assoc($binaryPacket->data, OkPacket::$FAST_AUTH_OK) ||
-                                !array_diff_assoc($binaryPacket->data, OkPacket::$SWITCH_AUTH_OK) ||
-                                !array_diff_assoc($binaryPacket->data, OkPacket::$FULL_AUTH_OK)) {
-                                $send = false;
-                                $this->connected = true;
-                                $this->chan->push($this);
-                            }
+                            $send = false;
+                            $this->connected = true;
+                            $this->chan->push($this);
                             # 快速认证
                         } elseif ($binaryPacket->data[4] == 0x01) {
                             # 请求公钥
@@ -147,6 +144,7 @@ class MysqlProxy extends MysqlClient
                                 $this->send($data);
                             }
                             $send = false;
+                            //EOF Packet
                         } elseif ($binaryPacket->data[4] == 0xfe) {
                             $mm = new MySQLMessage($binaryPacket->data);
                             $mm->move(5);
@@ -155,6 +153,7 @@ class MysqlProxy extends MysqlClient
                             $password = $this->processAuth($pluginName ?: 'mysql_native_password');
                             $this->send(getString(array_merge(getMysqlPackSize(count($password)), [3], $password)));
                             $send = false;
+                            //未授权
                         } elseif (!$this->auth) {
                             $handshakePacket = (new HandshakePacket())->read($binaryPacket);
                             $this->salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
