@@ -472,6 +472,7 @@ class SMProxyServer extends BaseServer
     private function query(BinaryPacket $bin, string &$data, int $fd)
     {
         $trim_data = rtrim($data);
+        $data_len  = strlen($trim_data);
         switch ($bin->data[4]) {
             case MySQLPacket::$COM_INIT_DB:
                 // just init the frontend
@@ -511,8 +512,8 @@ class SMProxyServer extends BaseServer
                     //处理读操作
                     if (!isset($this->connectHasTransaction[$fd]) ||
                         !$this->connectHasTransaction[$fd]) {
-                        if (strlen($trim_data) > 6 && (('u' == $trim_data[-6] || 'U' == $trim_data[-6]) &&
-                            ServerParse::UPDATE == ServerParse::uCheck($trim_data, -6, false))) {
+                        if ($data_len > 6 && (('u' == $trim_data[$data_len - 6] || 'U' == $trim_data[$data_len - 6]) &&
+                            ServerParse::UPDATE == ServerParse::uCheck($trim_data, $data_len - 6, false))) {
                             //判断悲观锁
                             $this->connectReadState[$fd] = false;
                         } else {
@@ -525,13 +526,13 @@ class SMProxyServer extends BaseServer
                     $this->connectHasTransaction[$fd] = true;
                     $this->connectReadState[$fd] = false;
                 } elseif (ServerParse::SET == $queryType && false !== strpos($data, 'autocommit', 4) &&
-                    0 == $trim_data[-1]) {
+                    0 == $trim_data[$data_len - 1]) {
                     //处理autocommit事务
                     $this->connectHasAutoCommit[$fd] = true;
                     $this->connectHasTransaction[$fd] = true;
                     $this->connectReadState[$fd] = false;
                 } elseif (ServerParse::SET == $queryType && false !== strpos($data, 'autocommit', 4) &&
-                    1 == $trim_data[-1]) {
+                    1 == $trim_data[$data_len - 1]) {
                     $this->connectHasAutoCommit[$fd] = false;
                     $this->connectReadState[$fd] = false;
                 } elseif (ServerParse::COMMIT == $queryType || ServerParse::ROLLBACK == $queryType) {
