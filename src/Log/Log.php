@@ -205,10 +205,18 @@ class Log extends AbstractLogger
      */
     private function createLogPath(string $log_path)
     {
-        if (!file_exists($log_path) || !is_dir($log_path)) {
-            return mkdir($log_path, 0755, true);
+        $dirs = explode("/", $log_path);
+        $current_dir = "";
+        foreach ($dirs as $dir) {
+            $current_dir .= $dir;
+            if (file_exists($current_dir) && !is_dir($current_dir)) {
+                @unlink($current_dir);
+            }
+            $current_dir .= "/";
+            if (!file_exists($current_dir)) {
+                @mkdir($current_dir, 0755);
+            }
         }
-
         return true;
     }
 
