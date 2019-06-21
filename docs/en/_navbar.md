@@ -1,3 +1,4 @@
+- [Blog](http://www.louislivi.com)
 - Translations
   - [:cn: 中文](/)
   - [:uk: English](/en/)
