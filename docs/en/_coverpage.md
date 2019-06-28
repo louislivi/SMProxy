@@ -24,7 +24,7 @@
 - Build with MySQL native protocol, cross-language, cross-platform.
 - Compatible with MySQL Transaction
 - Compatible with HandshakeV10
-- Compatible with MySQL 4.1 - 8.0
+- Compatible with MySQL 5.5 - 8.0
 - Compatible with Various Frameworks
 
 [GitHub](https://github.com/louislivi/smproxy/)

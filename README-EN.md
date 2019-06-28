@@ -55,7 +55,7 @@ If the maximum number of connections is exceeded, the coroutine will be suspende
 - Build with MySQL native protocol, cross-language, cross-platform.
 - Compatible with MySQL Transaction
 - Compatible with HandshakeV10
-- Compatible with MySQL 4.1 - 8.0
+- Compatible with MySQL 5.5 - 8.0
 - Compatible with Various Frameworks
 
 ## Why This
