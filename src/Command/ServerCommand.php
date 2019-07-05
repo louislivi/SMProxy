@@ -7,9 +7,13 @@
 
 namespace SMProxy\Command;
 
+use SMProxy\Base;
+use function SMProxy\Helper\initConfig;
 use function SMProxy\Helper\smproxy_error;
+use SMProxy\MysqlPool\MySQLException;
+use Swoole\Coroutine;
 
-class ServerCommand
+class ServerCommand extends Base
 {
     public $logo;
     public $desc;
@@ -19,8 +23,8 @@ class ServerCommand
 
     public function __construct()
     {
-        $this->logo  = HelpMessage::$logo . PHP_EOL . HelpMessage::$version;
-        $this->desc  = $this->logo . PHP_EOL . HelpMessage::$usage . PHP_EOL . HelpMessage::$desc;
+        $this->logo = HelpMessage::$logo . PHP_EOL . HelpMessage::$version;
+        $this->desc = $this->logo . PHP_EOL . HelpMessage::$usage . PHP_EOL . HelpMessage::$desc;
         $this->usage = $this->logo . PHP_EOL . HelpMessage::$usage;
     }
 
@@ -121,14 +125,110 @@ class ServerCommand
 
     /**
      * 服务状态
+     *
+     * @throws \SMProxy\SMProxyException
      */
     public function status()
     {
         // 是否已启动
         if ($this->isRunning()) {
-            echo 'The server is running', PHP_EOL;
+            self::go(function () {
+                //显示基础信息
+                echo str_replace([
+                    '${version}',
+                    '${uname}',
+                    '${php_version}',
+                    '${worker_num}',
+                    '${host}',
+                    '${port}',
+                    '${swoole_version}',
+                ], [
+                    self::SMPROXY_VERSION,
+                    php_uname(),
+                    PHP_VERSION,
+                    CONFIG['server']['swoole']['worker_num'],
+                    CONFIG['server']['host'],
+                    CONFIG['server']['port'],
+                    swoole_version(),
+                ], HelpMessage::$status), PHP_EOL;
+                $dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
+                $serverClient = new Coroutine\Client(SWOOLE_SOCK_TCP);
+                $serverClient->connect(CONFIG['server']['host'], CONFIG['server']['port'], 0.5);
+                $serverClient->recv();
+                $serverClient->send("status");
+                $result = unserialize($serverClient->recv());
+                $serverClient->close();
+                $clients = [];
+                foreach ($dbConfig as $key => $value) {
+                    $database = explode(DB_DELIMITER, $key)[1];
+                    if ($database && !isset($clients[$key])) {
+                        $threadId = "";
+                        foreach ($result as $index => $item) {
+                            $indexes = explode(DB_DELIMITER, $index);
+                            if ($indexes[0] . DB_DELIMITER . $indexes[1] == $key) {
+                                $threadId .= $item['threadId'] . ",";
+                            }
+                        }
+                        if (empty($threadId)) {
+                            continue;
+                        }
+                        $threadId = substr($threadId, 0, strlen($threadId) - 1);
+                        $mysql = new Coroutine\MySQL();
+                        $mysql->connect([
+                            'host'     => CONFIG['server']['host'],
+                            'user'     => CONFIG['server']['user'],
+                            'port'     => CONFIG['server']['port'],
+                            'password' => CONFIG['server']['password'],
+                            'database' => $database,
+                        ]);
+                        $mysql->setDefer();
+                        switch (explode(DB_DELIMITER, $key)[0]) {
+                            case 'read':
+                                $mysql->query('/*SMProxy processlist sql*/select * from information_schema.processlist where id in (' . $threadId . ') order by id asc');
+                                break;
+                            case 'write':
+                                $mysql->query('/** smproxy:db_type=write *//*SMProxy processlist sql*/select * from information_schema.processlist where id in (' . $threadId . ') order by id asc');
+                                break;
+                        }
+                        $clients[$key] = $mysql;
+                    }
+                }
+                //绘制表格数据
+                $table = new Table();
+                $table->setHeader(["ID", "USER", "HOST", "DB", "COMMAND", "TIME", "STATE", "INFO", "SERVER_VERSION", "PLUGIN_NAME", "SERVER_STATUS", "SERVER_KEY"]);
+                $processlist = [];
+                foreach ($clients as $key => $client) {
+                    $data = $client->recv();
+                    foreach ($data as $process) {
+                        $processlist[$process["COMMAND"]] = ($processlist[$process["COMMAND"]] ?: 0) + 1;
+                        foreach ($result as $index => $item) {
+                            $indexes = explode(DB_DELIMITER, $index);
+                            if ($indexes[0] . DB_DELIMITER . $indexes[1] == $key && $process["ID"] == $item["threadId"]) {
+                                $process["SERVER_VERSION"] = $item["serverVersion"];
+                                $process["PLUGIN_NAME"] = $item["pluginName"];
+                                $process["SERVER_STATUS"] = $item["serverStatus"];
+                                $process["SERVER_KEY"] = $key;
+                            }
+                        }
+                        if (strpos($process["INFO"], "/*SMProxy processlist sql*/") !== false) {
+                            $process["INFO"] = "/*SMProxy processlist sql*/";
+                        }
+                        $table->addRow(array_values($process));
+                    }
+                    if ($client->errno) {
+                        throw new MySQLException($client->error);
+                    }
+                    $client->close();
+                }
+                $processlistDetails = '';
+                foreach ($processlist as $key => $value) {
+                    $processlistDetails .= ',  ' . $value . ' ' . $key;
+                }
+                echo 'Process :  ' . $table->count() . ' total' . $processlistDetails, PHP_EOL;
+                echo $table->render(), PHP_EOL;
+            });
         } else {
-            echo 'The server is not running', PHP_EOL;
+            echo 'The Server is not running', PHP_EOL;
         }
     }
 

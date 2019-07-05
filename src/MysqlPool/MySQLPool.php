@@ -25,13 +25,14 @@ class MySQLPool extends Base
     protected static $yieldChannel  = [];
     protected static $initConnCount = [];
     protected static $lastConnsTime = [];
+    protected static $mysqlServer;
 
     /**
      * @param array $connsConfig
      *
      * @throws MySQLException
      */
-    public static function init(array $connsConfig)
+    public static function init(array $connsConfig, &$mysqlServer)
     {
         if (self::$init) {
             return;
@@ -47,6 +48,7 @@ class MySQLPool extends Base
                 throw new MySQLException("Invalid maxSpareConns or maxConns in {$name}");
             }
         }
+        self::$mysqlServer = $mysqlServer;
         self::$init = true;
     }
 
@@ -227,6 +229,13 @@ class MySQLPool extends Base
         self::$busyConns[$connName][$id] = $client;
         self::$lastConnsTime[$id] = microtime(true);
         --self::$initConnCount[$connName];
+        //保存服务信息
+        self::$mysqlServer->set($connName . DB_DELIMITER . count(self::$mysqlServer), [
+            "threadId"      => $client->mysqlServer->threadId,
+            "serverVersion" => $client->mysqlServer->serverVersion,
+            "pluginName"    => $client->mysqlServer->pluginName,
+            "serverStatus"  => $client->mysqlServer->serverStatus,
+        ]);
         return $client;
     }
 

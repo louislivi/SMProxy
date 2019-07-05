@@ -49,4 +49,10 @@ Options:
   --console                        Front desk operation
 
 DESC;
+
+    public static $status     = <<<'STATUS'
+SMProxy[${version}] - ${uname}
+Host: ${host}, Port: ${port}, PHPVerison: ${php_version}
+SwooleVersion: ${swoole_version}, WorkerNum: ${worker_num}
+STATUS;
 }

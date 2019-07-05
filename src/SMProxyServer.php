@@ -35,10 +35,25 @@ class SMProxyServer extends BaseServer
 {
     public $source;
     public $mysqlClient;
+    private $mysqlServer;
     protected $dbConfig;
     public $halfPack;
     public $stmtId = [];
     public $stmtPrepare = [];
+
+    /**
+     * SMProxyServer constructor.
+     */
+    public function __construct()
+    {
+        $this->mysqlServer = new \Swoole\Table(1024);
+        $this->mysqlServer->column('threadId', \Swoole\Table::TYPE_INT, 64);
+        $this->mysqlServer->column('serverVersion', \Swoole\Table::TYPE_STRING, 10);
+        $this->mysqlServer->column('pluginName', \Swoole\Table::TYPE_STRING, 64);
+        $this->mysqlServer->column('serverStatus', \Swoole\Table::TYPE_INT, 11);
+        $this->mysqlServer->create();
+        parent::__construct();
+    }
 
     /**
      * 连接.
@@ -79,6 +94,19 @@ class SMProxyServer extends BaseServer
                 $headerLength = 3;
             }
             $packages = packageSplit($data, $this->source[$fd]->auth ?: false, $headerLength, false, $this->halfPack[$fd]);
+            if (empty($packages)) {
+                switch ($data) {
+                    //获取服务状态信息
+                    case "status":
+                        $statusData = [];
+                        foreach ($this->mysqlServer as $key => $row) {
+                            $statusData[$key] = $row;
+                        }
+                        $server->send($fd, serialize($statusData));
+                        unset($statusData);
+                        break;
+                }
+            }
             foreach ($packages as $package) {
                 $data = $package;
                 self::go(function () use ($server, $fd, $reactor_id, $data) {
@@ -210,7 +238,7 @@ class SMProxyServer extends BaseServer
             try {
                 $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
                 //初始化链接
-                MySQLPool::init($this->dbConfig);
+                MySQLPool::init($this->dbConfig, $this->mysqlServer);
             } catch (MySQLException $exception) {
                 self::writeErrorMessage($exception, 'mysql');
                 $server ->shutdown();

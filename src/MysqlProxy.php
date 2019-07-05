@@ -40,6 +40,7 @@ class MysqlProxy extends MysqlClient
     public $connected = false;
     public $timeout = 0.1;
     public $mysqlClient;
+    public $mysqlServer;
 
     /**
      * MysqlClient constructor.
@@ -156,6 +157,7 @@ class MysqlProxy extends MysqlClient
                             //未授权
                         } elseif (!$this->auth) {
                             $handshakePacket = (new HandshakePacket())->read($binaryPacket);
+                            $this->mysqlServer = $handshakePacket;
                             $this->salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
                             $password = $this->processAuth($handshakePacket->pluginName);
                             $clientFlag = Capabilities::CLIENT_CAPABILITIES;
