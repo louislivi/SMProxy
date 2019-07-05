@@ -156,7 +156,11 @@ class ServerCommand extends Base
                 $serverClient->connect(CONFIG['server']['host'], CONFIG['server']['port'], 0.5);
                 $serverClient->recv();
                 $serverClient->send("status");
-                $result = json_decode($serverClient->recv(), true);
+                $result = '';
+                while ($nowData = $serverClient->recv()) {
+                    $result .= $nowData;
+                };
+                $result = json_decode(base64_decode($result), true);
                 $serverClient->close();
                 $clients = [];
                 foreach ($dbConfig as $key => $value) {

@@ -46,7 +46,7 @@ class SMProxyServer extends BaseServer
      */
     public function __construct()
     {
-        $this->mysqlServer = new \Swoole\Table(1024);
+        $this->mysqlServer = new \Swoole\Table(array_sum(array_column(CONFIG['database']['databases'], 'maxConns')) * 10);
         $this->mysqlServer->column('threadId', \Swoole\Table::TYPE_INT, 64);
         $this->mysqlServer->column('serverVersion', \Swoole\Table::TYPE_STRING, 10);
         $this->mysqlServer->column('pluginName', \Swoole\Table::TYPE_STRING, 64);
@@ -102,7 +102,7 @@ class SMProxyServer extends BaseServer
                         foreach ($this->mysqlServer as $key => $row) {
                             $statusData[$key] = $row;
                         }
-                        $server->send($fd, json_encode($statusData));
+                        $server->send($fd, base64_encode(json_encode($statusData)));
                         unset($statusData);
                         break;
                 }
