@@ -222,7 +222,7 @@ class ServerCommand extends Base
                 }
                 $processlistDetails = '';
                 foreach ($processlist as $key => $value) {
-                    $processlistDetails .= ',  ' . $value . ' ' . $key;
+                    $processlistDetails .= ',  ' . $value . ' ' . strtolower($key);
                 }
                 echo 'Process :  ' . $table->count() . ' total' . $processlistDetails, PHP_EOL;
                 echo $table->render(), PHP_EOL;
