@@ -160,7 +160,7 @@ class ServerCommand extends Base
                 $serverClient->close();
                 $clients = [];
                 foreach ($dbConfig as $key => $value) {
-                    $database = explode(DB_DELIMITER, $key)[1];
+                    $database = explode(DB_DELIMITER, $key)[1] ?? false;
                     if ($database && !isset($clients[$key])) {
                         $threadId = "";
                         foreach ($result as $index => $item) {
@@ -200,7 +200,7 @@ class ServerCommand extends Base
                 foreach ($clients as $key => $client) {
                     $data = $client->recv();
                     foreach ($data as $process) {
-                        $processlist[$process["COMMAND"]] = ($processlist[$process["COMMAND"]] ?: 0) + 1;
+                        $processlist[$process["COMMAND"]] = ($processlist[$process["COMMAND"]] ?? 0) + 1;
                         foreach ($result as $index => $item) {
                             $indexes = explode(DB_DELIMITER, $index);
                             if ($indexes[0] . DB_DELIMITER . $indexes[1] == $key && $process["ID"] == $item["threadId"]) {
