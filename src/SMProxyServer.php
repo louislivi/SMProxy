@@ -102,7 +102,7 @@ class SMProxyServer extends BaseServer
                         foreach ($this->mysqlServer as $key => $row) {
                             $statusData[$key] = $row;
                         }
-                        $server->send($fd, serialize($statusData));
+                        $server->send($fd, base64_encode(serialize($statusData)));
                         unset($statusData);
                         break;
                 }
