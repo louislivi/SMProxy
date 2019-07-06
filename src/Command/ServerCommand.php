@@ -165,11 +165,12 @@ class ServerCommand extends Base
                 $clients = [];
                 foreach ($dbConfig as $key => $value) {
                     $database = explode(DB_DELIMITER, $key)[1] ?? false;
+                    $model = explode(DB_DELIMITER, $key)[0];
                     if ($database && !isset($clients[$key])) {
                         $threadId = "";
                         foreach ($result as $index => $item) {
                             $indexes = explode(DB_DELIMITER, $index);
-                            if ($indexes[0] . DB_DELIMITER . $indexes[1] == $key) {
+                            if (($indexes[0] . DB_DELIMITER . $indexes[1] == $key) || (count($indexes) == 2 && $indexes[0] == $model)) {
                                 $threadId .= $item['threadId'] . ",";
                             }
                         }
@@ -186,7 +187,7 @@ class ServerCommand extends Base
                             'database' => $database,
                         ]);
                         $mysql->setDefer();
-                        switch (explode(DB_DELIMITER, $key)[0]) {
+                        switch ($model) {
                             case 'read':
                                 $mysql->query('/*SMProxy processlist sql*/select * from information_schema.processlist where id in (' . $threadId . ') order by id asc');
                                 break;
@@ -202,16 +203,21 @@ class ServerCommand extends Base
                 $table->setHeader(["ID", "USER", "HOST", "DB", "COMMAND", "TIME", "STATE", "INFO", "SERVER_VERSION", "PLUGIN_NAME", "SERVER_STATUS", "SERVER_KEY"]);
                 $processlist = [];
                 foreach ($clients as $key => $client) {
-                    $data = $client->recv();
+                    $model = explode(DB_DELIMITER, $key)[0];
+                    $data = $client->recv() ?: [];
                     foreach ($data as $process) {
                         $processlist[$process["COMMAND"]] = ($processlist[$process["COMMAND"]] ?? 0) + 1;
                         foreach ($result as $index => $item) {
                             $indexes = explode(DB_DELIMITER, $index);
-                            if ($indexes[0] . DB_DELIMITER . $indexes[1] == $key && $process["ID"] == $item["threadId"]) {
+                            if ($process["ID"] == $item["threadId"]) {
                                 $process["SERVER_VERSION"] = $item["serverVersion"];
                                 $process["PLUGIN_NAME"] = $item["pluginName"];
                                 $process["SERVER_STATUS"] = $item["serverStatus"];
-                                $process["SERVER_KEY"] = $key;
+                                if ($indexes[0] . DB_DELIMITER . $indexes[1] == $key) {
+                                    $process["SERVER_KEY"] = $key;
+                                } else if (count($indexes) == 2 && $indexes[0] == $model) {
+                                    $process["SERVER_KEY"] = $model;
+                                }
                             }
                         }
                         if (strpos($process["INFO"], "/*SMProxy processlist sql*/") !== false) {
