@@ -84,7 +84,9 @@ class ServerCommand extends Base
         }
 
         // 删除pid文件
-        @unlink(CONFIG['server']['swoole']['pid_file']);
+        if (file_exists(CONFIG['server']['swoole']['pid_file'])) {
+            @unlink(CONFIG['server']['swoole']['pid_file']);
+        }
 
         echo 'SMProxy has been shutting down.', PHP_EOL;
     }

@@ -78,9 +78,14 @@ class MySQLPool extends Base
             if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
                 ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
             ) {
+                $threadName = $connName . DB_DELIMITER . $conn->mysqlServer->threadId;
+                if (self::$mysqlServer->exist($threadName)) {
+                    self::$mysqlServer->del($threadName);
+                }
                 if ($conn->client->isConnected()) {
                     $conn->client->close();
                 }
+                unset($threadName);
                 unset(self::$connsNameMap[$id]);
             } else {
                 if (!$conn->client->isConnected()) {
@@ -230,12 +235,14 @@ class MySQLPool extends Base
         self::$lastConnsTime[$id] = microtime(true);
         --self::$initConnCount[$connName];
         //保存服务信息
-        self::$mysqlServer->set($connName . DB_DELIMITER . count(self::$mysqlServer), [
+        $threadName = $connName . DB_DELIMITER . $conn->mysqlServer->threadId;
+        self::$mysqlServer->set($threadName, [
             "threadId"      => $client->mysqlServer->threadId,
             "serverVersion" => $client->mysqlServer->serverVersion,
             "pluginName"    => $client->mysqlServer->pluginName,
             "serverStatus"  => $client->mysqlServer->serverStatus,
         ]);
+        unset($threadName);
         return $client;
     }
 
