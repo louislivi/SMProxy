@@ -48,7 +48,7 @@ class SMProxyServer extends BaseServer
     {
         $this->mysqlServer = new \Swoole\Table(array_sum(array_column(CONFIG['database']['databases'], 'maxConns')) * 10);
         $this->mysqlServer->column('threadId', \Swoole\Table::TYPE_INT, 64);
-        $this->mysqlServer->column('serverVersion', \Swoole\Table::TYPE_STRING, 10);
+        $this->mysqlServer->column('serverVersion', \Swoole\Table::TYPE_STRING, 20);
         $this->mysqlServer->column('pluginName', \Swoole\Table::TYPE_STRING, 64);
         $this->mysqlServer->column('serverStatus', \Swoole\Table::TYPE_INT, 11);
         $this->mysqlServer->create();
