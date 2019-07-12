@@ -19,7 +19,7 @@ class ServerCommand extends Base
     public $desc;
     public $usage;
     public $serverSetting = [];
-    const  SMPROXY_VERSION = 'v1.2.8';
+    const  SMPROXY_VERSION = 'v1.2.9';
 
     public function __construct()
     {
