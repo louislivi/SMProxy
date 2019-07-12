@@ -2,6 +2,7 @@
 
 - System: 
 - PHP version: 
+- Mysql version: 
 - Swoole version: 
 - SMProxy version: 
 
