@@ -47,7 +47,7 @@ class SMProxyServer extends BaseServer
     public function __construct()
     {
         $this->mysqlServer = new \Swoole\Table(array_sum(array_column(CONFIG['database']
-            ['databases'], 'maxConns')) * count(CONFIG['database']['databases']) * 20, 1);
+            ['databases'], 'maxConns')) * 100, 1);
         $this->mysqlServer->column('threadId', \Swoole\Table::TYPE_INT, 64);
         $this->mysqlServer->column('serverVersion', \Swoole\Table::TYPE_STRING, 20);
         $this->mysqlServer->column('pluginName', \Swoole\Table::TYPE_STRING, 64);
