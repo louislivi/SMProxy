@@ -20,6 +20,7 @@ install:
 
 before_script:
   - phpenv config-rm xdebug.ini
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('123456') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
   - composer install --no-dev
   - php -v
   - php -m
