@@ -255,7 +255,7 @@ Options:
 - `Config serverInfo->*->account is not exists! `
     - 请仔细比对`database.json`中`databse->serverInfo->*->*->account`是否在`database->account`下含有相对于的键值对。
 - `Reach max connections! Cann't pending fetch!` 
-    - 适当增加`maxSpareConns`或增加`database.json`中的`timeout`项。
+    - 适当增加`maxSpareConns`或`maxConns`,或增加`database.json`中的`timeout`项。
 - `Must be connected before sending data!` 
     - 检查`MySQL`是否有外网访问权限。
     - 检查`MySQL`验证插件是否为`mysql_native_password`或`caching_sha2_password`

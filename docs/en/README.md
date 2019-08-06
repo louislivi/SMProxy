@@ -274,7 +274,7 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 - `Config serverInfo->*->account is not exists! `
     - Please review `database.json`, make sure that `databse->serverInfo->*->*->account` exists in `database->account`.
 - `Reach max connections! Cann't pending fetch!`
-    - Increase `maxSpareConns` appropriately or increase the `timeout` entry in `database.json`.
+    - Increase `maxSpareConns` or `maxConns` appropriately or increase the `timeout` entry in `database.json`.
 - `Must be connected before sending data!`
     - Check if `MySQL` has access to the external network.
     - Check if `MySQL` verifies that the plugin is `mysql_native_password` or `caching_sha2_password`
