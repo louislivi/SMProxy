@@ -1,4 +1,4 @@
 - [博客](http://www.louislivi.com)
-- 多语言翻译
+- Translations
   - [:cn: 中文](/)
   - [:uk: English](/en/)
