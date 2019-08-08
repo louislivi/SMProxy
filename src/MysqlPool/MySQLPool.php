@@ -78,18 +78,13 @@ class MySQLPool extends Base
             if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
                 ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
             ) {
-                $threadName = $connName . DB_DELIMITER . $conn->mysqlServer->threadId;
-                if (self::$mysqlServer->exist($threadName)) {
-                    self::$mysqlServer->del($threadName);
-                }
                 if ($conn->client->isConnected()) {
                     $conn->client->close();
                 }
-                unset($threadName);
-                unset(self::$connsNameMap[$id]);
+                self::delConns($connName, $conn->mysqlServer->threadId, $id);
             } else {
                 if (!$conn->client->isConnected()) {
-                    unset(self::$connsNameMap[$id]);
+                    self::delConns($connName, $conn->mysqlServer->threadId, $id);
                     $conn = self::initConn($conn->server, $conn->serverFd, $connName);
                     $id = spl_object_hash($conn);
                 }
@@ -100,6 +95,23 @@ class MySQLPool extends Base
                 }
             }
         });
+    }
+
+    /**
+     * 删除连接
+     *
+     * @param $connName
+     * @param $threadId
+     * @param $id
+     */
+    private static function delConns($connName, $threadId, $id)
+    {
+        $threadName = $connName . DB_DELIMITER . $threadId;
+        if (self::$mysqlServer->exist($threadName)) {
+            self::$mysqlServer->del($threadName);
+        }
+        unset(self::$connsNameMap[$id]);
+        unset($threadName);
     }
 
     /**
