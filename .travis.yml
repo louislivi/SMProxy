@@ -16,7 +16,7 @@ services:
   - mysql
 
 install:
-  - printf "\n" | pecl install -f swoole-4.2.8
+  - printf "\n" | pecl install -f swoole
 
 before_script:
   - phpenv config-rm xdebug.ini
