@@ -116,7 +116,8 @@ Options:
       "...": "必选1个，自定义数据库连接信息 与databases中的serverInfo相对应,read读库可不配置"
     },
     "databases": {
-      "数据库名称": {
+      "数据库别名": {
+        "databaseName": "可选，指定真实链接数据库名称（默认不指定与别名相同）",
         "serverInfo": "必选，自定义数据库连接信息 与serverInfo中的自定义数据库连接信息相对应",
         "maxConns": "必选，该库服务最大连接数，支持计算",
         "maxSpareConns": "必选，该库服务最大空闲连接数，支持计算",
@@ -129,12 +130,14 @@ Options:
   }
 }
 ```
-- `maxConns`,`maxSpareConns`,`startConns`
+> - `maxConns`,`maxSpareConns`,`startConns`
     - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
-- 多个读库，写库
+> - 多个读库，写库
     - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
-- `timeout`
+> - `timeout`
     - 设置2-5秒最佳。
+> - `databaseName`
+    - `databaseName`与`数据库别名`的区别在于，`数据库别名`是供链接`SMProxy`时指定的库名，`databaseName`为`SMProxy`链接到`MySQL`的库名。
 
 ### server.json
 ```json
@@ -182,12 +185,12 @@ Options:
   }
 }
 ```
-- `user`,`password`,`port,host`
+> - `user`,`password`,`port,host`
     - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
     - 可随意设置用于`SMProxy`登录验证
     - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
     - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
-- `worker_num`
+> - `worker_num`
     - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
 ### 在项目中如何进行配置
@@ -217,7 +220,7 @@ Options:
     // 端口
     'hostport' => 'server.json中配置的port',
     ```
-- 其他框架以此类推，只需要配置代码中连接数据库的`host`，`port`，`user`，`password`与 `SMProxy`中`server.json`中一致即可。
+> - 其他框架以此类推，只需要配置代码中连接数据库的`host`，`port`，`user`，`password`与 `SMProxy`中`server.json`中一致即可。
 
 ## 路由
 
@@ -267,7 +270,7 @@ Options:
     - 查看`SMProxy`下的日志`mysql.log`和`system.log`。
     - 防止`SMProxy`异常退出，建议使用`Supervisor`或`docker`进行服务挂载。
 - `Supervisor` || `docker`
-    - 使用`Supervisor`和`docker`时需要使用前台运行模式(v1.2.5+使用`--console`,否则使用`daemonize`参数)否则无法正常启动。
+    - 使用`Supervisor`和`docker`时需要使用前台运行模式(v1.2.5+使用`--console`,或使用`daemonize`参数)否则无法正常启动。
 - `502 Bad Gateway`
     - MySQL异常崩溃后连接出现502或连接超时，请不要开启长连接模式。
     - SQL语句过大不要使用连接池，会导致连接阻塞，程序异常。

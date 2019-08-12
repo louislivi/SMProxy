@@ -128,7 +128,8 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
       "...": "<REQUIRED> At least one. Connection name will be used in databases below."
     },
     "databases": {
-      "<REQUIRED> Database name": {
+      "<REQUIRED> Database alias": {
+        "databaseName": "<OPTIONAL> Specify the real link database name (the default is not specified the same as the alias)",
         "serverInfo": "<REQUIRED> Connection name, should be one in serverInfo above.",
         "maxConns": "<REQUIRED> Max connections. Support expressions evaluating.",
         "maxSpareConns": "<REQUIRED> Max spare connections. Support expressions evaluating.",
@@ -141,12 +142,15 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
   }
 }
 ```
-- `maxConns`,`maxSpareConns`,`startConns`
+
+> - `maxConns`,`maxSpareConns`,`startConns`
     - Recommended set to multiple of `worker_num` configured in `server.json`. (`swoole_cpu_num()*N`)
-- With multiple readable / writable databases
+> - With multiple readable / writable databases
     - We are now only supporting random algorithm for retrieving connections. So setting `maxConns`, `startConns`, `startConns` at least more than 1 times of `max(master, slave) * worker_num` was recommended.
-- `timeout`
+> - `timeout`
     - Recommended between 2-5 seconds.
+> - `databaseName`
+    - The difference between `databaseName` and `Database alias` is that `Database alias` is the name of the database specified when linking `SMProxy`, and `databaseName` is the name of the database named `SMProxy` linked to `MySQL`.
 
 ### server.json
 ```json
@@ -194,12 +198,12 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
   }
 }
 ```
-- `user`,`password`,`port,host`
+> - `user`,`password`,`port,host`
     - These parameters are for SMProxy server, not MySQL.
     - Feel free to set to anything you like for authenticating of SMProxy.
     - E.g. The login command using MySQL cli with default config: `mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
     - MySQL cli will output `Server version: 5.6.0-SMProxy` when you logged in to SMProxy.
-- `worker_num`
+> - `worker_num`
     - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
 
 ### Integration
@@ -231,7 +235,7 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
     'hostport' => 'port' configured in server.json,
     ```
 
-- Other frameworks and so on, only need to configure the code to connect to the database `host`, `port`, `user`, `password` and `SMProxy` in the `server.json`.
+> - Other frameworks and so on, only need to configure the code to connect to the database `host`, `port`, `user`, `password` and `SMProxy` in the `server.json`.
 
 ## Route
 
@@ -286,7 +290,7 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
     - View the logs `mysql.log` and `system.log` under `SMProxy`.
     - Prevent `SMProxy` from exiting abnormally. It is recommended to use `Supervisor` or `docker` for service mounting.
 - `Supervisor` || `docker`
-    - Use `Supervisor` and `docker` to use the foreground run mode (v1.2.5+ use `--console`, otherwise use `daemonize` parameter) or it will not start properly.
+    - Use `Supervisor` and `docker` to use the foreground run mode (v1.2.5+ use `--console`, or use `daemonize` parameter) or it will not start properly.
 - `502 Bad Gateway`
     - After MySQL crashes abnormally, the connection appears 502 or the connection times out. Please do not enable long connection mode.
     - If the SQL statement is too large, do not use a succession pool, which will cause the connection to be blocked and the program to be abnormal.

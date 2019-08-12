@@ -211,11 +211,12 @@ class MySQLPool extends Base
             $conn->database = 0;
             $conn->model    = $connName;
         } else {
-            $conn->database = substr($connName, strpos($connName, DB_DELIMITER) + strlen(DB_DELIMITER));
+            $conn->database = self::$connsConfig[$connName]['databaseName'] ?? substr($connName, strpos($connName, DB_DELIMITER) + strlen(DB_DELIMITER));
             $conn->model    = substr($connName, 0, strpos($connName, DB_DELIMITER));
         }
 
         $conn->account  = $serverInfo['account'];
+        $conn->connName = $connName;
         $conn->charset  = self::$connsConfig[$connName]['charset'];
         if (false == $conn->connect($serverInfo['host'], $serverInfo['port'], $serverInfo['timeout'] ?? 0.1)) {
             --self::$initConnCount[$connName];
