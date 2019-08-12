@@ -144,13 +144,13 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 ```
 
 > - `maxConns`,`maxSpareConns`,`startConns`
-    - Recommended set to multiple of `worker_num` configured in `server.json`. (`swoole_cpu_num()*N`)
+>    - Recommended set to multiple of `worker_num` configured in `server.json`. (`swoole_cpu_num()*N`)
 > - With multiple readable / writable databases
-    - We are now only supporting random algorithm for retrieving connections. So setting `maxConns`, `startConns`, `startConns` at least more than 1 times of `max(master, slave) * worker_num` was recommended.
+>    - We are now only supporting random algorithm for retrieving connections. So setting `maxConns`, `startConns`, `startConns` at least more than 1 times of `max(master, slave) * worker_num` was recommended.
 > - `timeout`
-    - Recommended between 2-5 seconds.
+>    - Recommended between 2-5 seconds.
 > - `databaseName`
-    - The difference between `databaseName` and `Database alias` is that `Database alias` is the name of the database specified when linking `SMProxy`, and `databaseName` is the name of the database named `SMProxy` linked to `MySQL`.
+>    - The difference between `databaseName` and `Database alias` is that `Database alias` is the name of the database specified when linking `SMProxy`, and `databaseName` is the name of the database named `SMProxy` linked to `MySQL`.
 
 ### server.json
 ```json
@@ -199,12 +199,12 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 }
 ```
 > - `user`,`password`,`port,host`
-    - These parameters are for SMProxy server, not MySQL.
-    - Feel free to set to anything you like for authenticating of SMProxy.
-    - E.g. The login command using MySQL cli with default config: `mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
-    - MySQL cli will output `Server version: 5.6.0-SMProxy` when you logged in to SMProxy.
+>    - These parameters are for SMProxy server, not MySQL.
+>    - Feel free to set to anything you like for authenticating of SMProxy.
+>    - E.g. The login command using MySQL cli with default config: `mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
+>    - MySQL cli will output `Server version: 5.6.0-SMProxy` when you logged in to SMProxy.
 > - `worker_num`
-    - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
+>    - It is recommended to set to `swoole_cpu_num()` or `swoole_cpu_num()*N`.
 
 ### Integration
 

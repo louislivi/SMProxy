@@ -131,13 +131,13 @@ Options:
 }
 ```
 > - `maxConns`,`maxSpareConns`,`startConns`
-    - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
+>    - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
 > - 多个读库，写库
-    - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
+>    - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
 > - `timeout`
-    - 设置2-5秒最佳。
+>    - 设置2-5秒最佳。
 > - `databaseName`
-    - `databaseName`与`数据库别名`的区别在于，`数据库别名`是供链接`SMProxy`时指定的库名，`databaseName`为`SMProxy`链接到`MySQL`的库名。
+>    - `databaseName`与`数据库别名`的区别在于，`数据库别名`是供链接`SMProxy`时指定的库名，`databaseName`为`SMProxy`链接到`MySQL`的库名。
 
 ### server.json
 ```json
@@ -186,12 +186,12 @@ Options:
 }
 ```
 > - `user`,`password`,`port,host`
-    - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
-    - 可随意设置用于`SMProxy`登录验证
-    - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
-    - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
+>    - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
+>    - 可随意设置用于`SMProxy`登录验证
+>    - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
+>    - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
 > - `worker_num`
-    - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
+>    - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
 ### 在项目中如何进行配置
 - Laravel
