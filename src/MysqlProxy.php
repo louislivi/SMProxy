@@ -122,7 +122,7 @@ class MysqlProxy extends MysqlClient
                     if ($binaryPacket->data[4] == ErrorPacket::$FIELD_COUNT) {
                         $errorPacket = new ErrorPacket();
                         $errorPacket->read($binaryPacket);
-                        $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
+//                        $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
                         $data = getString($errorPacket->write());
                     } elseif (!$this->connected) {
                         //OK Packet
