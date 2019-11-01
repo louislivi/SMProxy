@@ -67,7 +67,7 @@ composer install --no-dev # 如果你想贡献你的代码，请不要使用 --n
 需要给予 bin/SMProxy 执行权限。
 
 ```bash
-  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console ]
+  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console | -f | --force ]
   SMProxy -h | --help
   SMProxy -v | --version
 ```
@@ -82,6 +82,7 @@ Options:
 - -v --version                     查看当前服务版本
 - -c --config <configuration_path> 设置配置项目录
 - --console                        前台运行(SMProxy>=1.2.5)
+- -f --force                       强制执行(SMProxy>=1.3.0)
 
 ## 配置
 

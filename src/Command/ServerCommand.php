@@ -18,6 +18,7 @@ class ServerCommand extends Base
     public $logo;
     public $desc;
     public $usage;
+    public $argv;
     public $serverSetting = [];
     const  SMPROXY_VERSION = 'v1.2.9';
 
@@ -54,13 +55,23 @@ class ServerCommand extends Base
             smproxy_error('ERROR: The server is not running! cannot stop!');
         }
 
+        //强制停止
+        $force = false;
+        if (in_array('--force', $this->argv) || in_array('-f', $this->argv)) {
+            $force = true;
+        }
+
         echo 'SMProxy is stopping ...', PHP_EOL;
 
-        $result = function () {
+        $result = function () use ($force) {
             // 获取master进程ID
             $masterPid = $this->serverSetting['masterPid'];
             // 使用swoole_process::kill代替posix_kill
-            \swoole_process::kill($masterPid);
+            if ($force) {
+                \swoole_process::kill($masterPid, SIGKILL);
+            } else {
+                \swoole_process::kill($masterPid);
+            }
             $timeout = 60;
             $startTime = time();
             while (true) {
@@ -73,9 +84,9 @@ class ServerCommand extends Base
                     usleep(10000);
                     continue;
                 }
-
                 return true;
             }
+            return false;
         };
 
         // 停止失败
@@ -249,7 +260,7 @@ class ServerCommand extends Base
      *
      * @return bool
      */
-    public function isRunning()
+    private function isRunning()
     {
         $masterIsLive = false;
         $pFile = CONFIG['server']['swoole']['pid_file'];

@@ -79,7 +79,7 @@ composer install --no-dev # If you want to contribute to this repo, please DO NO
 `bin/SMProxy` needs execute permission.
 
 ```bash
-  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console ]
+  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console | -f | --force ]
   SMProxy -h | --help
   SMProxy -v | --version
 ```
@@ -94,6 +94,7 @@ Options:
 - -v --version                     Display version
 - -c --config <configuration_path> Specify configuration path
 - --console                        Front desk operation(SMProxy>=1.2.5)
+- -f --force                       Enforce(SMProxy>=1.3.0)
 
 ## Configuration
 
