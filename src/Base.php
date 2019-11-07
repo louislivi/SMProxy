@@ -146,12 +146,12 @@ class Base extends Context
     /**
      * 计算配置参数
      *
-     * @param int $value
+     * @param string $value
      * @param bool $floor_worker_num
      *
      * @return float|mixed
      */
-    private function evalConfigParam(int $value, bool $floor_worker_num = false)
+    private function evalConfigParam(string $value, bool $floor_worker_num = false)
     {
         if ($floor_worker_num) {
             $param = floor(
