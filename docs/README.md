@@ -105,13 +105,21 @@ Options:
           "host": "必选，写库地址 多个用[]表示",
           "port": "必选，写库端口",
           "timeout": "必选，写库连接超时时间（秒）",
-          "account": "必选，自定义用户名 与 account中的自定义用户名相对应"
+          "account": "必选，自定义用户名 与 account中的自定义用户名相对应",
+          "maxConns": "重载，对应databases",
+          "maxSpareConns": "重载，对应databases",
+          "startConns": "重载，对应databases",
+          "maxSpareExp": "重载，对应databases"
         },
         "read": {
           "host": "可选，读库地址 多个用[]表示",
           "port": "可选，读库端口",
           "timeout": "可选，读库连接超时时间（秒）",
-          "account": "可选，自定义用户名 与 account中的自定义用户名相对应"
+          "account": "可选，自定义用户名 与 account中的自定义用户名相对应",
+          "maxConns": "重载，对应databases",
+          "maxSpareConns": "重载，对应databases",
+          "startConns": "重载，对应databases",
+          "maxSpareExp": "重载，对应databases"
         }
       },
       "...": "必选1个，自定义数据库连接信息 与databases中的serverInfo相对应,read读库可不配置"
@@ -139,6 +147,8 @@ Options:
 >    - 设置2-5秒最佳。
 > - `databaseName`
 >    - `databaseName`与`数据库别名`的区别在于，`数据库别名`是供链接`SMProxy`时指定的库名，`databaseName`为`SMProxy`链接到`MySQL`的库名。
+> - `重载`
+>    - 使用`重载`后会覆盖原对应参数的值，比如`maxConns`因读写使用频率不同，所以可以将读写设置不同的`maxConns`。
 
 ### server.json
 ```json

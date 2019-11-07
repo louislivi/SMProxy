@@ -117,13 +117,21 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
           "host": "<REQUIRED> Master database server hosts (write-only). Use [] if more than one.",
           "port": "<REQUIRED> Master database server port.",
           "timeout": "<REQUIRED> Connect timeout.",
-          "account": "<REQUIRED> Account name, should be one in accounts above."
+          "account": "<REQUIRED> Account name, should be one in accounts above.",
+          "maxConns": "<OVERRIDE> Look at databases.",
+          "maxSpareConns": "<OVERRIDE> Look at databases.",
+          "startConns": "<OVERRIDE> Look at databases.",
+          "maxSpareExp": "<OVERRIDE> Look at databases."
         },
         "read": {
           "host": "<OPTIONAL> Slave database server hosts (read-only). Use [] if more than one.",
           "port": "<OPTIONAL> Slave database server port.",
           "timeout": "<OPTIONAL> Connect timeout.",
-          "account": "<OPTIONAL> Account name, should be one in accounts above."
+          "account": "<OPTIONAL> Account name, should be one in accounts above.",
+          "maxConns": "<OVERRIDE> Look at databases.",
+          "maxSpareConns": "<OVERRIDE> Look at databases.",
+          "startConns": "<OVERRIDE> Look at databases.",
+          "maxSpareExp": "<OVERRIDE> Look at databases."
         }
       },
       "...": "<REQUIRED> At least one. Connection name will be used in databases below."
@@ -152,6 +160,8 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 >    - Recommended between 2-5 seconds.
 > - `databaseName`
 >    - The difference between `databaseName` and `Database alias` is that `Database alias` is the name of the database specified when linking `SMProxy`, and `databaseName` is the name of the database named `SMProxy` linked to `MySQL`.
+> - `OVERRIDE`
+>    - After using `OVERRIDE`, it will overwrite the value of the original corresponding parameter. For example, `maxConns` has different reading and writing frequency, so you can set the `maxConns` with different reading and writing.
 
 ### server.json
 ```json
