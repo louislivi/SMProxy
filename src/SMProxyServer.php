@@ -110,6 +110,7 @@ class SMProxyServer extends BaseServer
                         break;
                 }
             }
+            //分包解析
             foreach ($packages as $package) {
                 $data = $package;
                 self::go(function () use ($server, $fd, $reactor_id, $data) {

@@ -9,25 +9,40 @@ use SMProxy\MysqlProxy;
 use Swoole\Coroutine\Client;
 
 /**
+ * MySql连接池管理
+ *
  * Author: Louis Livi <574747417@qq.com>
  * Date: 2018/11/6
  * Time: 上午10:52.
  */
 class MySQLPool extends Base
 {
+    //是否初始化
     protected static $init = false;
+    //空闲连接
     protected static $spareConns = [];
+    //正在使用中的连接
     protected static $busyConns  = [];
+    //配置项
     protected static $connsConfig;
+    //所有的连接
     protected static $connsNameMap = [];
+    //等待中的连接
     protected static $pendingFetchCount = [];
+    //需要恢复的连接
     protected static $resumeFetchCount  = [];
+    //等待连接对应的协程通道
     protected static $yieldChannel  = [];
+    //初始连接数
     protected static $initConnCount = [];
+    //连接最后交互时间
     protected static $lastConnsTime = [];
+    //MySql服务端
     protected static $mysqlServer;
 
     /**
+     * 初始化连接池
+     *
      * @param array $connsConfig
      *
      * @throws MySQLException
@@ -50,10 +65,37 @@ class MySQLPool extends Base
         }
         self::$mysqlServer = $mysqlServer;
         self::$init = true;
+        // 启动定时回收空闲连接
+        self::tickRecycle();
     }
 
     /**
-     * 回收连接。
+     * 定时回收空闲连接
+     */
+    private static function tickRecycle()
+    {
+        \Swoole\Timer::tick(2000, function () {
+            foreach (self::$spareConns as $connName => &$connsPool) {
+                foreach ($connsPool as $key => &$conn) {
+                    $id = spl_object_hash($conn);
+                    if (((count($connsPool) + self::$initConnCount[$connName]) > self::$connsConfig[$connName]['maxSpareConns']) &&
+                        ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
+                    ) {
+                        unset($connsPool[$key]);
+                        if ($conn->client->isConnected()) {
+                            $conn->client->close();
+                        }
+                        self::delConns($connName, $conn->mysqlServer->threadId, $id);
+                    }
+                    unset($conn);
+                }
+                unset($connsPool);
+            }
+        });
+    }
+
+    /**
+     * 回收连接
      *
      * @param MysqlProxy $conn
      * @param bool       $busy
@@ -75,7 +117,7 @@ class MySQLPool extends Base
                 }
             }
             $connsPool = &self::$spareConns[$connName];
-            if (((count($connsPool) + self::$initConnCount[$connName]) >= self::$connsConfig[$connName]['maxSpareConns']) &&
+            if (((count($connsPool) + self::$initConnCount[$connName]) > self::$connsConfig[$connName]['maxSpareConns']) &&
                 ((microtime(true) - self::$lastConnsTime[$id]) >= ((self::$connsConfig[$connName]['maxSpareExp']) ?? 0))
             ) {
                 if ($conn->client->isConnected()) {
@@ -211,11 +253,12 @@ class MySQLPool extends Base
             $conn->database = 0;
             $conn->model    = $connName;
         } else {
-            $conn->database = substr($connName, strpos($connName, DB_DELIMITER) + strlen(DB_DELIMITER));
+            $conn->database = self::$connsConfig[$connName]['databaseName'] ?? substr($connName, strpos($connName, DB_DELIMITER) + strlen(DB_DELIMITER));
             $conn->model    = substr($connName, 0, strpos($connName, DB_DELIMITER));
         }
 
         $conn->account  = $serverInfo['account'];
+        $conn->connName = $connName;
         $conn->charset  = self::$connsConfig[$connName]['charset'];
         if (false == $conn->connect($serverInfo['host'], $serverInfo['port'], $serverInfo['timeout'] ?? 0.1)) {
             --self::$initConnCount[$connName];

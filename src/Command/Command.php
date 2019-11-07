@@ -24,7 +24,7 @@ class Command
     {
         $command = count($argv) >= 2 ? $argv[1] : false;
         $this ->settingConfig($argv);
-        $this ->commandHandler($command);
+        $this ->commandHandler($command, $argv);
     }
 
     /**
@@ -68,9 +68,10 @@ class Command
      *
      * @param string $command
      */
-    protected function commandHandler(string $command)
+    protected function commandHandler(string $command, array $argv)
     {
         $serverCommand = new ServerCommand();
+        $serverCommand->argv = $argv;
 
         if ('-h' == $command || '--help' == $command) {
             echo $serverCommand->desc, PHP_EOL;

@@ -67,7 +67,7 @@ composer install --no-dev # 如果你想贡献你的代码，请不要使用 --n
 需要给予 bin/SMProxy 执行权限。
 
 ```bash
-  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console ]
+  SMProxy [ start | stop | restart | status | reload ] [ -c | --config <configuration_path> | --console | -f | --force ]
   SMProxy -h | --help
   SMProxy -v | --version
 ```
@@ -82,6 +82,7 @@ Options:
 - -v --version                     查看当前服务版本
 - -c --config <configuration_path> 设置配置项目录
 - --console                        前台运行(SMProxy>=1.2.5)
+- -f --force                       强制执行(SMProxy>=1.3.0)
 
 ## 配置
 
@@ -104,19 +105,28 @@ Options:
           "host": "必选，写库地址 多个用[]表示",
           "port": "必选，写库端口",
           "timeout": "必选，写库连接超时时间（秒）",
-          "account": "必选，自定义用户名 与 account中的自定义用户名相对应"
+          "account": "必选，自定义用户名 与 account中的自定义用户名相对应",
+          "maxConns": "重载，对应databases",
+          "maxSpareConns": "重载，对应databases",
+          "startConns": "重载，对应databases",
+          "maxSpareExp": "重载，对应databases"
         },
         "read": {
           "host": "可选，读库地址 多个用[]表示",
           "port": "可选，读库端口",
           "timeout": "可选，读库连接超时时间（秒）",
-          "account": "可选，自定义用户名 与 account中的自定义用户名相对应"
+          "account": "可选，自定义用户名 与 account中的自定义用户名相对应",
+          "maxConns": "重载，对应databases",
+          "maxSpareConns": "重载，对应databases",
+          "startConns": "重载，对应databases",
+          "maxSpareExp": "重载，对应databases"
         }
       },
       "...": "必选1个，自定义数据库连接信息 与databases中的serverInfo相对应,read读库可不配置"
     },
     "databases": {
-      "数据库名称": {
+      "数据库别名": {
+        "databaseName": "可选，指定真实链接数据库名称（默认不指定与别名相同）",
         "serverInfo": "必选，自定义数据库连接信息 与serverInfo中的自定义数据库连接信息相对应",
         "maxConns": "必选，该库服务最大连接数，支持计算",
         "maxSpareConns": "必选，该库服务最大空闲连接数，支持计算",
@@ -129,12 +139,16 @@ Options:
   }
 }
 ```
-- `maxConns`,`maxSpareConns`,`startConns`
-    - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
-- 多个读库，写库
-    - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
-- `timeout`
-    - 设置2-5秒最佳。
+> - `maxConns`,`maxSpareConns`,`startConns`
+>    - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
+> - 多个读库，写库
+>    - 目前采取的是随机获取连接，推荐将`maxConns`，`startConns`，`startConns`至少设置为`max(读库,写库)*worker_num` 的1倍以上
+> - `timeout`
+>    - 设置2-5秒最佳。
+> - `databaseName`
+>    - `databaseName`与`数据库别名`的区别在于，`数据库别名`是供链接`SMProxy`时指定的库名，`databaseName`为`SMProxy`链接到`MySQL`的库名。
+> - `重载`
+>    - 使用`重载`后会覆盖原对应参数的值，比如`maxConns`因读写使用频率不同，所以可以将读写设置不同的`maxConns`。
 
 ### server.json
 ```json
@@ -182,13 +196,13 @@ Options:
   }
 }
 ```
-- `user`,`password`,`port,host`
-    - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
-    - 可随意设置用于`SMProxy`登录验证
-    - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
-    - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
-- `worker_num`
-    - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
+> - `user`,`password`,`port,host`
+>    - 为`SMProxy`的账户|密码|端口|地址(非Mysql数据库账户|密码|端口|地址)
+>    - 可随意设置用于`SMProxy`登录验证
+>    - 例如默认配置登录为`mysql -uroot -p123456 -P 3366 -h 127.0.0.1`
+>    - `SMProxy`登录成功MySQL COMMIT会提示`Server version: 5.6.0-SMProxy`
+> - `worker_num`
+>    - 推荐使用`swoole_cpu_num()` 或 `swoole_cpu_num()*N`
 
 ### 在项目中如何进行配置
 - Laravel
@@ -217,7 +231,7 @@ Options:
     // 端口
     'hostport' => 'server.json中配置的port',
     ```
-- 其他框架以此类推，只需要配置代码中连接数据库的`host`，`port`，`user`，`password`与 `SMProxy`中`server.json`中一致即可。
+> - 其他框架以此类推，只需要配置代码中连接数据库的`host`，`port`，`user`，`password`与 `SMProxy`中`server.json`中一致即可。
 
 ## 路由
 
@@ -267,7 +281,7 @@ Options:
     - 查看`SMProxy`下的日志`mysql.log`和`system.log`。
     - 防止`SMProxy`异常退出，建议使用`Supervisor`或`docker`进行服务挂载。
 - `Supervisor` || `docker`
-    - 使用`Supervisor`和`docker`时需要使用前台运行模式(v1.2.5+使用`--console`,否则使用`daemonize`参数)否则无法正常启动。
+    - 使用`Supervisor`和`docker`时需要使用前台运行模式(v1.2.5+使用`--console`,或使用`daemonize`参数)否则无法正常启动。
 - `502 Bad Gateway`
     - MySQL异常崩溃后连接出现502或连接超时，请不要开启长连接模式。
     - SQL语句过大不要使用连接池，会导致连接阻塞，程序异常。

@@ -9,6 +9,7 @@ namespace SMProxy;
  */
 abstract class MysqlClient extends Base
 {
+    public $connName;
     public $client;
     public $database;
     public $model;
