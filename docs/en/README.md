@@ -152,11 +152,11 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 }
 ```
 
-Parameter name | Description |
+| Parameter name | Description |
 | ---- | ---- |
-`maxSpareExp` | The maximum idle time of an active connection, in seconds. Connections that exceed this time will be released to the connection pool for active connections that have not been closed. |
-`maxSpareConns` | A maximum of` maxConns` connections can be idle in the connection pool. The value here is 20, which means that even when there is no database connection, 20 idle connections can be maintained without being cleared, and it is always on standby. |
-`maxConns` | The maximum number of connections supported by the connection pool. The value here is 20, which means that there are at most 20 database connections at the same time. Generally set `maxConns` to the possible concurrency. |
+| `maxSpareExp` | The maximum idle time of an active connection, in seconds. Connections that exceed this time will be released to the connection pool for active connections that have not been closed. |
+| `maxSpareConns` | A maximum of` maxConns` connections can be idle in the connection pool. The value here is 20, which means that even when there is no database connection, 20 idle connections can be maintained without being cleared, and it is always on standby. |
+| `maxConns` | The maximum number of connections supported by the connection pool. The value here is 20, which means that there are at most 20 database connections at the same time. Generally set `maxConns` to the possible concurrency. |
 | `startConns` | Initialize the number of connections, and generate connections when the service starts. |
 
 > - `maxConns`,`maxSpareConns`,`startConns`
