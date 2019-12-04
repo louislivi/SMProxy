@@ -139,6 +139,14 @@ Options:
   }
 }
 ```
+
+|  参数名称   |  描述  |
+| ---- | ---- |
+| maxSpareExp | 活动连接的最大空闲时间,单位为秒 超过此时间的连接会被释放到连接池中,针对未被`close`的活动连接。|
+| maxSpareConns | 连接池中最多可空闲maxConns个连接 ，这里取值为20，表示即使没有数据库连接时依然可以保持20空闲的连接，而不被清除，随时处于待命状态。|
+| maxConns | 连接池支持的最大连接数，这里取值为20，表示同时最多有20个数据库连接。一般把maxConns设置成可能的并发量就行了。|
+| startConns | 初始化连接数目,服务启动时生成连接数。 |
+
 > - `maxConns`,`maxSpareConns`,`startConns`
 >    - 推荐设置为`server.json`中配置的`worker_num`的倍数`swoole_cpu_num()*N`
 > - 多个读库，写库
