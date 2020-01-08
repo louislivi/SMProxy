@@ -6,6 +6,7 @@ use function SMProxy\Helper\getBytes;
 use function SMProxy\Helper\getString;
 use function SMProxy\Helper\packageSplit;
 use function SMProxy\Helper\getMysqlPackSize;
+use SMProxy\Log\Log;
 use Swoole\Coroutine\Channel;
 use Swoole\Coroutine\Client;
 use SMProxy\MysqlPacket\AuthPacket;
@@ -85,8 +86,9 @@ class MysqlProxy extends MysqlClient
                 $this->mysqlClient->push($this->client);
             }
             self::go(function () {
+                $remain = '';
                 while (true) {
-                    $data = $this->recv();
+                    $data = $this->recv($remain);
                     if ($data === '' || $data === false) {
                         break;
                     }
@@ -122,7 +124,7 @@ class MysqlProxy extends MysqlClient
                     if ($binaryPacket->data[4] == ErrorPacket::$FIELD_COUNT) {
                         $errorPacket = new ErrorPacket();
                         $errorPacket->read($binaryPacket);
-//                        $errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
+                        //$errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
                         $data = getString($errorPacket->write());
                     } elseif (!$this->connected) {
                         //OK Packet
@@ -259,11 +261,51 @@ class MysqlProxy extends MysqlClient
     }
 
     /**
+     * @param $new_recv
+     * @param $remain
+     * @return bool|string
+     */
+    private function parsePkg($new_recv, &$remain)
+    {
+        $remain .= $new_recv;
+        $data_len= strlen($remain);
+        if ($data_len <= 3) {
+            return '';
+        }
+        $last_pkg_end = -1;
+
+        for ($i = 0; $i + 2 < $data_len; ) {
+            $payload_length =
+                ord($remain[$i]) |
+                (ord($remain[$i + 1]) << 8) |
+                (ord($remain[$i + 2]) << 16);
+            $next_pkg_start = $i + $payload_length + 4;
+            if ($next_pkg_start <= $data_len) {
+                $last_pkg_end = $next_pkg_start;
+                $i = $last_pkg_end;
+            } else {
+                break;
+            }
+        }
+        if ($last_pkg_end == $data_len) {
+            $send = $remain;
+            $remain = '';
+            return $send;
+        } else if ($last_pkg_end > 0) {
+            $send = substr($remain, 0, $last_pkg_end);
+            $remain = substr($remain, $last_pkg_end);
+            return $send;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * recv.
      *
      * @return mixed
      */
-    public function recv()
+    public function recv(&$remain)
     {
         if ($this->isDuplex) {
             $client = $this->client;
@@ -271,7 +313,13 @@ class MysqlProxy extends MysqlClient
             if ($data === '' || $data === false) {
                 $this->onClientClose($client);
             } elseif (is_string($data)) {
-                $this->onClientReceive($client, $data);
+                $send = $this->parsePkg($data, $remain);
+                if ($send) {
+                    $this->onClientReceive($client, $send);
+                } else if ($send === false) {
+                    $system_log = Log::getLogger('system');
+                    $system_log->error('pkg parse error');
+                }
             }
         } else {
             $client = self::coPop($this->mysqlClient, $this->timeout);
@@ -293,7 +341,13 @@ class MysqlProxy extends MysqlClient
                 $this->mysqlClient->close();
                 $this->onClientClose($client);
             } elseif (is_string($data)) {
-                $this->onClientReceive($client, $data);
+                $send = $this->parsePkg($data, $remain);
+                if ($send) {
+                    $this->onClientReceive($client, $send);
+                } else if ($send === false) {
+                    $system_log = Log::getLogger('system');
+                    $system_log->error('pkg parse error');
+                }
             }
         }
         return $data;
