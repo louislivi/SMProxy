@@ -10,24 +10,20 @@ $username = "root";
 $password = "123456";
 $dbname = "mysql";
 $port   = 3366;
+$dsn = "mysql:host=$servername;dbname=$dbname;port=$port";			//设置服务器地址、数据库名称
 try {
-    // 创建连接
-    $conn = new mysqli($servername, $username, $password, $dbname, $port);
-    // Check connection
-    if ($conn->connect_error) {
-        fwrite(STDERR, "Connect failed!" . $conn->connect_error . PHP_EOL);
-    }
+    //初始化一个PDO对象
+    $conn = new \PDO($dsn, $username, $password);
     fwrite(STDOUT, 'Connect succeeded!' . PHP_EOL);
-
     $sql = "SELECT `Host`,`User`,`Plugin` FROM `mysql`.`user` limit 1";
     $result = $conn->query($sql);
     fwrite(STDOUT, 'Executed query:' . $sql . PHP_EOL);
-    if ($result->num_rows > 0) {
-        fwrite(STDOUT,  'Result: ' . json_encode($result->fetch_assoc()) . PHP_EOL);
+    if ($result->rowCount()) {
+        fwrite(STDOUT,  'Result: ' . json_encode($result->fetch()) . PHP_EOL);
     } else {
         fwrite(STDERR, "Result empty!" . PHP_EOL);
     }
-    $conn->close();
+    unset($conn);
 } catch (\Exception $exception) {
     fwrite(STDERR, $exception ->getMessage());
 }

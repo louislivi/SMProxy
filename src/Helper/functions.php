@@ -31,6 +31,18 @@ function getBytes(string $data)
 }
 
 /**
+ * 打印bytes 数组.
+ *
+ * @param $data
+ *
+ */
+function printBytes(string $data)
+{
+    print_r("print bytes:\n");
+    var_dump(implode(",", getBytes($data)));
+}
+
+/**
  * 获取 string.
  *
  * @param array $bytes
@@ -293,13 +305,13 @@ function smproxy_error($message, $exitCode = 0)
  *
  * @param string $data
  * @param bool $auth
- * @param int $headerLength 是否认证通过
+ * @param int $headerLength 认证通过的客户端包为 4 ，其余均为 3
  * @param bool $isClient 是否是客户端
  * @param string $halfPack 半包体
  *
  * @return array
  */
-function packageSplit(string $data, bool $auth, int $headerLength = 4, bool $isClient = false, string &$halfPack = '')
+function packageSplit(string $data, bool $auth = true, int $headerLength = 3, bool $isClient = true, string &$halfPack = '')
 {
     if ($halfPack !== '') {
         $data = $halfPack . $data;
@@ -341,7 +353,7 @@ function packageSplit(string $data, bool $auth, int $headerLength = 4, bool $isC
             $split($data, $packages, $packageLength);
         }
     }
-
+    var_dump("ok!");
     return $packages;
 }
 

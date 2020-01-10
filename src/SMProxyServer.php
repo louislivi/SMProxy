@@ -307,7 +307,7 @@ class SMProxyServer extends BaseServer
                 $mysql->setDefer();
                 switch (explode(DB_DELIMITER, $key)[0]) {
                     case 'read':
-                        $mysql->query('/*SMProxy test sql*/select sleep(0.1)');
+                        $mysql->query('/*SMProxy test sql*/select sleep(0.01)');
                         break;
                     case 'write':
                         $mysql->query('/*SMProxy test sql*/set autocommit=1');
