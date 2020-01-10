@@ -305,13 +305,12 @@ function smproxy_error($message, $exitCode = 0)
  *
  * @param string $data
  * @param bool $auth
- * @param int $headerLength 认证通过的客户端包为 4 ，其余均为 3
- * @param bool $isClient 是否是客户端
+ * @param int $headerLength 认证通过的客户端包为 4 ，未通过为 3
  * @param string $halfPack 半包体
  *
  * @return array
  */
-function packageSplit(string $data, bool $auth = true, int $headerLength = 3, bool $isClient = true, string &$halfPack = '')
+function packageSplit(string $data, bool $auth = true, int $headerLength = 3, string &$halfPack = '')
 {
     if ($halfPack !== '') {
         $data = $halfPack . $data;
@@ -334,12 +333,9 @@ function packageSplit(string $data, bool $auth = true, int $headerLength = 3, bo
         $halfPack = '';
     }
     $packages = [];
-    $split = function ($data, &$packages, $step = 0) use (&$split, $headerLength, $isClient) {
+    $split = function ($data, &$packages, $step = 0) use (&$split, $headerLength) {
         if (isset($data[$step]) && 0 != ord($data[$step])) {
             $packageLength = getPackageLength($data, $step, $headerLength);
-            if ($isClient) {
-                $packageLength++;
-            }
             $packages[] = substr($data, $step, $packageLength);
             $split($data, $packages, $step + $packageLength);
         }
@@ -353,7 +349,6 @@ function packageSplit(string $data, bool $auth = true, int $headerLength = 3, bo
             $split($data, $packages, $packageLength);
         }
     }
-    var_dump("ok!");
     return $packages;
 }
 

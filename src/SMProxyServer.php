@@ -96,7 +96,7 @@ class SMProxyServer extends BaseServer
             } else {
                 $headerLength = 3;
             }
-            $packages = packageSplit($data, $this->source[$fd]->auth ?: false, $headerLength, false, $this->halfPack[$fd]);
+            $packages = packageSplit($data, $this->source[$fd]->auth ?: false, $headerLength, $this->halfPack[$fd]);
             if (empty($packages)) {
                 switch ($data) {
                     //获取服务状态信息

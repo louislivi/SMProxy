@@ -4,7 +4,6 @@ namespace SMProxy;
 
 use function SMProxy\Helper\getBytes;
 use function SMProxy\Helper\getString;
-use function SMProxy\Helper\packageSplit;
 use function SMProxy\Helper\getMysqlPackSize;
 use SMProxy\Log\Log;
 use Swoole\Coroutine\Channel;
@@ -17,7 +16,6 @@ use SMProxy\MysqlPacket\MySQLMessage;
 use SMProxy\MysqlPacket\OkPacket;
 use SMProxy\MysqlPacket\Util\Capabilities;
 use SMProxy\MysqlPacket\Util\CharsetUtil;
-use SMProxy\MysqlPacket\Util\ErrorCode;
 use SMProxy\MysqlPacket\Util\SecurityUtil;
 use SMProxy\MysqlPool\MySQLException;
 use SMProxy\MysqlPool\MySQLPool;
@@ -106,95 +104,87 @@ class MysqlProxy extends MysqlClient
      */
     public function onClientReceive(\Swoole\Coroutine\Client $cli, string $data)
     {
-        if ($this->connected) {
-            $packages = [$data];
-        } else {
-            $packages = packageSplit($data, true, 3, true);
-        }
-        foreach ($packages as $package) {
-            $data = $package;
-            self::go(function () use ($cli, $data) {
-                $fd = $this->serverFd;
-                $binaryPacket = new BinaryPacket();
-                $binaryPacket->data = getBytes($data);
-                $binaryPacket->packetLength = $binaryPacket->calcPacketSize();
-                if (isset($binaryPacket->data[4])) {
-                    $send = true;
-                    //ERROR Packet
-                    if ($binaryPacket->data[4] == ErrorPacket::$FIELD_COUNT) {
-                        $errorPacket = new ErrorPacket();
-                        $errorPacket->read($binaryPacket);
-                        //$errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
-                        $data = getString($errorPacket->write());
-                    } elseif (!$this->connected) {
-                        //OK Packet
-                        if ($binaryPacket->data[4] == OkPacket::$FIELD_COUNT) {
-                            $send = false;
-                            $this->connected = true;
-                            $this->chan->push($this);
-                            # 快速认证
-                        } elseif ($binaryPacket->data[4] == 0x01) {
-                            # 请求公钥
-                            if ($binaryPacket->packetLength == 6) {
-                                if ($binaryPacket->data[$binaryPacket->packetLength - 1] == 4) {
-                                    $data = getString(array_merge(getMysqlPackSize(1), [3, 2]));
-                                    $this->send($data);
-                                }
-                            } else {
-                                $this->serverPublicKey = substr($data, 5, strlen($data) - 2);
-                                $encryptData = SecurityUtil::sha2RsaEncrypt($this->account['password'], $this->salt, $this->serverPublicKey);
-                                $data = getString(array_merge(getMysqlPackSize(strlen($encryptData)), [5])) . $encryptData;
+        self::go(function () use ($cli, $data) {
+            $fd = $this->serverFd;
+            $binaryPacket = new BinaryPacket();
+            $binaryPacket->data = getBytes($data);
+            $binaryPacket->packetLength = $binaryPacket->calcPacketSize();
+            if (isset($binaryPacket->data[4])) {
+                $send = true;
+                //ERROR Packet
+                if ($binaryPacket->data[4] == ErrorPacket::$FIELD_COUNT) {
+                    $errorPacket = new ErrorPacket();
+                    $errorPacket->read($binaryPacket);
+                    //$errorPacket->errno = ErrorCode::ER_SYNTAX_ERROR;
+                    $data = getString($errorPacket->write());
+                } elseif (!$this->connected) {
+                    //OK Packet
+                    if ($binaryPacket->data[4] == OkPacket::$FIELD_COUNT) {
+                        $send = false;
+                        $this->connected = true;
+                        $this->chan->push($this);
+                        # 快速认证
+                    } elseif ($binaryPacket->data[4] == 0x01) {
+                        # 请求公钥
+                        if ($binaryPacket->packetLength == 6) {
+                            if ($binaryPacket->data[$binaryPacket->packetLength - 1] == 4) {
+                                $data = getString(array_merge(getMysqlPackSize(1), [3, 2]));
                                 $this->send($data);
                             }
-                            $send = false;
-                            //EOF Packet
-                        } elseif ($binaryPacket->data[4] == 0xfe) {
-                            $mm = new MySQLMessage($binaryPacket->data);
-                            $mm->move(5);
-                            $pluginName = $mm->readStringWithNull();
-                            $this->salt = $mm->readBytesWithNull();
-                            $password = $this->processAuth($pluginName ?: 'mysql_native_password');
-                            $this->send(getString(array_merge(getMysqlPackSize(count($password)), [3], $password)));
-                            $send = false;
-                            //未授权
-                        } elseif (!$this->auth) {
-                            $handshakePacket = (new HandshakePacket())->read($binaryPacket);
-                            $this->mysqlServer = $handshakePacket;
-                            $this->salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
-                            $password = $this->processAuth($handshakePacket->pluginName);
-                            $clientFlag = Capabilities::CLIENT_CAPABILITIES;
-                            $authPacket = new AuthPacket();
-                            $authPacket->pluginName = $handshakePacket->pluginName;
-                            $authPacket->packetId = 1;
-                            if (isset($this->database) && $this->database) {
-                                $authPacket->database = $this->database;
-                            } else {
-                                $authPacket->database = 0;
-                            }
-                            if ($authPacket->database) {
-                                $clientFlag |= Capabilities::CLIENT_CONNECT_WITH_DB;
-                            }
-                            if (version_compare($handshakePacket->serverVersion, '5.0', '>=')) {
-                                $clientFlag |= Capabilities::CLIENT_MULTI_RESULTS;
-                            }
-                            $authPacket->clientFlags = $clientFlag;
-                            $authPacket->serverCapabilities = $handshakePacket->serverCapabilities;
-                            $authPacket->maxPacketSize =
-                                CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777215;
-                            $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf8mb4');
-                            $authPacket->user = $this->account['user'];
-                            $authPacket->password = $password;
-                            $this->auth = true;
-                            $this->send(getString($authPacket->write()));
-                            $send = false;
+                        } else {
+                            $this->serverPublicKey = substr($data, 5, strlen($data) - 2);
+                            $encryptData = SecurityUtil::sha2RsaEncrypt($this->account['password'], $this->salt, $this->serverPublicKey);
+                            $data = getString(array_merge(getMysqlPackSize(strlen($encryptData)), [5])) . $encryptData;
+                            $this->send($data);
                         }
-                    }
-                    if ($send && $this->server->exist($fd)) {
-                        $this->server->send($fd, $data);
+                        $send = false;
+                        //EOF Packet
+                    } elseif ($binaryPacket->data[4] == 0xfe) {
+                        $mm = new MySQLMessage($binaryPacket->data);
+                        $mm->move(5);
+                        $pluginName = $mm->readStringWithNull();
+                        $this->salt = $mm->readBytesWithNull();
+                        $password = $this->processAuth($pluginName ?: 'mysql_native_password');
+                        $this->send(getString(array_merge(getMysqlPackSize(count($password)), [3], $password)));
+                        $send = false;
+                        //未授权
+                    } elseif (!$this->auth) {
+                        $handshakePacket = (new HandshakePacket())->read($binaryPacket);
+                        $this->mysqlServer = $handshakePacket;
+                        $this->salt = array_merge($handshakePacket->seed, $handshakePacket->restOfScrambleBuff);
+                        $password = $this->processAuth($handshakePacket->pluginName);
+                        $clientFlag = Capabilities::CLIENT_CAPABILITIES;
+                        $authPacket = new AuthPacket();
+                        $authPacket->pluginName = $handshakePacket->pluginName;
+                        $authPacket->packetId = 1;
+                        if (isset($this->database) && $this->database) {
+                            $authPacket->database = $this->database;
+                        } else {
+                            $authPacket->database = 0;
+                        }
+                        if ($authPacket->database) {
+                            $clientFlag |= Capabilities::CLIENT_CONNECT_WITH_DB;
+                        }
+                        if (version_compare($handshakePacket->serverVersion, '5.0', '>=')) {
+                            $clientFlag |= Capabilities::CLIENT_MULTI_RESULTS;
+                        }
+                        $authPacket->clientFlags = $clientFlag;
+                        $authPacket->serverCapabilities = $handshakePacket->serverCapabilities;
+                        $authPacket->maxPacketSize =
+                            CONFIG['server']['swoole_client_setting']['package_max_length'] ?? 16777215;
+                        $authPacket->charsetIndex = CharsetUtil::getIndex($this->charset ?? 'utf8mb4');
+                        $authPacket->user = $this->account['user'];
+                        $authPacket->password = $password;
+                        $this->auth = true;
+                        $this->send(getString($authPacket->write()));
+                        $send = false;
                     }
                 }
-            });
-        }
+                if ($send && $this->server->exist($fd)) {
+                    $this->server->send($fd, $data);
+                }
+            }
+        });
     }
 
     /**
@@ -263,18 +253,19 @@ class MysqlProxy extends MysqlClient
     /**
      * @param $new_recv
      * @param $remain
+     *
      * @return bool|string
      */
     private function parsePkg($new_recv, &$remain)
     {
         $remain .= $new_recv;
-        $data_len= strlen($remain);
+        $data_len = strlen($remain);
         if ($data_len <= 3) {
             return '';
         }
         $last_pkg_end = -1;
 
-        for ($i = 0; $i + 2 < $data_len; ) {
+        for ($i = 0; $i + 2 < $data_len;) {
             $payload_length =
                 ord($remain[$i]) |
                 (ord($remain[$i + 1]) << 8) |
@@ -310,17 +301,6 @@ class MysqlProxy extends MysqlClient
         if ($this->isDuplex) {
             $client = $this->client;
             $data = $client->recv(-1);
-            if ($data === '' || $data === false) {
-                $this->onClientClose($client);
-            } elseif (is_string($data)) {
-                $send = $this->parsePkg($data, $remain);
-                if ($send) {
-                    $this->onClientReceive($client, $send);
-                } else if ($send === false) {
-                    $system_log = Log::getLogger('system');
-                    $system_log->error('pkg parse error');
-                }
-            }
         } else {
             $client = self::coPop($this->mysqlClient, $this->timeout);
             if ($client === false) {
@@ -339,15 +319,17 @@ class MysqlProxy extends MysqlClient
             }
             if ($data === '' || $data === false) {
                 $this->mysqlClient->close();
-                $this->onClientClose($client);
-            } elseif (is_string($data)) {
-                $send = $this->parsePkg($data, $remain);
-                if ($send) {
-                    $this->onClientReceive($client, $send);
-                } else if ($send === false) {
-                    $system_log = Log::getLogger('system');
-                    $system_log->error('pkg parse error');
-                }
+            }
+        }
+        if ($data === '' || $data === false) {
+            $this->onClientClose($client);
+        } elseif (is_string($data)) {
+            $send = $this->parsePkg($data, $remain);
+            if ($send) {
+                $this->onClientReceive($client, $send);
+            } else if ($send === false) {
+                $system_log = Log::getLogger('system');
+                $system_log->error('pkg parse error');
             }
         }
         return $data;
