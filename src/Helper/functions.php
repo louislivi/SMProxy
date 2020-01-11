@@ -301,55 +301,26 @@ function smproxy_error($message, $exitCode = 0)
 }
 
 /**
- * 处理粘包问题.
- *
- * @param string $data
- * @param bool $auth
- * @param int $headerLength 认证通过的客户端包为 4 ，未通过为 3
- * @param string $halfPack 半包体
+ * 获取包长配置
  *
  * @return array
  */
-function packageSplit(string $data, bool $auth = true, int $headerLength = 3, string &$halfPack = '')
+function packageLengthSetting()
 {
-    if ($halfPack !== '') {
-        $data = $halfPack . $data;
-    }
-    $dataLen = strlen($data);
-    if ($headerLength == 3) {
-        $dataLen -= 1;
-    }
-    if ($dataLen < 4) {
-        return [];
-    }
-    $packageLen = getPackageLength($data, 0, $headerLength);
-    if ($dataLen == $packageLen) {
-        $halfPack = '';
-        return [$data];
-    } elseif ($dataLen < $packageLen) {
-        $halfPack = $data;
-        return [];
-    } else {
-        $halfPack = '';
-    }
-    $packages = [];
-    $split = function ($data, &$packages, $step = 0) use (&$split, $headerLength) {
-        if (isset($data[$step]) && 0 != ord($data[$step])) {
-            $packageLength = getPackageLength($data, $step, $headerLength);
-            $packages[] = substr($data, $step, $packageLength);
-            $split($data, $packages, $step + $packageLength);
+    $package_length_func = function ($data) {
+        if (strlen($data) < 4) {
+            return 0;
         }
+        $length = ord($data[0]) | (ord($data[1]) << 8) | (ord($data[2]) << 16);
+        if ($length <= 0) {
+            return -1;
+        }
+        return $length + 4;
     };
-    if ($auth) {
-        $split($data, $packages);
-    } else {
-        $packageLength = getPackageLength($data, 0, 3) + 1;
-        $packages[] = substr($data, 0, $packageLength);
-        if (isset($data[$packageLength]) && 0 != ord($data[$packageLength])) {
-            $split($data, $packages, $packageLength);
-        }
-    }
-    return $packages;
+    return [
+        'open_length_check'   => true,
+        'package_length_func' => $package_length_func,
+    ];
 }
 
 /**

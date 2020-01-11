@@ -8,6 +8,8 @@
 namespace SMProxy\Command;
 
 use SMProxy\Base;
+use SMProxy\MysqlPacket\SMProxyPacket;
+use function SMProxy\Helper\getString;
 use function SMProxy\Helper\initConfig;
 use function SMProxy\Helper\smproxy_error;
 use SMProxy\MysqlPool\MySQLException;
@@ -168,7 +170,7 @@ class ServerCommand extends Base
                 $serverClient = new Coroutine\Client(SWOOLE_SOCK_TCP);
                 $serverClient->connect(CONFIG['server']['host'], CONFIG['server']['port'], 0.5);
                 $serverClient->recv();
-                $serverClient->send("status");
+                $serverClient->send(getString([7, 0, 0, 0, SMProxyPacket::$SMPROXY, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73]));
                 $result = '';
                 while ($nowData = $serverClient->recv()) {
                     $result .= $nowData;

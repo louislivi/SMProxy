@@ -3,6 +3,7 @@
 namespace SMProxy;
 
 use SMProxy\Helper\ProcessHelper;
+use function SMProxy\Helper\packageLengthSetting;
 use function SMProxy\Helper\smproxy_error;
 use SMProxy\Log\Log;
 use Swoole\Coroutine;
@@ -58,6 +59,7 @@ abstract class BaseServer extends Base
             $this->server->on('start', [$this, 'onStart']);
             $this->server->on('WorkerStart', [$this, 'onWorkerStart']);
             $this->server->on('ManagerStart', [$this, 'onManagerStart']);
+            $this->server->set(packageLengthSetting());
             $result = $this->server->start();
             if ($result) {
                 smproxy_error('WARNING: Server is shutdown!');

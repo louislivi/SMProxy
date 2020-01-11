@@ -4,13 +4,13 @@ namespace SMProxy;
 
 use SMProxy\Handler\Frontend\FrontendAuthenticator;
 use SMProxy\Handler\Frontend\FrontendConnection;
+use SMProxy\MysqlPacket\SMProxyPacket;
 use function SMProxy\Helper\array_copy;
 use function SMProxy\Helper\getBytes;
 use function SMProxy\Helper\getMysqlPackSize;
 use function SMProxy\Helper\getPackageLength;
 use function SMProxy\Helper\getString;
 use function SMProxy\Helper\initConfig;
-use function SMProxy\Helper\packageSplit;
 use SMProxy\Helper\ProcessHelper;
 use SMProxy\Log\Log;
 use SMProxy\MysqlPacket\AuthPacket;
@@ -91,73 +91,69 @@ class SMProxyServer extends BaseServer
             if (!isset($this->halfPack[$fd])) {
                 $this->halfPack[$fd] = '';
             }
-            if ($this->source[$fd]->auth) {
-                $headerLength = 4;
-            } else {
-                $headerLength = 3;
+            if (!$data) {
+                return;
             }
-            $packages = packageSplit($data, $this->source[$fd]->auth ?: false, $headerLength, $this->halfPack[$fd]);
-            if (empty($packages)) {
-                switch ($data) {
-                    //获取服务状态信息
-                    case "status":
-                        $statusData = [];
-                        foreach ($this->mysqlServer as $key => $row) {
-                            $statusData[$key] = $row;
-                        }
-                        $server->send($fd, base64_encode(json_encode($statusData)));
-                        unset($statusData);
-                        break;
+            self::go(function () use ($server, $fd, $reactor_id, $data) {
+                $bin = (new MySqlPacketDecoder())->decode($data);
+                // 处理SMProxy 命令
+                if ($bin->data[4] == SMProxyPacket::$SMPROXY) {
+                    $command = substr($data, 5);
+                    switch ($command) {
+                        //获取服务状态信息
+                        case "status":
+                            $statusData = [];
+                            foreach ($this->mysqlServer as $key => $row) {
+                                $statusData[$key] = $row;
+                            }
+                            $server->send($fd, base64_encode(json_encode($statusData)));
+                            unset($statusData);
+                            break;
+                    }
+                    return;
                 }
-            }
-            //分包解析
-            foreach ($packages as $package) {
-                $data = $package;
-                self::go(function () use ($server, $fd, $reactor_id, $data) {
-                    $bin = (new MySqlPacketDecoder())->decode($data);
-                    if (!$this->source[$fd]->auth) {
-                        $this->auth($bin, $server, $fd);
+                if (!$this->source[$fd]->auth) {
+                    $this->auth($bin, $server, $fd);
+                } else {
+                    $this->query($bin, $data, $fd);
+                    if (isset($this->connectReadState[$fd]) && true === $this->connectReadState[$fd]) {
+                        $model = 'read';
                     } else {
-                        $this->query($bin, $data, $fd);
-                        if (isset($this->connectReadState[$fd]) && true === $this->connectReadState[$fd]) {
-                            $model = 'read';
-                        } else {
-                            $model = 'write';
-                        }
-                        $key = $this ->compareModel($model, $server, $fd);
-                        if ($data) {
-                            if (isset($this->mysqlClient[$fd][$key])) {
-                                $this->mysqlClient[$fd][$key]->send($data);
-                            } else {
-                                $client = MySQLPool::fetch($key, $server, $fd);
-                                $result = $client->send($data);
-                                if ($result) {
-                                    $this->mysqlClient[$fd][$key] = $client;
-                                }
-                            }
-                        }
-                        //预处理语句id记录
+                        $model = 'write';
+                    }
+                    $key = $this->compareModel($model, $server, $fd);
+                    if ($data) {
                         if (isset($this->mysqlClient[$fd][$key])) {
-                            $clientId = spl_object_hash($this->mysqlClient[$fd][$key]);
-                            switch ($bin ->data[4]) {
-                                case MysqlPacket::$COM_STMT_PREPARE:
-                                    if (isset($this->stmtId[$clientId])) {
-                                        $this->stmtId[$clientId]++;
-                                    } else {
-                                        $this->stmtId[$clientId] = 1;
-                                    }
-                                    $this->stmtPrepare[$clientId][$this->stmtId[$clientId]] = $this->stmtId[$clientId];
-                                    break;
-                                case MySQLPacket::$COM_STMT_CLOSE:
-                                    $closeStmtId = getPackageLength($data, 5, 4) - 4;
-                                    unset($this->stmtPrepare[$clientId][$closeStmtId]);
-                                    break;
+                            $this->mysqlClient[$fd][$key]->send($data);
+                        } else {
+                            $client = MySQLPool::fetch($key, $server, $fd);
+                            $result = $client->send($data);
+                            if ($result) {
+                                $this->mysqlClient[$fd][$key] = $client;
                             }
-                            unset($clientId);
                         }
                     }
-                });
-            }
+                    //预处理语句id记录
+                    if (isset($this->mysqlClient[$fd][$key])) {
+                        $clientId = spl_object_hash($this->mysqlClient[$fd][$key]);
+                        switch ($bin->data[4]) {
+                            case MysqlPacket::$COM_STMT_PREPARE:
+                                if (isset($this->stmtId[$clientId])) {
+                                    $this->stmtId[$clientId]++;
+                                } else {
+                                    $this->stmtId[$clientId] = 1;
+                                }
+                                $this->stmtPrepare[$clientId][$this->stmtId[$clientId]] = $this->stmtId[$clientId];
+                                break;
+                            case MySQLPacket::$COM_STMT_CLOSE:
+                                $closeStmtId = getPackageLength($data, 5, 4) - 4;
+                                unset($this->stmtPrepare[$clientId][$closeStmtId]);
+                                break;
+                        }
+                        unset($clientId);
+                    }
+                }
+            });
         });
     }
 
@@ -165,7 +161,7 @@ class SMProxyServer extends BaseServer
      * 客户端断开连接.
      *
      * @param \swoole_server $server
-     * @param int            $fd
+     * @param int $fd
      *
      */
     public function onClose(\swoole_server $server, int $fd)
@@ -177,7 +173,7 @@ class SMProxyServer extends BaseServer
             unset($this->halfPack[$fd]);
         }
         $connectHasTransaction = false;
-        $connectHasAutoCommit  = false;
+        $connectHasAutoCommit = false;
         if (isset($this->connectHasTransaction[$fd]) && true === $this->connectHasTransaction[$fd]) {
             //回滚未关闭事务
             $connectHasTransaction = true;
@@ -192,7 +188,7 @@ class SMProxyServer extends BaseServer
             foreach ($this->mysqlClient[$fd] as $key => $mysqlClient) {
                 $model = explode(DB_DELIMITER, $key)[0];
                 if ($model == 'write') {
-                    if (isset($mysqlClient ->client) && $mysqlClient ->client) {
+                    if (isset($mysqlClient->client) && $mysqlClient->client) {
                         if ($connectHasTransaction) {
                             $mysqlClient->send(getString([9, 0, 0, 0, 3, 82, 79, 76, 76, 66, 65, 67, 75]));
                         }
@@ -245,20 +241,20 @@ class SMProxyServer extends BaseServer
                 MySQLPool::init($this->dbConfig, $this->mysqlServer);
             } catch (MySQLException $exception) {
                 self::writeErrorMessage($exception, 'mysql');
-                $server ->shutdown();
+                $server->shutdown();
                 return;
             } catch (SMProxyException $exception) {
                 self::writeErrorMessage($exception, 'system');
-                $server ->shutdown();
+                $server->shutdown();
                 return;
             }
             if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
                 try {
                     Coroutine::sleep(0.1);
-                    $this ->setStartConns();
+                    $this->setStartConns();
                 } catch (MySQLException $exception) {
                     self::writeErrorMessage($exception, 'mysql');
-                    $server ->shutdown();
+                    $server->shutdown();
                     return;
                 }
                 $system_log = Log::getLogger('system');
@@ -301,8 +297,8 @@ class SMProxyServer extends BaseServer
                     'password' => CONFIG['server']['password'],
                     'database' => explode(DB_DELIMITER, $key)[1],
                 ]);
-                if ($mysql ->connect_errno) {
-                    throw new MySQLException(CONFIG['server']['host'] . ':' . CONFIG['server']['port'] . $mysql ->connect_error);
+                if ($mysql->connect_errno) {
+                    throw new MySQLException(CONFIG['server']['host'] . ':' . CONFIG['server']['port'] . $mysql->connect_error);
                 }
                 $mysql->setDefer();
                 switch (explode(DB_DELIMITER, $key)[0]) {
@@ -319,8 +315,8 @@ class SMProxyServer extends BaseServer
         }
         foreach ($clients as $client) {
             $client->recv();
-            if ($client ->errno) {
-                throw new MySQLException($client ->error);
+            if ($client->errno) {
+                throw new MySQLException($client->error);
             }
             $client->close();
         }
@@ -356,7 +352,7 @@ class SMProxyServer extends BaseServer
     private function accessDenied(\swoole_server $server, int $fd, int $serverId)
     {
         $message = 'SMProxy@access denied for user \'' . $this->source[$fd]->user . '\'@\'' .
-            $server ->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
+            $server->getClientInfo($fd)['remote_ip'] . '\' (using password: YES)';
         $errMessage = self::writeErrMessage($serverId, $message, ErrorCode::ER_ACCESS_DENIED_ERROR, 28000);
         if ($server->exist($fd)) {
             $server->send($fd, getString($errMessage));
@@ -449,7 +445,7 @@ class SMProxyServer extends BaseServer
         if ($bin->data[0] == 20) {
             $checkAccount = $this->checkAccount($server, $fd, $this->source[$fd]->user, array_copy($bin->data, 4, 20));
             if (!$checkAccount) {
-                $this ->accessDenied($server, $fd, 4);
+                $this->accessDenied($server, $fd, 4);
             } else {
                 if ($server->exist($fd)) {
                     $server->send($fd, getString(OkPacket::$SWITCH_AUTH_OK));
@@ -466,9 +462,9 @@ class SMProxyServer extends BaseServer
             $checkAccount = $this->checkAccount($server, $fd, $authPacket->user ?? '', $authPacket->password ?? []);
             if (!$checkAccount) {
                 if ($authPacket->pluginName == 'mysql_native_password') {
-                    $this ->accessDenied($server, $fd, 2);
+                    $this->accessDenied($server, $fd, 2);
                 } else {
-                    $this->source[$fd]->user = $authPacket ->user;
+                    $this->source[$fd]->user = $authPacket->user;
                     $this->source[$fd]->database = $authPacket->database;
                     $this->source[$fd]->seed = RandomUtil::randomBytes(20);
                     $authSwitchRequest = array_merge(
@@ -504,7 +500,7 @@ class SMProxyServer extends BaseServer
     private function query(BinaryPacket $bin, string &$data, int $fd)
     {
         $trim_data = rtrim($data);
-        $data_len  = strlen($trim_data);
+        $data_len = strlen($trim_data);
         switch ($bin->data[4]) {
             case MySQLPacket::$COM_INIT_DB:
                 // just init the frontend
@@ -513,7 +509,7 @@ class SMProxyServer extends BaseServer
             case MySQLPacket::$COM_QUERY:
                 $connection = new FrontendConnection();
                 $queryType = $connection->query($bin);
-                $hintArr   = RouteService::route(substr($data, 5, strlen($data) - 5));
+                $hintArr = RouteService::route(substr($data, 5, strlen($data) - 5));
                 if (isset($hintArr['db_type'])) {
                     switch ($hintArr['db_type']) {
                         case 'read':
@@ -545,7 +541,7 @@ class SMProxyServer extends BaseServer
                     if (!isset($this->connectHasTransaction[$fd]) ||
                         !$this->connectHasTransaction[$fd]) {
                         if ($data_len > 6 && (('u' == $trim_data[$data_len - 6] || 'U' == $trim_data[$data_len - 6]) &&
-                            ServerParse::UPDATE == ServerParse::uCheck($trim_data, $data_len - 6, false))) {
+                                ServerParse::UPDATE == ServerParse::uCheck($trim_data, $data_len - 6, false))) {
                             //判断悲观锁
                             $this->connectReadState[$fd] = false;
                         } else {
