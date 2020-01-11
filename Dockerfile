@@ -1,6 +1,6 @@
 FROM php:7.2.13-cli-alpine
 
-ENV SMProxy_VERSION 1.3.0
+ENV SMProxy_VERSION 1.3.1
 
 RUN apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS linux-headers \
     && pecl install swoole \
