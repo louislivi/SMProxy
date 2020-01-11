@@ -233,33 +233,33 @@ class SMProxyServer extends BaseServer
             if ($worker_id >= CONFIG['server']['swoole']['worker_num']) {
                 ProcessHelper::setProcessTitle('SMProxy task    process');
             } else {
-                ProcessHelper::setProcessTitle('SMProxy worker  process');
-            }
-            try {
-                $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
-                //初始化链接
-                MySQLPool::init($this->dbConfig, $this->mysqlServer);
-            } catch (MySQLException $exception) {
-                self::writeErrorMessage($exception, 'mysql');
-                $server->shutdown();
-                return;
-            } catch (SMProxyException $exception) {
-                self::writeErrorMessage($exception, 'system');
-                $server->shutdown();
-                return;
-            }
-            if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1)) {
+                ProcessHelper::setProcessTitle('SMProxy worker-' . $worker_id . '  process');
                 try {
-                    Coroutine::sleep(0.1);
-                    $this->setStartConns();
+                    $this->dbConfig = $this->parseDbConfig(initConfig(CONFIG_PATH));
+                    //初始化链接
+                    MySQLPool::init($this->dbConfig, $this->mysqlServer);
                 } catch (MySQLException $exception) {
                     self::writeErrorMessage($exception, 'mysql');
                     $server->shutdown();
                     return;
+                } catch (SMProxyException $exception) {
+                    self::writeErrorMessage($exception, 'system');
+                    $server->shutdown();
+                    return;
                 }
-                $system_log = Log::getLogger('system');
-                $system_log->info('Worker started!');
-                echo 'Worker started!', PHP_EOL;
+                if ($worker_id === (CONFIG['server']['swoole']['worker_num'] - 1) && count($this->mysqlServer) === 0) {
+                    try {
+                        Coroutine::sleep(0.1);
+                        $this->setStartConns();
+                    } catch (MySQLException $exception) {
+                        self::writeErrorMessage($exception, 'mysql');
+                        $server->shutdown();
+                        return;
+                    }
+                    $system_log = Log::getLogger('system');
+                    $system_log->info('Worker started!');
+                    echo 'Worker started!', PHP_EOL;
+                }
             }
         });
     }
