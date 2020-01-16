@@ -239,7 +239,19 @@ Options:
     // 端口
     'hostport' => 'server.json中配置的port',
     ```
+
+- WordPress
+    - 除了配置数据库信息完成后还需要修改`wp-includes/wp-db.php`中的
+    ```php
+    mysqli_real_connect( $this->dbh, $host, $this->dbuser, $this->dbpassword, null, $port, $socket, $client_flags );
+    ```
+    改为
+    ```php
+    mysqli_real_connect( $this->dbh, $host, $this->dbuser, $this->dbpassword, $this->dbname, $port, $socket, $client_flags );
+    ```
+
 > - 其他框架以此类推，只需要配置代码中连接数据库的`host`，`port`，`user`，`password`与 `SMProxy`中`server.json`中一致即可。
+> - 切记连接数据库时一定要设置库信息，例如`mysqli_connect`,`new PDO`需要在连接时就设置库。
 
 ## 路由
 
@@ -259,26 +271,26 @@ Options:
 - `SMProxy1.2.4`及以上可直接使用
 - `SMProxy1.2.4`以下需要做如下兼容处理：
     - `MySQL-8.0`默认使用了安全性更强的`caching_sha2_password`插件，其他版本如果是从`5.x`升级上来的, 可以直接使用所有`MySQL`功能, 如是新建的`MySQL`, 需要进入`MySQL`命令行执行以下操作来兼容:
-    
+
     ```sql
     ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
     flush privileges;
     ```
     将语句中的 `'root'@'%'` 替换成你所使用的用户, `password` 替换成其密码.
-    
+
     如仍无法使用, 应在my.cnf中设置 `default_authentication_plugin = mysql_native_password`
 
 ## 常见问题
-- `SMProxy@access denied for user` 
+- `SMProxy@access denied for user`
     - 请检查`serve.json`中的账号密码与业务代码中配置的是否一致。
     - 数据库`host`请勿配置`localhost`。
-- `SMProxy@Database config dbname write is not exists! ` 
+- `SMProxy@Database config dbname write is not exists! `
     - 请将`database.json`中的`dbname`项改为你的业务数据库名。
 - `Config serverInfo->*->account is not exists! `
     - 请仔细比对`database.json`中`databse->serverInfo->*->*->account`是否在`database->account`下含有相对于的键值对。
-- `Reach max connections! Cann't pending fetch!` 
+- `Reach max connections! Cann't pending fetch!`
     - 适当增加`maxSpareConns`或`maxConns`,或增加`database.json`中的`timeout`项。
-- `Must be connected before sending data!` 
+- `Must be connected before sending data!`
     - 检查`MySQL`是否有外网访问权限。
     - 检查`MySQL`验证插件是否为`mysql_native_password`或`caching_sha2_password`
     - 排查是否有服务冲突，推荐使用`Docker`进行运行排查环境问题。
