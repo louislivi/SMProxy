@@ -253,7 +253,18 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
     'hostport' => 'port' configured in server.json,
     ```
 
+- WordPress
+    - In addition to the configuration database information, you need to modify the `wp-includes/wp-db.php`
+    ```php
+    mysqli_real_connect( $this->dbh, $host, $this->dbuser, $this->dbpassword, null, $port, $socket, $client_flags );
+    ```
+    Changed to
+    ```php
+    mysqli_real_connect( $this->dbh, $host, $this->dbuser, $this->dbpassword, $this->dbname, $port, $socket, $client_flags );
+    ```
+
 > - Other frameworks and so on, only need to configure the code to connect to the database `host`, `port`, `user`, `password` and `SMProxy` in the `server.json`.
+> - Remember to set the library information when connecting to the database, for example `mysqli_connect`,` new PDO` need to set the library when connecting.
 
 ## Route
 
