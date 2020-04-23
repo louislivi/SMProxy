@@ -155,6 +155,12 @@ Options:
 >    - 设置2-5秒最佳。
 > - `databaseName`
 >    - `databaseName`与`数据库别名`的区别在于，`数据库别名`是供链接`SMProxy`时指定的库名，`databaseName`为`SMProxy`链接到`MySQL`的库名。
+>    - `Laravel`框架使用时需要注释`Illuminate/Database/Connectors/ConnectionFactory.php`中的的如下代码避免重复选择数据库导致出现数据库不存在的问题。
+    ```php
+    if (! empty($config['database'])) {
+        $connection->exec("use `{$config['database']}`;");
+    }
+    ```
 > - `重载`
 >    - 使用`重载`后会覆盖原对应参数的值，比如`maxConns`因读写使用频率不同，所以可以将读写设置不同的`maxConns`。
 

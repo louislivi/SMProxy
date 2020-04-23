@@ -167,6 +167,12 @@ The configuration files are located in the `smproxy/conf` directory. The upperca
 >    - Recommended between 2-5 seconds.
 > - `databaseName`
 >    - The difference between `databaseName` and `Database alias` is that `Database alias` is the name of the database specified when linking `SMProxy`, and `databaseName` is the name of the database named `SMProxy` linked to `MySQL`.
+>    - When using the `Laravel` framework, you need to comment the following code in` Illuminate/Database /Connectors/ConnectionFactory.php` to avoid the problem of database non-existence caused by repeated database selection.
+    ```php
+    if (! empty($config['database'])) {
+        $connection->exec("use `{$config['database']}`;");
+    }
+    ```
 > - `OVERRIDE`
 >    - After using `OVERRIDE`, it will overwrite the value of the original corresponding parameter. For example, `maxConns` has different reading and writing frequency, so you can set the `maxConns` with different reading and writing.
 
