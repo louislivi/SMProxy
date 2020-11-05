@@ -241,7 +241,7 @@ class Log extends AbstractLogger
      */
     private function coWrite(string $logFile, string $messageText)
     {
-        go(function () use ($logFile, $messageText) {
+        \Swoole\Coroutine::create(function () use ($logFile, $messageText) {
             $res = Coroutine::writeFile($logFile, $messageText, FILE_APPEND);
             if ($res === false) {
                 throw new \InvalidArgumentException("Unable to append to log file: {$this->logFile}");

@@ -27,7 +27,7 @@ class Base extends Context
         } else {
             $pool = false;
         }
-        go(function () use ($function, $pool) {
+        \Swoole\Coroutine::create(function () use ($function, $pool) {
             try {
                 if ($pool) {
                     self::$pool[\Swoole\Coroutine::getuid()] = $pool;
