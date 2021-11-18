@@ -29,13 +29,22 @@ class FrontendAuthenticator
         $this->seed = array_merge($rand1, $rand2);
         $hs = new HandshakePacket();
         $hs->packetId = 0;
+        // 以下根据握手报文
+        // 协议版本号
         $hs->protocolVersion = Versions::PROTOCOL_VERSION;
+        // 服务器版本号信息
         $hs->serverVersion   = Versions::SERVER_VERSION;
+        // 服务器线程
         $hs->threadId = $server_id;
+        // 随机数
         $hs->seed = $rand1;
+        // 填充值，服务器权能标识,
         $hs->serverCapabilities = $this->getServerCapabilities();
+        // 字符编码
         $hs->serverCharsetIndex = (CharsetUtil::getIndex(CONFIG['server']['charset'] ?? 'utf8mb4') & 0xff);
+        // 服务器状态
         $hs->serverStatus = 2;
+        // 服务器权能标识+填充值
         $hs->restOfScrambleBuff = $rand2;
 
         return getString($hs->write());

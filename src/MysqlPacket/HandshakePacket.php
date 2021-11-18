@@ -54,22 +54,34 @@ class HandshakePacket extends MySQLPacket
     {
         // default init 256,so it can avoid buff extract
         $buffer = [];
+        // 写入消息头长度
         BufferUtil::writeUB3($buffer, $this->calcPacketSize());
+        // 写入序号 -- 消息头的
         $buffer[] = $this->packetId;
+        // 写入协议版本号
         $buffer[] = $this->protocolVersion;
+        // 写入服务器版本信息
         BufferUtil::writeWithNull($buffer, getBytes($this->serverVersion));
+        // 写入服务器线程ID
         BufferUtil::writeUB4($buffer, $this->threadId);
+        // 挑战随机数 9个字节 包含一个填充值
         BufferUtil::writeWithNull($buffer, $this->seed);
+        // 服务器权能标识
         BufferUtil::writeUB2($buffer, $this->serverCapabilities);
+        // 1字节 字符编码
         $buffer[] = $this->serverCharsetIndex;
         BufferUtil::writeUB2($buffer, $this->serverStatus);
         if ($this ->serverCapabilities & Capabilities::CLIENT_PLUGIN_AUTH) {
+            // 服务器权能标志 16位
             BufferUtil::writeUB2($buffer, $this->serverCapabilities);
+            // 挑战长度+填充值+挑战随机数
             $buffer[] = max(13, count($this->seed) + count($this->restOfScrambleBuff) + 1);
             $buffer = array_merge($buffer, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         } else {
+            // 10字节填充数
             $buffer = array_merge($buffer, self::$FILLER_13);
         }
+        // +12字节挑战随机数
         if ($this ->serverCapabilities & Capabilities::CLIENT_SECURE_CONNECTION) {
             BufferUtil::writeWithNull($buffer, $this->restOfScrambleBuff);
         }
