@@ -56,7 +56,6 @@ PHP 没有连接池，所以高并发时数据库会出现连接打满的情况�
 
 ## 开发与讨论
 - 文档：<https://smproxy.louislivi.com>
-    - 若被墙请访问：<https://smproxy.gitee.louislivi.com>
 - QQ群：722124111
 - 欢迎各类 Issue 和 Pull Request。
 
